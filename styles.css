@@ -746,6 +746,29 @@ a { text-decoration: none; color: inherit; }
     transform: translateX(4px);
 }
 .sede-link i { font-size: 0.95rem; }
+.sede-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+}
+.sede-link-ig {
+    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    color: var(--color-white);
+    font-size: 0.78rem;
+}
+.sede-link-ig:hover {
+    background: linear-gradient(45deg, #bc1888, #cc2366, #dc2743, #e6683c, #f09433);
+    color: var(--color-white);
+}
+.sede-link-wa {
+    background: #25D366;
+    color: var(--color-white);
+}
+.sede-link-wa:hover {
+    background: #1da851;
+    color: var(--color-white);
+}
 
 /* ===== Mapa Sede Principal ===== */
 .sede-map-wrap {
