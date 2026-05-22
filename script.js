@@ -85,7 +85,7 @@ document.querySelectorAll('.nav-menu a').forEach(link => {
 });
 
 // Reveal on scroll
-const reveals = document.querySelectorAll('.historia-text, .historia-img, .dish, .sede-card, .exp-text, .exp-img');
+const reveals = document.querySelectorAll('.historia-text, .historia-img, .dish, .sede-card, .exp-text, .exp-img, .news-card');
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {

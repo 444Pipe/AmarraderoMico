@@ -623,6 +623,130 @@ a { text-decoration: none; color: inherit; }
     font-size: 1.1rem;
 }
 
+/* ============= NOTICIAS / PRENSA ============= */
+.noticias {
+    padding: 120px 30px;
+    background: var(--color-cream);
+    position: relative;
+}
+.noticias-header {
+    text-align: center;
+    max-width: 720px;
+    margin: 0 auto 60px;
+}
+.noticias-header h2 {
+    font-size: clamp(2.2rem, 3.8vw, 3.4rem);
+    margin-bottom: 16px;
+}
+.noticias-header p {
+    color: var(--color-text-soft);
+    font-size: 1.05rem;
+}
+
+.noticias-grid {
+    max-width: 1300px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+}
+
+.news-card {
+    background: var(--color-white);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition);
+}
+.news-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-strong);
+}
+.news-link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: inherit;
+}
+.news-img {
+    position: relative;
+    height: 220px;
+    overflow: hidden;
+}
+.news-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s;
+}
+.news-card:hover .news-img img { transform: scale(1.08); }
+.news-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--color-gold-bright);
+    color: var(--color-brown-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+}
+.news-body {
+    padding: 24px 26px 28px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+.news-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+.news-source {
+    color: var(--color-rust);
+    font-weight: 700;
+}
+.news-date {
+    color: var(--color-text-soft);
+    font-weight: 500;
+}
+.news-body h3 {
+    font-size: 1.25rem;
+    line-height: 1.3;
+    margin-bottom: 12px;
+    color: var(--color-brown-dark);
+    transition: color 0.3s;
+}
+.news-card:hover .news-body h3 { color: var(--color-rust); }
+.news-body p {
+    color: var(--color-text-soft);
+    font-size: 0.92rem;
+    margin-bottom: 20px;
+    flex: 1;
+}
+.news-read {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-rust);
+    font-weight: 600;
+    font-size: 0.88rem;
+    letter-spacing: 0.5px;
+    align-self: flex-start;
+}
+.news-read i {
+    transition: transform 0.3s;
+}
+.news-card:hover .news-read i { transform: translateX(6px); }
+
 /* ============= SEDES ============= */
 .sedes {
     padding: 120px 30px;
@@ -975,6 +1099,10 @@ a { text-decoration: none; color: inherit; }
     .dish-wide { grid-column: span 2; grid-row: span 1; }
     .dish-large .dish-info h3 { font-size: 1.7rem; }
 
+    .noticias { padding: 90px 28px; }
+    .noticias-header { margin-bottom: 45px; }
+    .noticias-grid { grid-template-columns: repeat(2, 1fr); gap: 22px; }
+
     .sedes { padding: 90px 28px; }
     .sedes-header { margin-bottom: 50px; }
     .sedes-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
@@ -1031,7 +1159,12 @@ a { text-decoration: none; color: inherit; }
 
     .section-tag { font-size: 0.85rem; letter-spacing: 3px; margin-bottom: 14px; }
 
-    .historia, .carta, .sedes, .cta { padding: 70px 20px; }
+    .historia, .carta, .sedes, .cta, .noticias { padding: 70px 20px; }
+    .noticias-grid { grid-template-columns: 1fr; gap: 20px; }
+    .noticias-header { margin-bottom: 36px; }
+    .news-img { height: 200px; }
+    .news-body { padding: 20px 22px 24px; }
+    .news-body h3 { font-size: 1.15rem; }
     .historia-container { gap: 36px; }
     .historia-img img { height: 360px; }
     .historia-badge { bottom: 18px; left: 18px; padding: 14px 22px; }
@@ -1102,7 +1235,11 @@ a { text-decoration: none; color: inherit; }
     .strip-label { font-size: 0.68rem; }
     .strip-stars { font-size: 0.95rem !important; }
 
-    .historia, .carta, .sedes, .cta { padding: 56px 16px; }
+    .historia, .carta, .sedes, .cta, .noticias { padding: 56px 16px; }
+    .news-img { height: 180px; }
+    .news-body { padding: 18px 18px 22px; }
+    .news-body h3 { font-size: 1.05rem; }
+    .news-meta { font-size: 0.7rem; letter-spacing: 1px; }
     .historia-img img { height: 300px; }
     .historia-badge { padding: 10px 16px; bottom: 14px; left: 14px; }
     .historia-badge strong { font-size: 1.5rem; }
