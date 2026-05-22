@@ -60,14 +60,14 @@ a { text-decoration: none; color: inherit; }
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 100;
-    padding: 18px 0;
+    padding: 14px 0;
     transition: var(--transition);
     background: transparent;
 }
 .navbar.scrolled {
     background: rgba(45, 24, 16, 0.95);
     backdrop-filter: blur(12px);
-    padding: 10px 0;
+    padding: 8px 0;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
 }
 .nav-container {
@@ -78,12 +78,17 @@ a { text-decoration: none; color: inherit; }
     align-items: center;
     justify-content: space-between;
 }
-.nav-logo img {
-    height: 70px;
-    transition: var(--transition);
-    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+.nav-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.navbar.scrolled .nav-logo img { height: 55px; }
+.nav-logo img {
+    height: 110px;
+    transition: var(--transition);
+    filter: drop-shadow(0 4px 16px rgba(0,0,0,0.55)) drop-shadow(0 0 24px rgba(0,0,0,0.35));
+}
+.navbar.scrolled .nav-logo img { height: 80px; }
 
 .nav-menu {
     display: flex;
@@ -777,7 +782,8 @@ a { text-decoration: none; color: inherit; }
     .nav-container { padding: 0 24px; }
     .nav-menu { gap: 22px; }
     .nav-menu a { font-size: 0.88rem; }
-    .nav-logo img { height: 60px; }
+    .nav-logo img { height: 90px; }
+    .navbar.scrolled .nav-logo img { height: 68px; }
 
     .hero { min-height: 650px; }
 
@@ -817,8 +823,8 @@ a { text-decoration: none; color: inherit; }
 /* --- Tablets pequeñas / Móviles grandes (768px) --- */
 @media (max-width: 768px) {
     .nav-container { padding: 0 20px; }
-    .nav-logo img { height: 50px; }
-    .navbar.scrolled .nav-logo img { height: 42px; }
+    .nav-logo img { height: 72px; }
+    .navbar.scrolled .nav-logo img { height: 56px; }
     .nav-toggle { display: flex; }
     .nav-menu {
         position: fixed;
@@ -903,9 +909,9 @@ a { text-decoration: none; color: inherit; }
 /* --- Móviles (480px) --- */
 @media (max-width: 480px) {
     .nav-container { padding: 0 16px; }
-    .nav-logo img { height: 44px; }
-    .navbar.scrolled .nav-logo img { height: 38px; }
-    .nav-menu { top: 70px; }
+    .nav-logo img { height: 60px; }
+    .navbar.scrolled .nav-logo img { height: 48px; }
+    .nav-menu { top: 88px; }
 
     .hero { min-height: 520px; }
     .hero-tag { font-size: 0.72rem; letter-spacing: 3px; padding: 5px 14px; }
