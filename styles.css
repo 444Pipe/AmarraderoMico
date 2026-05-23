@@ -34,6 +34,39 @@ body {
 }
 body.loading { overflow: hidden; height: 100vh; }
 
+/* ============= SCROLL PROGRESS BAR ============= */
+.scroll-progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    width: 0%;
+    background: linear-gradient(90deg, var(--color-gold), var(--color-gold-bright), var(--color-rust));
+    z-index: 200;
+    transition: width 0.1s linear;
+    box-shadow: 0 0 10px rgba(230, 184, 92, 0.6);
+}
+
+/* ============= SCROLL REVEAL ============= */
+.reveal {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+.reveal.from-left { transform: translateX(-60px); }
+.reveal.from-right { transform: translateX(60px); }
+.reveal.scale-up { transform: scale(0.9); }
+.reveal.fade-only { transform: none; }
+.reveal.visible {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+}
+.reveal[data-delay="100"].visible { transition-delay: 100ms; }
+.reveal[data-delay="200"].visible { transition-delay: 200ms; }
+.reveal[data-delay="300"].visible { transition-delay: 300ms; }
+.reveal[data-delay="400"].visible { transition-delay: 400ms; }
+.reveal[data-delay="500"].visible { transition-delay: 500ms; }
+
 /* ============= LOADER ============= */
 .loader {
     position: fixed;
@@ -195,6 +228,8 @@ a { text-decoration: none; color: inherit; }
 }
 .nav-menu a:hover { color: var(--color-gold-bright); }
 .nav-menu a:hover::after { width: 100%; }
+.nav-menu a.active { color: var(--color-gold-bright); }
+.nav-menu a.active::after { width: 100%; }
 
 .nav-toggle {
     display: none;
@@ -246,6 +281,7 @@ a { text-decoration: none; color: inherit; }
     max-width: 900px;
     padding: 0 30px;
     animation: fadeUp 1.2s ease-out;
+    will-change: transform, opacity;
 }
 .hero-tag {
     display: inline-block;

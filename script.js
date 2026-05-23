@@ -71,21 +71,103 @@ document.querySelectorAll('.nav-menu a').forEach(link => {
     });
 });
 
-// Reveal on scroll
-const reveals = document.querySelectorAll('.historia-text, .historia-img, .dish, .sede-card, .exp-text, .exp-img, .news-card');
-const observer = new IntersectionObserver((entries) => {
+// ============= SCROLL PROGRESS BAR =============
+const scrollProgress = document.getElementById('scrollProgress');
+let ticking = false;
+const updateScrollProgress = () => {
+    const h = document.documentElement;
+    const scrollTop = h.scrollTop || document.body.scrollTop;
+    const scrollHeight = h.scrollHeight - h.clientHeight;
+    const pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+    if (scrollProgress) scrollProgress.style.width = pct + '%';
+    ticking = false;
+};
+window.addEventListener('scroll', () => {
+    if (!ticking) {
+        requestAnimationFrame(updateScrollProgress);
+        ticking = true;
+    }
+}, { passive: true });
+
+// ============= HERO PARALLAX =============
+const heroSection = document.querySelector('.hero');
+const heroVideoEl = document.querySelector('.hero-video');
+const heroContent = document.querySelector('.hero-content');
+let heroTicking = false;
+const updateHeroParallax = () => {
+    const scrollY = window.scrollY;
+    if (heroSection && scrollY < window.innerHeight) {
+        if (heroVideoEl) heroVideoEl.style.transform = `translateY(${scrollY * 0.35}px)`;
+        if (heroContent) {
+            heroContent.style.transform = `translateY(${scrollY * 0.5}px)`;
+            heroContent.style.opacity = Math.max(0, 1 - scrollY / (window.innerHeight * 0.7));
+        }
+    }
+    heroTicking = false;
+};
+window.addEventListener('scroll', () => {
+    if (!heroTicking) {
+        requestAnimationFrame(updateHeroParallax);
+        heroTicking = true;
+    }
+}, { passive: true });
+
+// ============= SCROLL REVEAL =============
+const revealSelectors = [
+    { sel: '.historia-img', cls: 'from-left' },
+    { sel: '.historia-text', cls: 'from-right' },
+    { sel: '.exp-img', cls: 'from-left' },
+    { sel: '.exp-text', cls: 'from-right' },
+    { sel: '.carta-header', cls: 'fade-only' },
+    { sel: '.sedes-header', cls: 'fade-only' },
+    { sel: '.noticias-header', cls: 'fade-only' },
+    { sel: '.sede-map-text', cls: 'from-left' },
+    { sel: '.sede-map-frame', cls: 'from-right' },
+    { sel: '.cta-content', cls: 'scale-up' },
+];
+revealSelectors.forEach(({ sel, cls }) => {
+    document.querySelectorAll(sel).forEach(el => {
+        el.classList.add('reveal', cls);
+    });
+});
+
+// Grids con stagger (cards aparecen una despues de otra)
+const staggerGrids = [
+    { sel: '.dish', step: 80, max: 5 },
+    { sel: '.sede-card', step: 150, max: 3 },
+    { sel: '.news-card', step: 130, max: 3 },
+    { sel: '.exp-list li', step: 100, max: 4 },
+    { sel: '.strip-item', step: 100, max: 4 },
+];
+staggerGrids.forEach(({ sel, step, max }) => {
+    document.querySelectorAll(sel).forEach((el, i) => {
+        el.classList.add('reveal');
+        el.setAttribute('data-delay', Math.min(i, max) * step);
+    });
+});
+
+const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-            observer.unobserve(entry.target);
+            entry.target.classList.add('visible');
+            revealObserver.unobserve(entry.target);
         }
     });
-}, { threshold: 0.12 });
+}, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
 
-reveals.forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(40px)';
-    el.style.transition = 'opacity 0.9s ease, transform 0.9s ease';
-    observer.observe(el);
-});
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+// ============= NAVBAR ACTIVE LINK ON SCROLL =============
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-menu a');
+const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const id = entry.target.id;
+            navLinks.forEach(link => {
+                link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+            });
+        }
+    });
+}, { threshold: 0.4, rootMargin: '-80px 0px -50% 0px' });
+sections.forEach(s => sectionObserver.observe(s));
