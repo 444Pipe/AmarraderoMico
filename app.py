@@ -1,12 +1,41 @@
 import os
-from flask import Flask, send_from_directory
+import re
+from flask import Flask, send_from_directory, Response
 
 app = Flask(__name__, static_folder='.', static_url_path='')
+
+CLOUDINARY_CLOUD = os.environ.get('CLOUDINARY_CLOUD_NAME', '').strip()
+SITE_URL = os.environ.get('SITE_URL', '').strip().rstrip('/')
+CLOUDINARY_TRANSFORM = os.environ.get('CLOUDINARY_TRANSFORM', 'f_auto,q_auto').strip()
+
+IMG_PATTERN = re.compile(
+    r'(src|href)="(statics/[^"]+\.(?:jpg|jpeg|png|gif|webp|svg))"',
+    re.IGNORECASE,
+)
+
+
+def _cloudinary_url(path: str) -> str:
+    absolute = f"{SITE_URL}/{path}"
+    return (
+        f"https://res.cloudinary.com/{CLOUDINARY_CLOUD}"
+        f"/image/fetch/{CLOUDINARY_TRANSFORM}/{absolute}"
+    )
+
+
+def _render_index() -> str:
+    with open('index.html', 'r', encoding='utf-8') as f:
+        html = f.read()
+    if CLOUDINARY_CLOUD and SITE_URL:
+        html = IMG_PATTERN.sub(
+            lambda m: f'{m.group(1)}="{_cloudinary_url(m.group(2))}"',
+            html,
+        )
+    return html
 
 
 @app.route('/')
 def index():
-    return send_from_directory('.', 'index.html')
+    return Response(_render_index(), mimetype='text/html')
 
 
 @app.route('/statics/<path:filename>')
