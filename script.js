@@ -47,19 +47,6 @@
     setTimeout(hideLoader, 7000); // failsafe
 })();
 
-// Hero video: empieza en el segundo 26 y hace loop desde ahi
-const HERO_START = 26;
-const heroVideo = document.getElementById('heroVideo');
-if (heroVideo) {
-    heroVideo.addEventListener('loadedmetadata', () => {
-        if (heroVideo.currentTime < HERO_START) heroVideo.currentTime = HERO_START;
-    });
-    heroVideo.addEventListener('ended', () => {
-        heroVideo.currentTime = HERO_START;
-        heroVideo.play();
-    });
-}
-
 // Navbar scroll effect
 const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', () => {
