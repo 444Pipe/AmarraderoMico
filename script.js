@@ -212,20 +212,27 @@ function renderCart() {
     const total = subtotal + DELIVERY_CONFIG.deliveryFee;
 
     if (cart.size === 0) {
-        dom.items.innerHTML = '<p class="cart-empty">Aún no has agregado nada. Selecciona platos del menú para empezar.</p>';
+        dom.items.innerHTML = `
+            <div class="cart-empty">
+                <i class="fa-solid fa-utensils"></i>
+                <p>Tu pedido está vacío</p>
+                <small>Selecciona platos del menú para empezar</small>
+            </div>`;
         dom.totals.hidden = true;
     } else {
         dom.totals.hidden = false;
         dom.items.innerHTML = [...cart.values()].map(({ item, qty }) => `
             <div class="cart-item">
-                <div>
+                <img src="${item.img}" alt="${item.name}" class="cart-item-img" loading="lazy">
+                <div class="cart-item-body">
                     <div class="cart-item-name">${item.name}</div>
-                    <div class="cart-item-meta">${formatCOP(item.price)} × ${qty} = <strong>${formatCOP(item.price * qty)}</strong></div>
-                </div>
-                <div class="cart-item-actions">
-                    <button data-dec="${item.id}">−</button>
-                    <span class="cart-item-qty">${qty}</span>
-                    <button data-inc="${item.id}">+</button>
+                    <div class="cart-item-price">${formatCOP(item.price)} <span>c/u</span></div>
+                    <div class="cart-item-actions">
+                        <button class="cart-qty-btn" data-dec="${item.id}" aria-label="Quitar"><i class="fa-solid fa-minus"></i></button>
+                        <span class="cart-item-qty">${qty}</span>
+                        <button class="cart-qty-btn" data-inc="${item.id}" aria-label="Agregar"><i class="fa-solid fa-plus"></i></button>
+                        <span class="cart-item-subtotal">${formatCOP(item.price * qty)}</span>
+                    </div>
                 </div>
             </div>
         `).join('');
@@ -433,15 +440,24 @@ function showMenuView() {
 }
 
 function renderCheckoutSummary() {
-    const lines = [...cart.values()].map(({ item, qty }) =>
-        `<div class="summary-line"><span>${qty}× ${item.name}</span><strong>${formatCOP(item.price * qty)}</strong></div>`
-    ).join('');
+    const itemLines = [...cart.values()].map(({ item, qty }) => `
+        <div class="summary-item">
+            <img src="${item.img}" alt="${item.name}" class="summary-thumb" loading="lazy">
+            <div class="summary-item-info">
+                <div class="summary-item-name">${item.name}</div>
+                <div class="summary-item-meta">${qty} × ${formatCOP(item.price)}</div>
+            </div>
+            <strong class="summary-item-price">${formatCOP(item.price * qty)}</strong>
+        </div>
+    `).join('');
     const subtotal = [...cart.values()].reduce((s, { item, qty }) => s + item.price * qty, 0);
     const total = subtotal + DELIVERY_CONFIG.deliveryFee;
     dom.checkoutSummary.innerHTML = `
-        ${lines}
-        <div class="summary-line"><span>Subtotal</span><strong>${formatCOP(subtotal)}</strong></div>
-        <div class="summary-line"><span>Domicilio</span><strong>${formatCOP(DELIVERY_CONFIG.deliveryFee)}</strong></div>
+        <div class="summary-items">${itemLines}</div>
+        <div class="summary-totals">
+            <div class="summary-line"><span>Subtotal</span><strong>${formatCOP(subtotal)}</strong></div>
+            <div class="summary-line"><span><i class="fa-solid fa-motorcycle"></i> Costo de domicilio</span><strong>${formatCOP(DELIVERY_CONFIG.deliveryFee)}</strong></div>
+        </div>
     `;
     dom.checkoutTotal.textContent = formatCOP(total);
 }
