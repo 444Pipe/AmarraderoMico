@@ -104,6 +104,7 @@ const DELIVERY_CONFIG = {
 };
 
 const cart = new Map(); // id -> { item, qty }
+let pickedLocation = null; // { lat, lng } seleccionado en el mapa
 
 const formatCOP = (n) => '$' + n.toLocaleString('es-CO');
 
@@ -278,6 +279,112 @@ function showCheckoutView() {
     closeCartMobile();
     dom.mobileBar.classList.remove('show');
     renderCheckoutSummary();
+    initMapPicker();
+}
+
+// ============= MAP PICKER (Leaflet + Nominatim) =============
+let leafletMap = null;
+let mapMarker = null;
+const VILLAVO_CENTER = [4.142, -73.626];
+
+function initMapPicker() {
+    if (typeof L === 'undefined') return; // Leaflet aun no cargado
+    const container = document.getElementById('mapContainer');
+    if (!container) return;
+
+    if (!leafletMap) {
+        leafletMap = L.map(container, {
+            center: VILLAVO_CENTER,
+            zoom: 13,
+            scrollWheelZoom: false,
+        });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap',
+        }).addTo(leafletMap);
+
+        // Fix icono por defecto cuando se carga via CDN
+        const DefaultIcon = L.icon({
+            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+            iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41],
+        });
+        L.Marker.prototype.options.icon = DefaultIcon;
+
+        leafletMap.on('click', (e) => setMarker(e.latlng.lat, e.latlng.lng, true));
+
+        const locateBtn = document.getElementById('btnLocate');
+        if (locateBtn) locateBtn.addEventListener('click', useMyLocation);
+    }
+
+    // Llamar invalidateSize despues de que sea visible
+    setTimeout(() => leafletMap.invalidateSize(), 100);
+}
+
+function setMarker(lat, lng, reverseGeocode = false) {
+    pickedLocation = { lat, lng };
+    if (!mapMarker) {
+        mapMarker = L.marker([lat, lng], { draggable: true }).addTo(leafletMap);
+        mapMarker.on('dragend', (e) => {
+            const pos = e.target.getLatLng();
+            setMarker(pos.lat, pos.lng, true);
+        });
+    } else {
+        mapMarker.setLatLng([lat, lng]);
+    }
+    leafletMap.setView([lat, lng], Math.max(leafletMap.getZoom(), 15));
+    updateCoordsDisplay();
+    if (reverseGeocode) reverseLookup(lat, lng);
+}
+
+function updateCoordsDisplay() {
+    const el = document.getElementById('mapCoords');
+    if (!el || !pickedLocation) return;
+    el.textContent = `Ubicación marcada: ${pickedLocation.lat.toFixed(5)}, ${pickedLocation.lng.toFixed(5)}`;
+    el.classList.add('has-pin');
+}
+
+async function reverseLookup(lat, lng) {
+    try {
+        const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=es&zoom=18`);
+        const data = await r.json();
+        const input = document.getElementById('addressInput');
+        if (input && data.display_name && !input.value.trim()) {
+            input.value = data.display_name;
+        }
+    } catch (err) {
+        console.warn('Reverse geocoding falló', err);
+    }
+}
+
+function useMyLocation() {
+    const btn = document.getElementById('btnLocate');
+    if (!navigator.geolocation) {
+        alert('Tu navegador no soporta geolocalización.');
+        return;
+    }
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Detectando...';
+    navigator.geolocation.getCurrentPosition(
+        (pos) => {
+            setMarker(pos.coords.latitude, pos.coords.longitude, true);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-location-arrow"></i> Usar mi ubicación';
+        },
+        (err) => {
+            const msg = err.code === err.PERMISSION_DENIED
+                ? 'Diste permiso? Activa la ubicación en tu navegador.'
+                : 'No pudimos obtener tu ubicación. Tócala manualmente en el mapa.';
+            alert(msg);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-location-arrow"></i> Usar mi ubicación';
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+    );
 }
 function showMenuView() {
     dom.body.style.display = '';
@@ -306,6 +413,10 @@ function buildWhatsappMessage(data) {
     const subtotal = [...cart.values()].reduce((s, { item, qty }) => s + item.price * qty, 0);
     const total = subtotal + DELIVERY_CONFIG.deliveryFee;
 
+    const mapsLink = pickedLocation
+        ? `https://www.google.com/maps?q=${pickedLocation.lat},${pickedLocation.lng}`
+        : null;
+
     return [
         `*🛵 Nuevo pedido a domicilio — ${DELIVERY_CONFIG.branchName}*`,
         '',
@@ -320,6 +431,7 @@ function buildWhatsappMessage(data) {
         `👤 ${data.nombre}`,
         `📞 ${data.telefono}`,
         `📍 ${data.direccion}`,
+        mapsLink ? `🗺️ Ubicación en mapa: ${mapsLink}` : null,
         data.notas ? `📝 ${data.notas}` : null,
     ].filter(Boolean).join('\n');
 }

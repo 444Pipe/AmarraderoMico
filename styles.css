@@ -540,6 +540,79 @@ body.loading { overflow: hidden; height: 100vh; }
 }
 .btn-wa:hover { background: #1da851; color: var(--color-white); }
 
+/* ===== Map picker ===== */
+.map-picker {
+    background: var(--color-cream);
+    border-radius: var(--radius);
+    padding: 18px 18px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.map-picker-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+.map-picker-head h4 {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.98rem;
+    color: var(--color-brown-dark);
+    margin: 0 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.map-picker-head h4 i { color: var(--color-rust); }
+.map-picker-head p {
+    font-size: 0.82rem;
+    color: var(--color-text-soft);
+    margin: 0;
+    line-height: 1.4;
+}
+.btn-locate {
+    background: var(--color-brown-dark);
+    color: var(--color-gold-bright);
+    border: none;
+    padding: 10px 16px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    transition: var(--transition);
+}
+.btn-locate:hover { background: var(--color-rust); color: var(--color-white); }
+.btn-locate:disabled { opacity: 0.6; cursor: not-allowed; }
+.map-container {
+    width: 100%;
+    height: 280px;
+    border-radius: 12px;
+    overflow: hidden;
+    z-index: 0;
+}
+.map-coords {
+    font-size: 0.8rem;
+    color: var(--color-text-soft);
+    text-align: center;
+    margin: 0;
+}
+.map-coords.has-pin {
+    color: var(--color-rust);
+    font-weight: 600;
+}
+.map-coords.has-pin::before {
+    content: '\f3c5';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    margin-right: 6px;
+}
+
 /* --- Tablets pequenas (900px) --- */
 @media (max-width: 900px) {
     .checkout-form { grid-template-columns: 1fr; }
@@ -674,6 +747,11 @@ body.loading { overflow: hidden; height: 100vh; }
     .checkout-form textarea { font-size: 0.95rem; padding: 11px 13px; }
     .checkout-summary { padding: 16px 18px; }
     .btn-wa { padding: 14px 24px; font-size: 0.95rem; }
+
+    .map-picker { padding: 14px; }
+    .map-picker-head { flex-direction: column; gap: 10px; }
+    .btn-locate { align-self: stretch; justify-content: center; }
+    .map-container { height: 240px; }
 }
 
 /* --- Mobile pequeño (480px) --- */

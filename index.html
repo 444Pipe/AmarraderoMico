@@ -13,6 +13,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;900&family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="loading">
@@ -101,8 +103,23 @@
                     </label>
                     <label class="full">
                         <span>Dirección de entrega *</span>
-                        <input type="text" name="direccion" required placeholder="Ej: Calle 12 # 45-67, Barrio La Esperanza">
+                        <input type="text" name="direccion" id="addressInput" required placeholder="Ej: Calle 12 # 45-67, Barrio La Esperanza">
                     </label>
+
+                    <div class="map-picker full">
+                        <div class="map-picker-head">
+                            <div>
+                                <h4><i class="fa-solid fa-location-crosshairs"></i> Pinea tu ubicación exacta</h4>
+                                <p>Arrastra el marcador o toca el mapa donde estás. El repartidor llegará más fácil.</p>
+                            </div>
+                            <button type="button" class="btn-locate" id="btnLocate">
+                                <i class="fa-solid fa-location-arrow"></i> Usar mi ubicación
+                            </button>
+                        </div>
+                        <div class="map-container" id="mapContainer"></div>
+                        <p class="map-coords" id="mapCoords">Aún no has seleccionado ubicación</p>
+                    </div>
+
                     <label class="full">
                         <span>Detalles adicionales</span>
                         <textarea name="notas" rows="3" placeholder="Ej: Apartamento 302, sin cebolla, pagar con $50.000..."></textarea>
