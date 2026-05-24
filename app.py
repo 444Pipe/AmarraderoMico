@@ -7,7 +7,6 @@ app = Flask(__name__, static_folder='.', static_url_path='')
 CLOUDINARY_CLOUD = os.environ.get('CLOUDINARY_CLOUD_NAME', '').strip()
 SITE_URL = os.environ.get('SITE_URL', '').strip().rstrip('/')
 CLOUDINARY_TRANSFORM = os.environ.get('CLOUDINARY_TRANSFORM', 'f_auto,q_auto').strip()
-GOOGLE_MAPS_KEY = os.environ.get('GOOGLE_MAPS_API_KEY', '').strip()
 
 IMG_PATTERN = re.compile(
     r'(src|href)="(statics/[^"]+\.(?:jpg|jpeg|png|gif|webp|svg))"',
@@ -31,7 +30,6 @@ def _render_index() -> str:
             lambda m: f'{m.group(1)}="{_cloudinary_url(m.group(2))}"',
             html,
         )
-    html = html.replace('__GOOGLE_MAPS_KEY__', GOOGLE_MAPS_KEY)
     return html
 
 

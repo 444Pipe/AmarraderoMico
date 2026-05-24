@@ -282,121 +282,123 @@ function showCheckoutView() {
     initMapPicker();
 }
 
-// ============= MAP PICKER (Google Maps + Places) =============
-const VILLAVO_CENTER = { lat: 4.142, lng: -73.626 };
-let gMap = null;
-let gMarker = null;
-let gGeocoder = null;
-let gAutocomplete = null;
-let mapsLoadingPromise = null;
+// ============= MAP PICKER (Leaflet + Nominatim) =============
+let leafletMap = null;
+let mapMarker = null;
+let addressDebounce = null;
+const VILLAVO_CENTER = [4.142, -73.626];
 
-function loadGoogleMaps() {
-    if (window.google?.maps) return Promise.resolve();
-    if (mapsLoadingPromise) return mapsLoadingPromise;
-    const key = window.__GMAPS_KEY__;
-    if (!key || key === '__GOOGLE_MAPS_KEY__') {
-        return Promise.reject(new Error('GOOGLE_MAPS_API_KEY no configurada'));
-    }
-    mapsLoadingPromise = new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places&language=es&region=CO`;
-        script.async = true;
-        script.defer = true;
-        script.onload = resolve;
-        script.onerror = () => reject(new Error('No se pudo cargar Google Maps'));
-        document.head.appendChild(script);
-    });
-    return mapsLoadingPromise;
-}
-
-async function initMapPicker() {
+function initMapPicker() {
+    if (typeof L === 'undefined') return;
     const container = document.getElementById('mapContainer');
-    const coordsEl = document.getElementById('mapCoords');
     if (!container) return;
 
-    try {
-        await loadGoogleMaps();
-    } catch (err) {
-        console.error(err);
-        if (coordsEl) coordsEl.textContent = 'Mapa no disponible. Escribe tu dirección manualmente.';
-        return;
-    }
-
-    if (!gMap) {
-        gMap = new google.maps.Map(container, {
+    if (!leafletMap) {
+        leafletMap = L.map(container, {
             center: VILLAVO_CENTER,
             zoom: 13,
-            mapTypeControl: false,
-            streetViewControl: false,
-            fullscreenControl: false,
-            gestureHandling: 'greedy',
+            scrollWheelZoom: false,
         });
-        gGeocoder = new google.maps.Geocoder();
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap',
+        }).addTo(leafletMap);
 
-        gMap.addListener('click', (e) => setMarker(e.latLng.lat(), e.latLng.lng(), true));
+        const DefaultIcon = L.icon({
+            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+            iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41],
+        });
+        L.Marker.prototype.options.icon = DefaultIcon;
 
-        // Autocomplete en el input de direccion (restringido a Colombia)
-        const input = document.getElementById('addressInput');
-        if (input && google.maps.places?.Autocomplete) {
-            gAutocomplete = new google.maps.places.Autocomplete(input, {
-                componentRestrictions: { country: 'co' },
-                fields: ['formatted_address', 'geometry'],
-            });
-            gAutocomplete.bindTo('bounds', gMap);
-            gAutocomplete.addListener('place_changed', () => {
-                const place = gAutocomplete.getPlace();
-                if (place.geometry?.location) {
-                    const lat = place.geometry.location.lat();
-                    const lng = place.geometry.location.lng();
-                    setMarker(lat, lng, false);
-                    if (place.formatted_address) input.value = place.formatted_address;
-                }
-            });
-        }
+        leafletMap.on('click', (e) => setMarker(e.latlng.lat, e.latlng.lng, true));
 
         const locateBtn = document.getElementById('btnLocate');
         if (locateBtn) locateBtn.addEventListener('click', useMyLocation);
+
+        // Forward geocoding: al escribir la direccion, buscar en mapa
+        const input = document.getElementById('addressInput');
+        if (input) {
+            input.addEventListener('input', () => {
+                clearTimeout(addressDebounce);
+                const val = input.value.trim();
+                if (val.length < 5) return;
+                addressDebounce = setTimeout(() => forwardLookup(val), 700);
+            });
+            input.addEventListener('blur', () => {
+                const val = input.value.trim();
+                if (val.length >= 5 && !pickedLocation) forwardLookup(val);
+            });
+        }
     }
 
-    google.maps.event.trigger(gMap, 'resize');
-    gMap.setCenter(pickedLocation || VILLAVO_CENTER);
+    setTimeout(() => leafletMap.invalidateSize(), 100);
 }
 
 function setMarker(lat, lng, reverseGeocode = false) {
     pickedLocation = { lat, lng };
-    if (!gMarker) {
-        gMarker = new google.maps.Marker({
-            position: { lat, lng },
-            map: gMap,
-            draggable: true,
-            animation: google.maps.Animation.DROP,
-        });
-        gMarker.addListener('dragend', (e) => {
-            setMarker(e.latLng.lat(), e.latLng.lng(), true);
+    if (!mapMarker) {
+        mapMarker = L.marker([lat, lng], { draggable: true }).addTo(leafletMap);
+        mapMarker.on('dragend', (e) => {
+            const pos = e.target.getLatLng();
+            setMarker(pos.lat, pos.lng, true);
         });
     } else {
-        gMarker.setPosition({ lat, lng });
+        mapMarker.setLatLng([lat, lng]);
     }
-    gMap.panTo({ lat, lng });
-    if (gMap.getZoom() < 16) gMap.setZoom(16);
+    leafletMap.setView([lat, lng], Math.max(leafletMap.getZoom(), 15));
     updateCoordsDisplay();
     if (reverseGeocode) reverseLookup(lat, lng);
 }
 
-function updateCoordsDisplay() {
+function updateCoordsDisplay(status = null) {
     const el = document.getElementById('mapCoords');
-    if (!el || !pickedLocation) return;
+    if (!el) return;
+    if (status) {
+        el.textContent = status;
+        el.classList.remove('has-pin');
+        return;
+    }
+    if (!pickedLocation) return;
     el.textContent = `Ubicación marcada: ${pickedLocation.lat.toFixed(5)}, ${pickedLocation.lng.toFixed(5)}`;
     el.classList.add('has-pin');
 }
 
-function reverseLookup(lat, lng) {
-    if (!gGeocoder) return;
-    gGeocoder.geocode({ location: { lat, lng } }, (results, status) => {
-        if (status !== 'OK' || !results?.[0]) return;
+async function reverseLookup(lat, lng) {
+    try {
+        const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=es&zoom=18`);
+        const data = await r.json();
         const input = document.getElementById('addressInput');
-        if (input && !input.value.trim()) input.value = results[0].formatted_address;
-    });
+        if (input && data.display_name && !input.value.trim()) {
+            input.value = data.display_name;
+        }
+    } catch (err) {
+        console.warn('Reverse geocoding falló', err);
+    }
+}
+
+async function forwardLookup(address) {
+    updateCoordsDisplay('Buscando dirección en el mapa...');
+    try {
+        const q = encodeURIComponent(address + ', Villavicencio, Meta, Colombia');
+        const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}&countrycodes=co&limit=1&addressdetails=1`);
+        const data = await r.json();
+        if (!data || data.length === 0) {
+            updateCoordsDisplay('No se encontró la dirección. Toca el mapa para fijar tu ubicación.');
+            return;
+        }
+        const place = data[0];
+        const lat = parseFloat(place.lat);
+        const lng = parseFloat(place.lon);
+        setMarker(lat, lng, false);
+    } catch (err) {
+        console.warn('Forward geocoding falló', err);
+        updateCoordsDisplay('No se pudo buscar la dirección. Toca el mapa para fijar tu ubicación.');
+    }
 }
 
 function useMyLocation() {
