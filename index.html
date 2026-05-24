@@ -20,6 +20,109 @@
     <!-- ============= SCROLL PROGRESS BAR ============= -->
     <div class="scroll-progress" id="scrollProgress"></div>
 
+    <!-- ============= FAB DOMICILIO ============= -->
+    <button class="fab-delivery" id="fabDelivery" aria-label="Pedir a domicilio">
+        <i class="fa-solid fa-motorcycle"></i>
+        <span class="fab-text">Pedir a domicilio</span>
+        <span class="fab-count" id="fabCount" hidden>0</span>
+    </button>
+
+    <!-- ============= DELIVERY MODAL ============= -->
+    <div class="delivery-modal" id="deliveryModal" aria-hidden="true">
+        <div class="delivery-backdrop" data-close-delivery></div>
+
+        <div class="delivery-panel">
+            <!-- HEADER -->
+            <header class="delivery-header">
+                <div class="delivery-header-info">
+                    <h2><i class="fa-solid fa-motorcycle"></i> Pedidos a Domicilio</h2>
+                    <p>Solo desde nuestra <strong>Sede Vanguardia</strong> · Entregas en Villavicencio</p>
+                </div>
+                <button class="delivery-close" data-close-delivery aria-label="Cerrar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </header>
+
+            <!-- BODY: MENU + CART -->
+            <div class="delivery-body" id="deliveryBody">
+                <!-- MENU -->
+                <div class="delivery-menu" id="deliveryMenu">
+                    <!-- Generado por JS -->
+                </div>
+
+                <!-- CART -->
+                <aside class="delivery-cart" id="deliveryCart">
+                    <div class="cart-header">
+                        <h3><i class="fa-solid fa-bag-shopping"></i> Tu pedido</h3>
+                        <button class="cart-close-mobile" id="cartCloseMobile" aria-label="Cerrar carrito">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <div class="cart-items" id="cartItems">
+                        <p class="cart-empty">Aún no has agregado nada. Selecciona platos del menú para empezar.</p>
+                    </div>
+                    <div class="cart-totals" id="cartTotals" hidden>
+                        <div class="cart-row"><span>Subtotal</span><strong id="cartSubtotal">$0</strong></div>
+                        <div class="cart-row"><span>Domicilio</span><strong id="cartDelivery">$5.000</strong></div>
+                        <div class="cart-row cart-total"><span>Total</span><strong id="cartTotal">$0</strong></div>
+                        <button class="btn btn-primary cart-checkout" id="cartCheckout">
+                            <i class="fa-solid fa-arrow-right"></i> Continuar al pedido
+                        </button>
+                    </div>
+                </aside>
+
+                <!-- BARRA STICKY MOBILE (visible solo en mobile con items en carrito) -->
+                <button class="mobile-cart-bar" id="mobileCartBar" hidden>
+                    <span class="bar-count"><span id="barCount">0</span></span>
+                    <span class="bar-label">Ver mi pedido</span>
+                    <span class="bar-total" id="barTotal">$0</span>
+                </button>
+
+                <!-- Backdrop carrito mobile -->
+                <div class="cart-backdrop" id="cartBackdrop"></div>
+            </div>
+
+            <!-- CHECKOUT FORM (slides over) -->
+            <div class="delivery-checkout" id="deliveryCheckout" hidden>
+                <button class="checkout-back" id="checkoutBack">
+                    <i class="fa-solid fa-arrow-left"></i> Volver al menú
+                </button>
+                <h2>Datos para tu domicilio</h2>
+                <p class="checkout-sub">Diligencia tus datos y enviaremos tu pedido por WhatsApp a la sede.</p>
+
+                <form class="checkout-form" id="checkoutForm">
+                    <label>
+                        <span>Nombre completo *</span>
+                        <input type="text" name="nombre" required placeholder="Ej: Juan Pérez">
+                    </label>
+                    <label>
+                        <span>Teléfono *</span>
+                        <input type="tel" name="telefono" required placeholder="Ej: 300 123 4567">
+                    </label>
+                    <label class="full">
+                        <span>Dirección de entrega *</span>
+                        <input type="text" name="direccion" required placeholder="Ej: Calle 12 # 45-67, Barrio La Esperanza">
+                    </label>
+                    <label class="full">
+                        <span>Detalles adicionales</span>
+                        <textarea name="notas" rows="3" placeholder="Ej: Apartamento 302, sin cebolla, pagar con $50.000..."></textarea>
+                    </label>
+
+                    <div class="checkout-summary">
+                        <h4>Resumen del pedido</h4>
+                        <div id="checkoutSummary"></div>
+                        <div class="cart-row cart-total"><span>Total a pagar</span><strong id="checkoutTotal">$0</strong></div>
+                        <p class="checkout-note">El pago se coordina directamente con la sede. No se procesa pago en línea.</p>
+                    </div>
+
+                    <button type="submit" class="btn btn-wa">
+                        <i class="fa-brands fa-whatsapp"></i> Enviar pedido por WhatsApp
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- ============= LOADER ============= -->
     <div class="loader" id="loader">
         <div class="loader-content">

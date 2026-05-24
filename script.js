@@ -71,6 +71,299 @@ document.querySelectorAll('.nav-menu a').forEach(link => {
     });
 });
 
+// ============= SISTEMA DE DOMICILIOS =============
+const DELIVERY_CONFIG = {
+    whatsapp: '573159265910',
+    branchName: 'Sede Vanguardia',
+    deliveryFee: 5000,
+    // Menu de muestra. Reemplazar/ampliar con el menu real.
+    categories: [
+        {
+            name: 'Platos Fuertes',
+            items: [
+                { id: 'mamona', name: 'Mamona al Palo', desc: 'Porción de ternero asado al palo (300g).', price: 42000, img: 'statics/img/comida.jpg' },
+                { id: 'bandeja', name: 'Bandeja Llanera', desc: 'Carne, longaniza, yuca, plátano y arepa.', price: 38000, img: 'statics/img/comida2.jpg' },
+                { id: 'carne-perra', name: 'Carne a la Perra', desc: 'Asada y enterrada al estilo tradicional.', price: 40000, img: 'statics/img/comida3.jpg' },
+            ]
+        },
+        {
+            name: 'Para Compartir',
+            items: [
+                { id: 'picada', name: 'Picada del Mico (2 personas)', desc: 'Variedad de carnes, longaniza, yuca, plátano y arepa.', price: 75000, img: 'statics/img/comida6.jpg' },
+                { id: 'hayacas', name: 'Hayacas Llaneras (unidad)', desc: 'Tradicional masa envuelta en hoja de plátano.', price: 12000, img: 'statics/img/comida5.jpg' },
+            ]
+        },
+        {
+            name: 'Bebidas',
+            items: [
+                { id: 'limonada', name: 'Limonada de panela', desc: 'Jarra (1 litro).', price: 9000, img: 'statics/img/DDD.jpg' },
+                { id: 'jugo', name: 'Jugo natural en agua', desc: 'Mora, lulo, mango o maracuyá.', price: 7000, img: 'statics/img/dos.jpg' },
+            ]
+        },
+    ]
+};
+
+const cart = new Map(); // id -> { item, qty }
+
+const formatCOP = (n) => '$' + n.toLocaleString('es-CO');
+
+const dom = {
+    fab: document.getElementById('fabDelivery'),
+    fabCount: document.getElementById('fabCount'),
+    modal: document.getElementById('deliveryModal'),
+    menu: document.getElementById('deliveryMenu'),
+    cart: document.getElementById('deliveryCart'),
+    items: document.getElementById('cartItems'),
+    totals: document.getElementById('cartTotals'),
+    subtotal: document.getElementById('cartSubtotal'),
+    delivery: document.getElementById('cartDelivery'),
+    total: document.getElementById('cartTotal'),
+    checkoutBtn: document.getElementById('cartCheckout'),
+    body: document.getElementById('deliveryBody'),
+    checkout: document.getElementById('deliveryCheckout'),
+    checkoutBack: document.getElementById('checkoutBack'),
+    checkoutSummary: document.getElementById('checkoutSummary'),
+    checkoutTotal: document.getElementById('checkoutTotal'),
+    form: document.getElementById('checkoutForm'),
+    mobileBar: document.getElementById('mobileCartBar'),
+    barCount: document.getElementById('barCount'),
+    barTotal: document.getElementById('barTotal'),
+    cartBackdrop: document.getElementById('cartBackdrop'),
+    cartCloseMobile: document.getElementById('cartCloseMobile'),
+};
+
+const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
+
+function openCartMobile() {
+    if (!isMobile()) return;
+    dom.cart.classList.add('open');
+    dom.cartBackdrop.classList.add('show');
+}
+function closeCartMobile() {
+    dom.cart.classList.remove('open');
+    dom.cartBackdrop.classList.remove('show');
+}
+
+function renderMenu() {
+    if (!dom.menu) return;
+    dom.menu.innerHTML = DELIVERY_CONFIG.categories.map(cat => `
+        <div class="menu-category">
+            <h3>${cat.name}</h3>
+            ${cat.items.map(item => `
+                <div class="menu-item" data-item-id="${item.id}">
+                    <img src="${item.img}" alt="${item.name}" loading="lazy">
+                    <div class="menu-item-info">
+                        <h4>${item.name}</h4>
+                        <p>${item.desc}</p>
+                        <span class="menu-item-price">${formatCOP(item.price)}</span>
+                    </div>
+                    <div class="menu-item-add" data-add-slot="${item.id}"></div>
+                </div>
+            `).join('')}
+        </div>
+    `).join('');
+    refreshAddButtons();
+}
+
+function refreshAddButtons() {
+    document.querySelectorAll('[data-add-slot]').forEach(slot => {
+        const id = slot.getAttribute('data-add-slot');
+        const entry = cart.get(id);
+        if (!entry) {
+            slot.innerHTML = `<button class="menu-add-btn" data-add="${id}" aria-label="Agregar"><i class="fa-solid fa-plus"></i></button>`;
+        } else {
+            slot.innerHTML = `
+                <div class="menu-qty">
+                    <button data-dec="${id}">−</button>
+                    <span>${entry.qty}</span>
+                    <button data-inc="${id}">+</button>
+                </div>
+            `;
+        }
+    });
+}
+
+function getItemById(id) {
+    for (const cat of DELIVERY_CONFIG.categories) {
+        const found = cat.items.find(i => i.id === id);
+        if (found) return found;
+    }
+    return null;
+}
+
+function changeQty(id, delta) {
+    const entry = cart.get(id);
+    if (entry) {
+        entry.qty += delta;
+        if (entry.qty <= 0) cart.delete(id);
+    } else if (delta > 0) {
+        const item = getItemById(id);
+        if (item) cart.set(id, { item, qty: 1 });
+    }
+    refreshAddButtons();
+    renderCart();
+    updateFab();
+}
+
+function renderCart() {
+    const totalQty = [...cart.values()].reduce((s, e) => s + e.qty, 0);
+    const subtotal = [...cart.values()].reduce((s, { item, qty }) => s + item.price * qty, 0);
+    const total = subtotal + DELIVERY_CONFIG.deliveryFee;
+
+    if (cart.size === 0) {
+        dom.items.innerHTML = '<p class="cart-empty">Aún no has agregado nada. Selecciona platos del menú para empezar.</p>';
+        dom.totals.hidden = true;
+    } else {
+        dom.totals.hidden = false;
+        dom.items.innerHTML = [...cart.values()].map(({ item, qty }) => `
+            <div class="cart-item">
+                <div>
+                    <div class="cart-item-name">${item.name}</div>
+                    <div class="cart-item-meta">${formatCOP(item.price)} × ${qty} = <strong>${formatCOP(item.price * qty)}</strong></div>
+                </div>
+                <div class="cart-item-actions">
+                    <button data-dec="${item.id}">−</button>
+                    <span class="cart-item-qty">${qty}</span>
+                    <button data-inc="${item.id}">+</button>
+                </div>
+            </div>
+        `).join('');
+        dom.subtotal.textContent = formatCOP(subtotal);
+        dom.delivery.textContent = formatCOP(DELIVERY_CONFIG.deliveryFee);
+        dom.total.textContent = formatCOP(total);
+    }
+
+    // Barra sticky mobile
+    if (totalQty > 0 && dom.modal.classList.contains('open')) {
+        dom.mobileBar.hidden = false;
+        dom.mobileBar.classList.add('show');
+        dom.barCount.textContent = totalQty;
+        dom.barTotal.textContent = formatCOP(total);
+    } else {
+        dom.mobileBar.classList.remove('show');
+        dom.mobileBar.hidden = true;
+        if (totalQty === 0) closeCartMobile();
+    }
+}
+
+function updateFab() {
+    const totalQty = [...cart.values()].reduce((s, e) => s + e.qty, 0);
+    if (totalQty > 0) {
+        dom.fabCount.hidden = false;
+        dom.fabCount.textContent = totalQty;
+    } else {
+        dom.fabCount.hidden = true;
+    }
+}
+
+function openDelivery() {
+    dom.modal.classList.add('open');
+    dom.modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    renderCart();
+}
+function closeDelivery() {
+    dom.modal.classList.remove('open');
+    dom.modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    showMenuView();
+    closeCartMobile();
+    dom.mobileBar.classList.remove('show');
+    dom.mobileBar.hidden = true;
+}
+function showCheckoutView() {
+    if (cart.size === 0) return;
+    dom.body.style.display = 'none';
+    dom.checkout.hidden = false;
+    closeCartMobile();
+    dom.mobileBar.classList.remove('show');
+    renderCheckoutSummary();
+}
+function showMenuView() {
+    dom.body.style.display = '';
+    dom.checkout.hidden = true;
+    renderCart();
+}
+
+function renderCheckoutSummary() {
+    const lines = [...cart.values()].map(({ item, qty }) =>
+        `<div class="summary-line"><span>${qty}× ${item.name}</span><strong>${formatCOP(item.price * qty)}</strong></div>`
+    ).join('');
+    const subtotal = [...cart.values()].reduce((s, { item, qty }) => s + item.price * qty, 0);
+    const total = subtotal + DELIVERY_CONFIG.deliveryFee;
+    dom.checkoutSummary.innerHTML = `
+        ${lines}
+        <div class="summary-line"><span>Subtotal</span><strong>${formatCOP(subtotal)}</strong></div>
+        <div class="summary-line"><span>Domicilio</span><strong>${formatCOP(DELIVERY_CONFIG.deliveryFee)}</strong></div>
+    `;
+    dom.checkoutTotal.textContent = formatCOP(total);
+}
+
+function buildWhatsappMessage(data) {
+    const lines = [...cart.values()].map(({ item, qty }) =>
+        `• ${qty}× ${item.name} — ${formatCOP(item.price * qty)}`
+    ).join('\n');
+    const subtotal = [...cart.values()].reduce((s, { item, qty }) => s + item.price * qty, 0);
+    const total = subtotal + DELIVERY_CONFIG.deliveryFee;
+
+    return [
+        `*🛵 Nuevo pedido a domicilio — ${DELIVERY_CONFIG.branchName}*`,
+        '',
+        '*Pedido:*',
+        lines,
+        '',
+        `*Subtotal:* ${formatCOP(subtotal)}`,
+        `*Domicilio:* ${formatCOP(DELIVERY_CONFIG.deliveryFee)}`,
+        `*Total a pagar:* ${formatCOP(total)}`,
+        '',
+        '*Datos de entrega:*',
+        `👤 ${data.nombre}`,
+        `📞 ${data.telefono}`,
+        `📍 ${data.direccion}`,
+        data.notas ? `📝 ${data.notas}` : null,
+    ].filter(Boolean).join('\n');
+}
+
+// ----- EVENTS -----
+if (dom.fab) {
+    renderMenu();
+    dom.fab.addEventListener('click', openDelivery);
+    document.querySelectorAll('[data-close-delivery]').forEach(el =>
+        el.addEventListener('click', closeDelivery)
+    );
+
+    // Delegacion de eventos para botones +/-
+    dom.modal.addEventListener('click', (e) => {
+        const add = e.target.closest('[data-add]');
+        const inc = e.target.closest('[data-inc]');
+        const dec = e.target.closest('[data-dec]');
+        if (add) changeQty(add.getAttribute('data-add'), 1);
+        if (inc) changeQty(inc.getAttribute('data-inc'), 1);
+        if (dec) changeQty(dec.getAttribute('data-dec'), -1);
+    });
+
+    dom.checkoutBtn.addEventListener('click', showCheckoutView);
+    dom.checkoutBack.addEventListener('click', showMenuView);
+
+    // Mobile: abrir/cerrar carrito bottom sheet
+    dom.mobileBar.addEventListener('click', openCartMobile);
+    dom.cartBackdrop.addEventListener('click', closeCartMobile);
+    dom.cartCloseMobile.addEventListener('click', closeCartMobile);
+
+    dom.form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(dom.form));
+        const msg = buildWhatsappMessage(data);
+        const url = `https://wa.me/${DELIVERY_CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
+        window.open(url, '_blank');
+    });
+
+    // ESC cierra modal
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && dom.modal.classList.contains('open')) closeDelivery();
+    });
+}
+
 // ============= SCROLL PROGRESS BAR =============
 const scrollProgress = document.getElementById('scrollProgress');
 let ticking = false;
