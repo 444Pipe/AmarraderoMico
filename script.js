@@ -282,61 +282,103 @@ function showCheckoutView() {
     initMapPicker();
 }
 
-// ============= MAP PICKER (Leaflet + Nominatim) =============
-let leafletMap = null;
-let mapMarker = null;
-const VILLAVO_CENTER = [4.142, -73.626];
+// ============= MAP PICKER (Google Maps + Places) =============
+const VILLAVO_CENTER = { lat: 4.142, lng: -73.626 };
+let gMap = null;
+let gMarker = null;
+let gGeocoder = null;
+let gAutocomplete = null;
+let mapsLoadingPromise = null;
 
-function initMapPicker() {
-    if (typeof L === 'undefined') return; // Leaflet aun no cargado
+function loadGoogleMaps() {
+    if (window.google?.maps) return Promise.resolve();
+    if (mapsLoadingPromise) return mapsLoadingPromise;
+    const key = window.__GMAPS_KEY__;
+    if (!key || key === '__GOOGLE_MAPS_KEY__') {
+        return Promise.reject(new Error('GOOGLE_MAPS_API_KEY no configurada'));
+    }
+    mapsLoadingPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places&loading=async&language=es&region=CO`;
+        script.async = true;
+        script.defer = true;
+        script.onload = resolve;
+        script.onerror = () => reject(new Error('No se pudo cargar Google Maps'));
+        document.head.appendChild(script);
+    });
+    return mapsLoadingPromise;
+}
+
+async function initMapPicker() {
     const container = document.getElementById('mapContainer');
+    const coordsEl = document.getElementById('mapCoords');
     if (!container) return;
 
-    if (!leafletMap) {
-        leafletMap = L.map(container, {
+    try {
+        await loadGoogleMaps();
+    } catch (err) {
+        console.error(err);
+        if (coordsEl) coordsEl.textContent = 'Mapa no disponible. Escribe tu dirección manualmente.';
+        return;
+    }
+
+    if (!gMap) {
+        gMap = new google.maps.Map(container, {
             center: VILLAVO_CENTER,
             zoom: 13,
-            scrollWheelZoom: false,
+            mapTypeControl: false,
+            streetViewControl: false,
+            fullscreenControl: false,
+            gestureHandling: 'greedy',
         });
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap',
-        }).addTo(leafletMap);
+        gGeocoder = new google.maps.Geocoder();
 
-        // Fix icono por defecto cuando se carga via CDN
-        const DefaultIcon = L.icon({
-            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-            iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41],
-        });
-        L.Marker.prototype.options.icon = DefaultIcon;
+        gMap.addListener('click', (e) => setMarker(e.latLng.lat(), e.latLng.lng(), true));
 
-        leafletMap.on('click', (e) => setMarker(e.latlng.lat, e.latlng.lng, true));
+        // Autocomplete en el input de direccion (restringido a Colombia)
+        const input = document.getElementById('addressInput');
+        if (input && google.maps.places?.Autocomplete) {
+            gAutocomplete = new google.maps.places.Autocomplete(input, {
+                componentRestrictions: { country: 'co' },
+                fields: ['formatted_address', 'geometry'],
+            });
+            gAutocomplete.bindTo('bounds', gMap);
+            gAutocomplete.addListener('place_changed', () => {
+                const place = gAutocomplete.getPlace();
+                if (place.geometry?.location) {
+                    const lat = place.geometry.location.lat();
+                    const lng = place.geometry.location.lng();
+                    setMarker(lat, lng, false);
+                    if (place.formatted_address) input.value = place.formatted_address;
+                }
+            });
+        }
 
         const locateBtn = document.getElementById('btnLocate');
         if (locateBtn) locateBtn.addEventListener('click', useMyLocation);
     }
 
-    // Llamar invalidateSize despues de que sea visible
-    setTimeout(() => leafletMap.invalidateSize(), 100);
+    google.maps.event.trigger(gMap, 'resize');
+    gMap.setCenter(pickedLocation || VILLAVO_CENTER);
 }
 
 function setMarker(lat, lng, reverseGeocode = false) {
     pickedLocation = { lat, lng };
-    if (!mapMarker) {
-        mapMarker = L.marker([lat, lng], { draggable: true }).addTo(leafletMap);
-        mapMarker.on('dragend', (e) => {
-            const pos = e.target.getLatLng();
-            setMarker(pos.lat, pos.lng, true);
+    if (!gMarker) {
+        gMarker = new google.maps.Marker({
+            position: { lat, lng },
+            map: gMap,
+            draggable: true,
+            animation: google.maps.Animation.DROP,
+        });
+        gMarker.addListener('dragend', (e) => {
+            setMarker(e.latLng.lat(), e.latLng.lng(), true);
         });
     } else {
-        mapMarker.setLatLng([lat, lng]);
+        gMarker.setPosition({ lat, lng });
     }
-    leafletMap.setView([lat, lng], Math.max(leafletMap.getZoom(), 15));
+    gMap.panTo({ lat, lng });
+    if (gMap.getZoom() < 16) gMap.setZoom(16);
     updateCoordsDisplay();
     if (reverseGeocode) reverseLookup(lat, lng);
 }
@@ -348,17 +390,13 @@ function updateCoordsDisplay() {
     el.classList.add('has-pin');
 }
 
-async function reverseLookup(lat, lng) {
-    try {
-        const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=es&zoom=18`);
-        const data = await r.json();
+function reverseLookup(lat, lng) {
+    if (!gGeocoder) return;
+    gGeocoder.geocode({ location: { lat, lng } }, (results, status) => {
+        if (status !== 'OK' || !results?.[0]) return;
         const input = document.getElementById('addressInput');
-        if (input && data.display_name && !input.value.trim()) {
-            input.value = data.display_name;
-        }
-    } catch (err) {
-        console.warn('Reverse geocoding falló', err);
-    }
+        if (input && !input.value.trim()) input.value = results[0].formatted_address;
+    });
 }
 
 function useMyLocation() {
@@ -377,7 +415,7 @@ function useMyLocation() {
         },
         (err) => {
             const msg = err.code === err.PERMISSION_DENIED
-                ? 'Diste permiso? Activa la ubicación en tu navegador.'
+                ? '¿Diste permiso? Activa la ubicación en tu navegador.'
                 : 'No pudimos obtener tu ubicación. Tócala manualmente en el mapa.';
             alert(msg);
             btn.disabled = false;
