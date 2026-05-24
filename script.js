@@ -299,7 +299,7 @@ function loadGoogleMaps() {
     }
     mapsLoadingPromise = new Promise((resolve, reject) => {
         const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places&loading=async&language=es&region=CO`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places&language=es&region=CO`;
         script.async = true;
         script.defer = true;
         script.onload = resolve;
@@ -323,15 +323,7 @@ async function initMapPicker() {
     }
 
     if (!gMap) {
-        // Modern dynamic library import (required with loading=async)
-        const [{ Map }, { Marker }, { Geocoder }, places] = await Promise.all([
-            google.maps.importLibrary('maps'),
-            google.maps.importLibrary('marker'),
-            google.maps.importLibrary('geocoding'),
-            google.maps.importLibrary('places'),
-        ]);
-
-        gMap = new Map(container, {
+        gMap = new google.maps.Map(container, {
             center: VILLAVO_CENTER,
             zoom: 13,
             mapTypeControl: false,
@@ -339,15 +331,14 @@ async function initMapPicker() {
             fullscreenControl: false,
             gestureHandling: 'greedy',
         });
-        gGeocoder = new Geocoder();
-        window._gMarkerCtor = Marker;
+        gGeocoder = new google.maps.Geocoder();
 
         gMap.addListener('click', (e) => setMarker(e.latLng.lat(), e.latLng.lng(), true));
 
         // Autocomplete en el input de direccion (restringido a Colombia)
         const input = document.getElementById('addressInput');
-        if (input && places?.Autocomplete) {
-            gAutocomplete = new places.Autocomplete(input, {
+        if (input && google.maps.places?.Autocomplete) {
+            gAutocomplete = new google.maps.places.Autocomplete(input, {
                 componentRestrictions: { country: 'co' },
                 fields: ['formatted_address', 'geometry'],
             });
@@ -374,12 +365,11 @@ async function initMapPicker() {
 function setMarker(lat, lng, reverseGeocode = false) {
     pickedLocation = { lat, lng };
     if (!gMarker) {
-        const Marker = window._gMarkerCtor || google.maps.Marker;
-        gMarker = new Marker({
+        gMarker = new google.maps.Marker({
             position: { lat, lng },
             map: gMap,
             draggable: true,
-            animation: google.maps.Animation?.DROP,
+            animation: google.maps.Animation.DROP,
         });
         gMarker.addListener('dragend', (e) => {
             setMarker(e.latLng.lat(), e.latLng.lng(), true);
