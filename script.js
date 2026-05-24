@@ -323,7 +323,15 @@ async function initMapPicker() {
     }
 
     if (!gMap) {
-        gMap = new google.maps.Map(container, {
+        // Modern dynamic library import (required with loading=async)
+        const [{ Map }, { Marker }, { Geocoder }, places] = await Promise.all([
+            google.maps.importLibrary('maps'),
+            google.maps.importLibrary('marker'),
+            google.maps.importLibrary('geocoding'),
+            google.maps.importLibrary('places'),
+        ]);
+
+        gMap = new Map(container, {
             center: VILLAVO_CENTER,
             zoom: 13,
             mapTypeControl: false,
@@ -331,14 +339,15 @@ async function initMapPicker() {
             fullscreenControl: false,
             gestureHandling: 'greedy',
         });
-        gGeocoder = new google.maps.Geocoder();
+        gGeocoder = new Geocoder();
+        window._gMarkerCtor = Marker;
 
         gMap.addListener('click', (e) => setMarker(e.latLng.lat(), e.latLng.lng(), true));
 
         // Autocomplete en el input de direccion (restringido a Colombia)
         const input = document.getElementById('addressInput');
-        if (input && google.maps.places?.Autocomplete) {
-            gAutocomplete = new google.maps.places.Autocomplete(input, {
+        if (input && places?.Autocomplete) {
+            gAutocomplete = new places.Autocomplete(input, {
                 componentRestrictions: { country: 'co' },
                 fields: ['formatted_address', 'geometry'],
             });
@@ -365,11 +374,12 @@ async function initMapPicker() {
 function setMarker(lat, lng, reverseGeocode = false) {
     pickedLocation = { lat, lng };
     if (!gMarker) {
-        gMarker = new google.maps.Marker({
+        const Marker = window._gMarkerCtor || google.maps.Marker;
+        gMarker = new Marker({
             position: { lat, lng },
             map: gMap,
             draggable: true,
-            animation: google.maps.Animation.DROP,
+            animation: google.maps.Animation?.DROP,
         });
         gMarker.addListener('dragend', (e) => {
             setMarker(e.latLng.lat(), e.latLng.lng(), true);
