@@ -73,7 +73,7 @@ document.querySelectorAll('.nav-menu a').forEach(link => {
 
 // ============= SISTEMA DE DOMICILIOS =============
 const DELIVERY_CONFIG = {
-    whatsapp: '573159265910',
+    whatsapp: '573208583991',
     branchName: 'Sede Vanguardia',
     deliveryFee: 5000,
     // Menu de muestra. Reemplazar/ampliar con el menu real.
