@@ -1016,12 +1016,38 @@ body.loading { overflow: hidden; height: 100vh; }
     .order-type-btn { padding: 10px 8px; }
     .order-type-btn i { font-size: 1.2rem; }
     .order-type-btn span { font-size: 0.85rem; }
-    .order-type-btn small { font-size: 0.66rem; }
+    .order-type-btn small { font-size: 0.66rem; line-height: 1.2; }
 
     .pickup-info { padding: 22px 18px; }
-    .pickup-icon { width: 54px; height: 54px; font-size: 1.4rem; }
-    .pickup-info h4 { font-size: 1.2rem; }
+    .pickup-icon { width: 54px; height: 54px; font-size: 1.4rem; margin-bottom: 12px; }
+    .pickup-info h4 { font-size: 1.2rem; margin-bottom: 8px; }
     .pickup-address, .pickup-time { font-size: 0.88rem; }
+    .pickup-map-link { font-size: 0.82rem; padding: 9px 16px; margin-top: 12px; }
+
+    /* Cart items en mobile: layout compacto */
+    .cart-item { grid-template-columns: 48px 1fr; gap: 10px; padding: 10px; }
+    .cart-item-img { width: 48px; height: 48px; }
+    .cart-item-name { font-size: 0.88rem; }
+    .cart-item-price { font-size: 0.72rem; }
+    .cart-qty-btn { width: 24px; height: 24px; }
+    .cart-item-subtotal { font-size: 0.88rem; }
+
+    /* Totales mobile */
+    .cart-totals { padding: 14px; }
+    .cart-row { font-size: 0.85rem; }
+    .cart-total { padding: 12px 14px; font-size: 0.92rem; }
+    .cart-total strong { font-size: 1.2rem; }
+
+    /* Summary items en checkout mobile */
+    .checkout-summary { padding: 18px 16px; }
+    .checkout-summary h4 { font-size: 1.1rem; }
+    .summary-item { grid-template-columns: 40px 1fr auto; gap: 10px; padding: 6px; }
+    .summary-thumb { width: 40px; height: 40px; }
+    .summary-item-name { font-size: 0.85rem; }
+    .summary-item-meta { font-size: 0.72rem; }
+    .summary-item-price { font-size: 0.92rem; }
+    .checkout-summary .cart-total { padding: 14px; font-size: 0.95rem; }
+    .checkout-summary .cart-total strong { font-size: 1.3rem; }
 
     .delivery-checkout {
         padding: 20px 16px 30px;
@@ -1059,6 +1085,48 @@ body.loading { overflow: hidden; height: 100vh; }
     .bar-label { font-size: 0.88rem; }
     .delivery-checkout { padding: 18px 14px 24px; }
     .checkout-summary { padding: 14px 16px; }
+
+    /* Order type toggle ultra-compacto en mobile pequeno */
+    .order-type-toggle { padding: 10px 12px; gap: 6px; }
+    .order-type-btn { padding: 9px 6px; gap: 2px; }
+    .order-type-btn i { font-size: 1.1rem; }
+    .order-type-btn span { font-size: 0.78rem; }
+    .order-type-btn small { display: none; }
+
+    /* Pickup info compacto */
+    .pickup-info { padding: 20px 14px; border-radius: 14px; }
+    .pickup-icon { width: 48px; height: 48px; font-size: 1.3rem; }
+    .pickup-info h4 { font-size: 1.1rem; }
+    .pickup-address, .pickup-time { font-size: 0.82rem; }
+    .pickup-map-link { font-size: 0.78rem; padding: 8px 14px; }
+
+    /* Cart items aun mas compactos */
+    .cart-item { grid-template-columns: 44px 1fr; gap: 8px; padding: 9px; }
+    .cart-item-img { width: 44px; height: 44px; }
+    .cart-item-name { font-size: 0.84rem; }
+    .cart-item-actions { gap: 6px; margin-top: 3px; }
+    .cart-qty-btn { width: 22px; height: 22px; font-size: 0.65rem; }
+    .cart-item-subtotal { font-size: 0.82rem; }
+
+    /* Cart totals super compacto */
+    .cart-totals { padding: 12px; }
+    .cart-total { padding: 11px 13px; }
+    .cart-total strong { font-size: 1.15rem; }
+
+    /* Summary items mas compacto */
+    .summary-item { grid-template-columns: 36px 1fr auto; gap: 8px; padding: 5px; }
+    .summary-thumb { width: 36px; height: 36px; }
+    .summary-item-name { font-size: 0.82rem; }
+    .summary-item-meta { font-size: 0.68rem; }
+    .summary-item-price { font-size: 0.88rem; }
+}
+
+/* --- Mobile extra pequeno (360px y menos) --- */
+@media (max-width: 360px) {
+    .order-type-btn span { font-size: 0.72rem; }
+    .order-type-btn i { font-size: 1rem; }
+    .pickup-info h4 { font-size: 1rem; }
+    .pickup-address br { display: none; }
 }
 
 /* ============= SCROLL PROGRESS BAR ============= */
