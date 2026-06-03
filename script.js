@@ -75,7 +75,8 @@ document.querySelectorAll('.nav-menu a').forEach(link => {
 const DELIVERY_CONFIG = {
     whatsapp: '573208583991',
     branchName: 'Sede Vanguardia',
-    deliveryFee: 5000,
+    // El costo de domicilio se coordina con la sede segun distancia
+    // (no se cobra fijo en linea, solo se muestra el subtotal de productos)
     // Menu de muestra. Reemplazar/ampliar con el menu real.
     categories: [
         {
@@ -214,8 +215,7 @@ function changeQty(id, delta) {
 function renderCart() {
     const totalQty = [...cart.values()].reduce((s, e) => s + e.qty, 0);
     const subtotal = [...cart.values()].reduce((s, { item, qty }) => s + item.price * qty, 0);
-    const deliveryFee = orderType === 'pickup' ? 0 : DELIVERY_CONFIG.deliveryFee;
-    const total = subtotal + deliveryFee;
+    const total = subtotal; // El domicilio se coordina con la sede segun distancia
 
     if (cart.size === 0) {
         dom.items.innerHTML = `
@@ -243,7 +243,7 @@ function renderCart() {
             </div>
         `).join('');
         dom.subtotal.textContent = formatCOP(subtotal);
-        dom.delivery.textContent = orderType === 'pickup' ? 'Gratis (recoger)' : formatCOP(DELIVERY_CONFIG.deliveryFee);
+        dom.delivery.textContent = orderType === 'pickup' ? 'Gratis (recoger)' : 'Según ubicación';
         dom.delivery.parentElement.querySelector('span').textContent = orderType === 'pickup' ? 'Recoger en sede' : 'Domicilio';
         dom.total.textContent = formatCOP(total);
     }
@@ -481,17 +481,20 @@ function renderCheckoutSummary() {
         </div>
     `).join('');
     const subtotal = [...cart.values()].reduce((s, { item, qty }) => s + item.price * qty, 0);
-    const deliveryFee = orderType === 'pickup' ? 0 : DELIVERY_CONFIG.deliveryFee;
-    const total = subtotal + deliveryFee;
+    const total = subtotal;
     const feeLine = orderType === 'pickup'
         ? `<div class="summary-line"><span><i class="fa-solid fa-store"></i> Recoger en sede</span><strong style="color: var(--color-green);">Gratis</strong></div>`
-        : `<div class="summary-line"><span><i class="fa-solid fa-motorcycle"></i> Costo de domicilio</span><strong>${formatCOP(DELIVERY_CONFIG.deliveryFee)}</strong></div>`;
+        : `<div class="summary-line"><span><i class="fa-solid fa-motorcycle"></i> Costo de domicilio</span><strong class="fee-coord">Según ubicación</strong></div>`;
+    const totalNote = orderType === 'pickup'
+        ? '<p class="total-note">Precio final. No hay costo de domicilio.</p>'
+        : '<p class="total-note"><i class="fa-solid fa-circle-info"></i> El costo del domicilio se confirma con la sede según tu ubicación.</p>';
     dom.checkoutSummary.innerHTML = `
         <div class="summary-items">${itemLines}</div>
         <div class="summary-totals">
-            <div class="summary-line"><span>Subtotal</span><strong>${formatCOP(subtotal)}</strong></div>
+            <div class="summary-line"><span>Subtotal productos</span><strong>${formatCOP(subtotal)}</strong></div>
             ${feeLine}
         </div>
+        ${totalNote}
     `;
     dom.checkoutTotal.textContent = formatCOP(total);
 }
@@ -501,8 +504,7 @@ function buildWhatsappMessage(data) {
         `• ${qty}× ${item.name} — ${formatCOP(item.price * qty)}`
     ).join('\n');
     const subtotal = [...cart.values()].reduce((s, { item, qty }) => s + item.price * qty, 0);
-    const deliveryFee = orderType === 'pickup' ? 0 : DELIVERY_CONFIG.deliveryFee;
-    const total = subtotal + deliveryFee;
+    const total = subtotal;
 
     const isPickup = orderType === 'pickup';
     const mapsLink = pickedLocation
@@ -515,7 +517,7 @@ function buildWhatsappMessage(data) {
 
     const feeLine = isPickup
         ? `*Domicilio:* No aplica (recoge en sede)`
-        : `*Domicilio:* ${formatCOP(DELIVERY_CONFIG.deliveryFee)}`;
+        : `*Domicilio:* Por coordinar según ubicación`;
 
     const customerInfo = isPickup
         ? [
@@ -532,15 +534,17 @@ function buildWhatsappMessage(data) {
             mapsLink ? `🗺️ Ubicación en mapa: ${mapsLink}` : null,
           ];
 
+    const totalLabel = isPickup ? '*Total a pagar:*' : '*Subtotal productos:*';
+
     return [
         header,
         '',
         '*Pedido:*',
         lines,
         '',
-        `*Subtotal:* ${formatCOP(subtotal)}`,
         feeLine,
-        `*Total a pagar:* ${formatCOP(total)}`,
+        `${totalLabel} ${formatCOP(total)}`,
+        isPickup ? null : '_(el costo del domicilio se suma al total según distancia)_',
         '',
         ...customerInfo,
         data.notas ? `📝 ${data.notas}` : null,

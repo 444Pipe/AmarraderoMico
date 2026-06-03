@@ -808,6 +808,26 @@ body.loading { overflow: hidden; height: 100vh; }
     background: rgba(255,255,255,0.5);
     border-radius: 8px;
 }
+.fee-coord {
+    color: var(--color-rust) !important;
+    font-style: italic;
+    font-weight: 600 !important;
+    font-size: 0.85rem;
+}
+.total-note {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.7);
+    border-left: 3px solid var(--color-gold);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    color: var(--color-text-soft);
+    line-height: 1.4;
+}
+.total-note i {
+    color: var(--color-rust);
+    margin-right: 6px;
+}
 .btn-wa {
     grid-column: 1 / -1;
     background: #25D366;
