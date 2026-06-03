@@ -37,13 +37,27 @@
             <!-- HEADER -->
             <header class="delivery-header">
                 <div class="delivery-header-info">
-                    <h2><i class="fa-solid fa-motorcycle"></i> Pedidos a Domicilio</h2>
-                    <p>Solo desde nuestra <strong>Sede Vanguardia</strong> · Entregas en Villavicencio</p>
+                    <h2><i class="fa-solid fa-utensils"></i> Tu Pedido</h2>
+                    <p>Desde nuestra <strong>Sede Vanguardia</strong> · Villavicencio</p>
                 </div>
                 <button class="delivery-close" data-close-delivery aria-label="Cerrar">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </header>
+
+            <!-- TIPO DE PEDIDO TOGGLE -->
+            <div class="order-type-toggle" id="orderTypeToggle">
+                <button type="button" class="order-type-btn active" data-order-type="delivery">
+                    <i class="fa-solid fa-motorcycle"></i>
+                    <span>A Domicilio</span>
+                    <small>Entregamos en tu dirección</small>
+                </button>
+                <button type="button" class="order-type-btn" data-order-type="pickup">
+                    <i class="fa-solid fa-store"></i>
+                    <span>Recoger en sede</span>
+                    <small>Pasas por tu pedido</small>
+                </button>
+            </div>
 
             <!-- BODY: MENU + CART -->
             <div class="delivery-body" id="deliveryBody">
@@ -101,23 +115,35 @@
                         <span>Teléfono *</span>
                         <input type="tel" name="telefono" required placeholder="Ej: 300 123 4567">
                     </label>
-                    <label class="full">
-                        <span>Dirección de entrega *</span>
-                        <input type="text" name="direccion" id="addressInput" required placeholder="Ej: Calle 12 # 45-67, Barrio La Esperanza">
-                    </label>
+                    <div class="delivery-only-fields full" id="deliveryOnlyFields">
+                        <label class="full">
+                            <span>Dirección de entrega *</span>
+                            <input type="text" name="direccion" id="addressInput" placeholder="Ej: Calle 12 # 45-67, Barrio La Esperanza">
+                        </label>
 
-                    <div class="map-picker full">
-                        <div class="map-picker-head">
-                            <div>
-                                <h4><i class="fa-solid fa-location-crosshairs"></i> Pinea tu ubicación exacta</h4>
-                                <p>Arrastra el marcador o toca el mapa donde estás. El repartidor llegará más fácil.</p>
+                        <div class="map-picker">
+                            <div class="map-picker-head">
+                                <div>
+                                    <h4><i class="fa-solid fa-location-crosshairs"></i> Pinea tu ubicación exacta</h4>
+                                    <p>Arrastra el marcador o toca el mapa donde estás.</p>
+                                </div>
+                                <button type="button" class="btn-locate" id="btnLocate">
+                                    <i class="fa-solid fa-location-arrow"></i> Usar mi ubicación
+                                </button>
                             </div>
-                            <button type="button" class="btn-locate" id="btnLocate">
-                                <i class="fa-solid fa-location-arrow"></i> Usar mi ubicación
-                            </button>
+                            <div class="map-container" id="mapContainer"></div>
+                            <p class="map-coords" id="mapCoords">Aún no has seleccionado ubicación</p>
                         </div>
-                        <div class="map-container" id="mapContainer"></div>
-                        <p class="map-coords" id="mapCoords">Aún no has seleccionado ubicación</p>
+                    </div>
+
+                    <div class="pickup-info full" id="pickupInfo" hidden>
+                        <div class="pickup-icon"><i class="fa-solid fa-store"></i></div>
+                        <h4>Recoges en Sede Vanguardia</h4>
+                        <p class="pickup-address"><i class="fa-solid fa-location-dot"></i> Kilómetro 1, vía aeropuerto Vanguardia<br>Villavicencio, Meta</p>
+                        <p class="pickup-time"><i class="fa-regular fa-clock"></i> Tu pedido estará listo en <strong>25 a 35 minutos</strong> aprox.</p>
+                        <a href="https://www.google.com/maps/place/EL+AMARRADERO+DEL+MICO/@4.1659871,-73.6235892,17z" target="_blank" rel="noopener" class="pickup-map-link">
+                            <i class="fa-solid fa-diamond-turn-right"></i> Ver cómo llegar a la sede
+                        </a>
                     </div>
 
                     <label class="full">

@@ -105,6 +105,7 @@ const DELIVERY_CONFIG = {
 
 const cart = new Map(); // id -> { item, qty }
 let pickedLocation = null; // { lat, lng } seleccionado en el mapa
+let orderType = 'delivery'; // 'delivery' | 'pickup'
 
 const formatCOP = (n) => '$' + n.toLocaleString('es-CO');
 
@@ -131,6 +132,10 @@ const dom = {
     barTotal: document.getElementById('barTotal'),
     cartBackdrop: document.getElementById('cartBackdrop'),
     cartCloseMobile: document.getElementById('cartCloseMobile'),
+    orderTypeToggle: document.getElementById('orderTypeToggle'),
+    deliveryOnlyFields: document.getElementById('deliveryOnlyFields'),
+    pickupInfo: document.getElementById('pickupInfo'),
+    cartDeliveryRow: null, // se setea dinamicamente
 };
 
 const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
@@ -209,7 +214,8 @@ function changeQty(id, delta) {
 function renderCart() {
     const totalQty = [...cart.values()].reduce((s, e) => s + e.qty, 0);
     const subtotal = [...cart.values()].reduce((s, { item, qty }) => s + item.price * qty, 0);
-    const total = subtotal + DELIVERY_CONFIG.deliveryFee;
+    const deliveryFee = orderType === 'pickup' ? 0 : DELIVERY_CONFIG.deliveryFee;
+    const total = subtotal + deliveryFee;
 
     if (cart.size === 0) {
         dom.items.innerHTML = `
@@ -237,7 +243,8 @@ function renderCart() {
             </div>
         `).join('');
         dom.subtotal.textContent = formatCOP(subtotal);
-        dom.delivery.textContent = formatCOP(DELIVERY_CONFIG.deliveryFee);
+        dom.delivery.textContent = orderType === 'pickup' ? 'Gratis (recoger)' : formatCOP(DELIVERY_CONFIG.deliveryFee);
+        dom.delivery.parentElement.querySelector('span').textContent = orderType === 'pickup' ? 'Recoger en sede' : 'Domicilio';
         dom.total.textContent = formatCOP(total);
     }
 
@@ -286,7 +293,30 @@ function showCheckoutView() {
     closeCartMobile();
     dom.mobileBar.classList.remove('show');
     renderCheckoutSummary();
-    initMapPicker();
+    applyOrderTypeToCheckout();
+    if (orderType === 'delivery') initMapPicker();
+}
+
+function applyOrderTypeToCheckout() {
+    const addressInput = document.getElementById('addressInput');
+    if (orderType === 'pickup') {
+        dom.deliveryOnlyFields.hidden = true;
+        dom.pickupInfo.hidden = false;
+        if (addressInput) addressInput.required = false;
+    } else {
+        dom.deliveryOnlyFields.hidden = false;
+        dom.pickupInfo.hidden = true;
+        if (addressInput) addressInput.required = true;
+    }
+}
+
+function setOrderType(type) {
+    orderType = type;
+    document.querySelectorAll('.order-type-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-order-type') === type);
+    });
+    renderCart();
+    applyOrderTypeToCheckout();
 }
 
 // ============= MAP PICKER (Leaflet + Nominatim) =============
@@ -451,12 +481,16 @@ function renderCheckoutSummary() {
         </div>
     `).join('');
     const subtotal = [...cart.values()].reduce((s, { item, qty }) => s + item.price * qty, 0);
-    const total = subtotal + DELIVERY_CONFIG.deliveryFee;
+    const deliveryFee = orderType === 'pickup' ? 0 : DELIVERY_CONFIG.deliveryFee;
+    const total = subtotal + deliveryFee;
+    const feeLine = orderType === 'pickup'
+        ? `<div class="summary-line"><span><i class="fa-solid fa-store"></i> Recoger en sede</span><strong style="color: var(--color-green);">Gratis</strong></div>`
+        : `<div class="summary-line"><span><i class="fa-solid fa-motorcycle"></i> Costo de domicilio</span><strong>${formatCOP(DELIVERY_CONFIG.deliveryFee)}</strong></div>`;
     dom.checkoutSummary.innerHTML = `
         <div class="summary-items">${itemLines}</div>
         <div class="summary-totals">
             <div class="summary-line"><span>Subtotal</span><strong>${formatCOP(subtotal)}</strong></div>
-            <div class="summary-line"><span><i class="fa-solid fa-motorcycle"></i> Costo de domicilio</span><strong>${formatCOP(DELIVERY_CONFIG.deliveryFee)}</strong></div>
+            ${feeLine}
         </div>
     `;
     dom.checkoutTotal.textContent = formatCOP(total);
@@ -467,27 +501,48 @@ function buildWhatsappMessage(data) {
         `• ${qty}× ${item.name} — ${formatCOP(item.price * qty)}`
     ).join('\n');
     const subtotal = [...cart.values()].reduce((s, { item, qty }) => s + item.price * qty, 0);
-    const total = subtotal + DELIVERY_CONFIG.deliveryFee;
+    const deliveryFee = orderType === 'pickup' ? 0 : DELIVERY_CONFIG.deliveryFee;
+    const total = subtotal + deliveryFee;
 
+    const isPickup = orderType === 'pickup';
     const mapsLink = pickedLocation
         ? `https://www.google.com/maps?q=${pickedLocation.lat},${pickedLocation.lng}`
         : null;
 
+    const header = isPickup
+        ? `*🏪 Nuevo pedido para RECOGER — ${DELIVERY_CONFIG.branchName}*`
+        : `*🛵 Nuevo pedido a DOMICILIO — ${DELIVERY_CONFIG.branchName}*`;
+
+    const feeLine = isPickup
+        ? `*Domicilio:* No aplica (recoge en sede)`
+        : `*Domicilio:* ${formatCOP(DELIVERY_CONFIG.deliveryFee)}`;
+
+    const customerInfo = isPickup
+        ? [
+            '*Datos del cliente:*',
+            `👤 ${data.nombre}`,
+            `📞 ${data.telefono}`,
+            `🏪 Recoge en: Sede Vanguardia (Km 1 vía aeropuerto)`,
+          ]
+        : [
+            '*Datos de entrega:*',
+            `👤 ${data.nombre}`,
+            `📞 ${data.telefono}`,
+            `📍 ${data.direccion}`,
+            mapsLink ? `🗺️ Ubicación en mapa: ${mapsLink}` : null,
+          ];
+
     return [
-        `*🛵 Nuevo pedido a domicilio — ${DELIVERY_CONFIG.branchName}*`,
+        header,
         '',
         '*Pedido:*',
         lines,
         '',
         `*Subtotal:* ${formatCOP(subtotal)}`,
-        `*Domicilio:* ${formatCOP(DELIVERY_CONFIG.deliveryFee)}`,
+        feeLine,
         `*Total a pagar:* ${formatCOP(total)}`,
         '',
-        '*Datos de entrega:*',
-        `👤 ${data.nombre}`,
-        `📞 ${data.telefono}`,
-        `📍 ${data.direccion}`,
-        mapsLink ? `🗺️ Ubicación en mapa: ${mapsLink}` : null,
+        ...customerInfo,
         data.notas ? `📝 ${data.notas}` : null,
     ].filter(Boolean).join('\n');
 }
@@ -517,6 +572,14 @@ if (dom.fab) {
     dom.mobileBar.addEventListener('click', openCartMobile);
     dom.cartBackdrop.addEventListener('click', closeCartMobile);
     dom.cartCloseMobile.addEventListener('click', closeCartMobile);
+
+    // Toggle tipo de pedido (domicilio / recoger)
+    if (dom.orderTypeToggle) {
+        dom.orderTypeToggle.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-order-type]');
+            if (btn) setOrderType(btn.getAttribute('data-order-type'));
+        });
+    }
 
     dom.form.addEventListener('submit', (e) => {
         e.preventDefault();
