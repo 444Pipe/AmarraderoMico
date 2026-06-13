@@ -437,7 +437,8 @@ body.loading { overflow: hidden; height: 100vh; }
     cursor: pointer;
     animation: slideUpBar 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.mobile-cart-bar.show { display: flex; }
+/* Solo se muestra en mobile (regla .show dentro de @media max-width:768px).
+   En PC el carrito lateral ya es visible, así que esta barra no debe aparecer. */
 @keyframes slideUpBar {
     from { transform: translateY(120%); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
