@@ -6,67 +6,295 @@
     <title>Ingresar · El Amarradero del Mico</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
             --bg: #FAF6F0; --cream: #F5E6D3; --brown-dark: #2D1810; --brown: #4A2C1F;
-            --rust: #B8541F; --orange: #D2691E; --gold-bright: #E6B85C; --text-soft: #5C4538; --red: #B83227;
+            --rust: #B8541F; --orange: #D2691E; --gold-bright: #E6B85C; --text-soft: #5C4538;
+            --red: #B83227; --green: #3C7A34;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
         body {
             min-height: 100vh; display: flex; align-items: center; justify-content: center;
-            font-family: 'Inter', -apple-system, sans-serif; padding: 20px;
-            background: linear-gradient(135deg, var(--brown-dark), var(--brown) 55%, var(--rust));
-            position: relative; overflow: hidden;
+            font-family: 'Inter', -apple-system, sans-serif; padding: 22px;
+            position: relative; overflow: hidden; color: #fff;
+            background: var(--brown-dark);
+            -webkit-font-smoothing: antialiased;
         }
-        body::before, body::after {
-            content: ''; position: absolute; border-radius: 50%; filter: blur(2px); opacity: .12;
+
+        /* ===== Fondo inmersivo: una sola foto con Ken-Burns muy lento ===== */
+        .bg {
+            position: fixed; inset: -5%; z-index: 0;
+            background: url('/statics/img/comida.jpg') center/cover no-repeat var(--brown-dark);
+            transform: scale(1.1); will-change: transform;
+            animation: kenburns 34s ease-in-out infinite alternate;
         }
-        body::before { width: 380px; height: 380px; background: var(--orange); top: -120px; right: -100px; }
-        body::after { width: 320px; height: 320px; background: var(--gold-bright); bottom: -120px; left: -90px; }
+        @keyframes kenburns {
+            from { transform: scale(1.1) translate(0, 0); }
+            to   { transform: scale(1.22) translate(-2.4%, -2.2%); }
+        }
+        /* Overlay café oscuro + leve desenfoque para legibilidad.
+           Fondo sólido base por si backdrop-filter no aplica (navegadores viejos). */
+        .overlay {
+            position: fixed; inset: 0; z-index: 1;
+            background:
+                radial-gradient(120% 95% at 50% 14%, rgba(45,24,16,.30), transparent 58%),
+                linear-gradient(180deg, rgba(45,24,16,.86), rgba(45,24,16,.72) 45%, rgba(20,10,6,.95));
+        }
+        @supports ((-webkit-backdrop-filter: blur(2px)) or (backdrop-filter: blur(2px))) {
+            .overlay {
+                -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+                background:
+                    radial-gradient(120% 95% at 50% 14%, rgba(45,24,16,.28), transparent 58%),
+                    linear-gradient(180deg, rgba(45,24,16,.82), rgba(45,24,16,.66) 45%, rgba(24,12,7,.94));
+            }
+        }
+        /* Resplandores cálidos de marca */
+        .overlay::before, .overlay::after {
+            content: ''; position: absolute; border-radius: 50%; filter: blur(72px);
+            pointer-events: none;
+        }
+        .overlay::before { width: 460px; height: 460px; background: var(--orange); opacity: .32; top: -170px; right: -130px; }
+        .overlay::after  { width: 380px; height: 380px; background: var(--gold-bright); opacity: .24; bottom: -160px; left: -120px; }
+
+        /* ===== Badge de marca · esquina superior izquierda ===== */
+        .brand-mark {
+            position: fixed; top: 22px; left: 22px; z-index: 3;
+            display: flex; align-items: center; gap: 11px;
+            padding: 7px 14px 7px 8px; border-radius: 999px;
+            background: rgba(30,16,10,.55);
+            -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+            border: 1px solid rgba(230,184,92,.30);
+            box-shadow: 0 8px 24px rgba(10,5,2,.4);
+        }
+        .brand-mark .chip {
+            width: 38px; height: 38px; flex: 0 0 38px; border-radius: 50%;
+            background: radial-gradient(circle at 50% 38%, #FFFFFF, #FBF4E8 70%, var(--cream));
+            display: grid; place-items: center; padding: 4px;
+            box-shadow: 0 0 0 2px rgba(230,184,92,.55), inset 0 1px 3px rgba(255,255,255,.7);
+        }
+        .brand-mark .chip img { width: 100%; height: 100%; object-fit: contain; }
+        .brand-mark b {
+            display: block; font-family: 'Playfair Display', serif; font-weight: 700;
+            font-size: .9rem; line-height: 1.05; color: #fff; letter-spacing: .2px;
+        }
+        .brand-mark span {
+            display: block; margin-top: 2px; font-size: .58rem; font-weight: 600;
+            letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold-bright);
+        }
+
+        /* ===== Frase llanera protagonista (desktop) ===== */
+        .hero-line {
+            position: fixed; left: 50%; top: 30px; transform: translateX(-50%);
+            z-index: 3; text-align: center; width: min(92vw, 640px); pointer-events: none;
+        }
+        .hero-line .place {
+            display: inline-flex; align-items: center; gap: 9px;
+            font-size: .68rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+            color: var(--gold-bright); margin-bottom: 10px;
+        }
+        .hero-line .place::before, .hero-line .place::after {
+            content: ''; width: 26px; height: 1.5px; background: var(--gold-bright); opacity: .8;
+        }
+        .hero-line h2 {
+            font-family: 'Playfair Display', serif; font-weight: 900;
+            font-size: clamp(1.5rem, 3.4vw, 2.5rem); line-height: 1.06; color: #fff;
+            text-shadow: 0 3px 22px rgba(0,0,0,.7);
+        }
+        .hero-line h2 em { color: var(--gold-bright); font-style: italic; }
+        .hero-tags { display: flex; gap: 9px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+        .hero-tags span {
+            font-size: .72rem; font-weight: 600; letter-spacing: .3px;
+            padding: 7px 14px; border-radius: 999px; color: #fbeedd;
+            background: rgba(30,16,10,.42); border: 1px solid rgba(230,184,92,.40);
+            -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+        }
+        .hero-tags i { color: var(--gold-bright); margin-right: 7px; }
+
+        /* ===== Formulario tipo vidrio esmerilado ===== */
         .card {
-            position: relative; background: #fff; border-radius: 22px; padding: 40px 34px; width: 100%;
-            max-width: 400px; box-shadow: 0 30px 70px rgba(0,0,0,.4); animation: rise .5s ease both;
+            position: relative; z-index: 2; width: 100%; max-width: 412px;
+            padding: 72px 36px 34px; margin-top: 60px; border-radius: 26px;
+            /* Fallback sólido café (legible aunque no haya blur) */
+            background: linear-gradient(165deg, rgba(58,33,22,.92), rgba(28,15,9,.94));
+            border: 1px solid rgba(230,184,92,.42);
+            box-shadow: 0 34px 84px rgba(15,8,3,.6), inset 0 1px 0 rgba(255,255,255,.14);
+            animation: rise .6s cubic-bezier(.2,.8,.25,1) both;
         }
-        @keyframes rise { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .logo {
-            width: 64px; height: 64px; border-radius: 18px; margin: 0 auto 18px;
-            background: linear-gradient(135deg, var(--rust), var(--orange)); display: grid; place-items: center;
-            font-size: 1.8rem; color: #fff; box-shadow: 0 10px 26px rgba(184,84,31,.45);
+        @supports ((-webkit-backdrop-filter: blur(2px)) or (backdrop-filter: blur(2px))) {
+            .card {
+                background: linear-gradient(165deg, rgba(74,44,31,.62), rgba(28,15,9,.56));
+                -webkit-backdrop-filter: blur(18px) saturate(1.25);
+                backdrop-filter: blur(18px) saturate(1.25);
+            }
         }
-        h1 { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--brown-dark); text-align: center; }
-        p.sub { text-align: center; color: var(--text-soft); font-size: .88rem; margin: 4px 0 26px; }
-        label { display: block; font-size: .82rem; font-weight: 600; color: var(--brown); margin: 16px 0 7px; }
+        @keyframes rise { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: translateY(0); } }
+        /* Hilo dorado decorativo del borde superior */
+        .card::before {
+            content: ''; position: absolute; left: 24%; right: 24%; top: 14px; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(230,184,92,.7), transparent);
+        }
+
+        /* ===== Insignia del logo: protagonista arriba con halo cálido ===== */
+        .badge {
+            position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+            width: 148px; height: 124px; border-radius: 64px; display: grid; place-items: center;
+            background: radial-gradient(circle at 50% 36%, #FFFFFF 0%, #FBF4E8 62%, var(--cream) 100%);
+            border: 3px solid var(--gold-bright);
+            box-shadow: 0 0 0 7px rgba(45,24,16,.6), 0 18px 42px rgba(15,8,3,.6), inset 0 2px 6px rgba(255,255,255,.75);
+        }
+        /* Halo / resplandor cálido animado detrás del logo */
+        .badge::after {
+            content: ''; position: absolute; inset: -24px; border-radius: 50%; z-index: -1;
+            background: radial-gradient(circle, rgba(230,184,92,.6), rgba(210,105,30,.2) 55%, transparent 72%);
+            filter: blur(6px); animation: halo 4.5s ease-in-out infinite;
+        }
+        @keyframes halo { 0%, 100% { opacity: .55; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } }
+        .badge img {
+            width: 124px; height: 100px; object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(45,24,16,.20));
+        }
+
+        .greet {
+            text-align: center; font-size: .72rem; font-weight: 700; letter-spacing: 3px;
+            text-transform: uppercase; color: var(--gold-bright); margin-bottom: 6px;
+        }
+        h1 {
+            font-family: 'Playfair Display', serif; font-weight: 900; font-size: 1.62rem;
+            color: #fff; text-align: center; line-height: 1.15; letter-spacing: .2px;
+            text-shadow: 0 2px 12px rgba(0,0,0,.55);
+        }
+
+        /* Divisor decorativo llanero */
+        .divider {
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            margin: 12px auto 8px;
+        }
+        .divider span {
+            height: 1px; width: 58px;
+            background: linear-gradient(90deg, transparent, rgba(230,184,92,.75));
+        }
+        .divider span:last-child { background: linear-gradient(90deg, rgba(230,184,92,.75), transparent); }
+        .divider i { font-size: .9rem; color: var(--gold-bright); }
+        p.sub {
+            text-align: center; color: #f1e4d4; font-size: .9rem; margin-top: 4px;
+        }
+
+        label {
+            display: block; font-size: .82rem; font-weight: 700; color: #fbeedd;
+            margin: 18px 0 8px; letter-spacing: .3px;
+        }
         .field { position: relative; }
-        .field i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--gold-bright); }
+        .field > i {
+            position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
+            color: var(--gold-bright); font-size: .95rem; z-index: 2; pointer-events: none;
+        }
         input {
-            width: 100%; padding: 13px 14px 13px 42px; border: 1.5px solid #e6ddd0; border-radius: 12px;
-            font-size: 1rem; font-family: 'Inter', sans-serif; outline: none; transition: border-color .2s, box-shadow .2s;
+            width: 100%; padding: 14px 14px 14px 44px; border-radius: 13px;
+            border: 1.5px solid rgba(230,184,92,.34);
+            background: rgba(255,255,255,.10); color: #fff;
+            font-size: 1rem; font-family: 'Inter', sans-serif; outline: none;
+            transition: border-color .2s, box-shadow .2s, background .2s;
         }
-        input:focus { border-color: var(--rust); box-shadow: 0 0 0 4px rgba(184,84,31,.12); }
+        input::placeholder { color: rgba(245,230,211,.6); }
+        input:focus {
+            border-color: var(--gold-bright); background: rgba(255,255,255,.16);
+            box-shadow: 0 0 0 4px rgba(230,184,92,.22);
+        }
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus {
+            -webkit-text-fill-color: #fff;
+            -webkit-box-shadow: 0 0 0 1000px rgba(46,26,17,.96) inset;
+            caret-color: #fff;
+        }
+
         button {
-            width: 100%; margin-top: 26px; padding: 14px; border: none; border-radius: 12px; cursor: pointer;
-            background: linear-gradient(135deg, var(--rust), var(--orange)); color: #fff;
-            font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 700; transition: all .2s;
-            display: inline-flex; align-items: center; justify-content: center; gap: 9px;
-            box-shadow: 0 10px 24px rgba(184,84,31,.4);
+            width: 100%; margin-top: 28px; padding: 15px; border: none; border-radius: 13px; cursor: pointer;
+            background: linear-gradient(135deg, var(--rust), var(--orange) 60%, var(--gold-bright));
+            color: #fff; font-family: 'Inter', sans-serif; font-size: 1.02rem; font-weight: 700;
+            letter-spacing: .3px; transition: transform .18s, filter .18s, box-shadow .18s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 12px 28px rgba(184,84,31,.5), 0 1px 0 rgba(255,255,255,.2) inset;
         }
-        button:hover { transform: translateY(-2px); filter: brightness(1.05); }
+        button:hover { transform: translateY(-2px); filter: brightness(1.07); box-shadow: 0 16px 34px rgba(184,84,31,.6); }
         button:active { transform: scale(.98); }
+
         .error {
-            background: #f8e3e0; color: var(--red); padding: 11px 14px; border-radius: 10px;
-            font-size: .85rem; margin-top: 18px; display: flex; align-items: center; gap: 9px;
+            background: rgba(184,50,39,.28); color: #ffe0db; border: 1px solid rgba(184,50,39,.6);
+            padding: 12px 14px; border-radius: 11px; font-size: .85rem; font-weight: 500;
+            margin-top: 18px; display: flex; align-items: center; gap: 10px;
         }
-        .foot { text-align: center; margin-top: 22px; font-size: .78rem; color: #b6a796; }
+        .error i { color: #ff9e93; }
+
+        .foot {
+            text-align: center; margin-top: 24px; font-size: .78rem; font-weight: 500;
+            color: rgba(245,230,211,.85);
+            display: flex; align-items: center; justify-content: center; gap: 7px;
+        }
+        .foot i { color: var(--gold-bright); opacity: .9; font-size: .8rem; }
+
+        /* Tablet/desktop pequeño: la frase hero podría chocar con el badge de marca */
+        @media (max-width: 760px) {
+            .hero-line, .hero-tags { display: none; }
+            .card { margin-top: 34px; }
+        }
+        @media (max-width: 480px) {
+            .brand-mark span { display: none; }
+            .brand-mark b { font-size: .82rem; }
+        }
+        @media (max-width: 420px) {
+            body { padding: 16px; }
+            .brand-mark { top: 14px; left: 14px; padding: 6px 12px 6px 6px; }
+            .brand-mark .chip { width: 32px; height: 32px; flex-basis: 32px; }
+            .card { padding: 64px 24px 30px; margin-top: 30px; border-radius: 22px; }
+            .badge { width: 130px; height: 108px; top: -52px; }
+            .badge img { width: 108px; height: 86px; }
+            h1 { font-size: 1.42rem; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .bg, .badge::after, .card { animation: none; }
+        }
     </style>
 </head>
 <body>
+    <div class="bg"></div>
+    <div class="overlay"></div>
+
+    <!-- Badge de marca · contexto inmediato -->
+    <div class="brand-mark">
+        <span class="chip"><img src="/statics/logodelmico.png" alt="El Amarradero del Mico"></span>
+        <div>
+            <b>El Amarradero del Mico</b>
+            <span>Comida Llanera</span>
+        </div>
+    </div>
+
+    <!-- Frase llanera protagonista (solo desktop) -->
+    <div class="hero-line">
+        <span class="place">Villavicencio · Meta</span>
+        <h2>Sabor de los <em>Llanos</em>, directo a tu mesa</h2>
+        <div class="hero-tags">
+            <span><i class="fa-solid fa-fire"></i>A la llanera</span>
+            <span><i class="fa-solid fa-motorcycle"></i>Domicilios</span>
+            <span><i class="fa-solid fa-leaf"></i>Tradición</span>
+        </div>
+    </div>
+
     <form class="card" method="post">
         {% csrf_token %}
-        <div class="logo"><i class="fa-solid fa-drumstick-bite"></i></div>
+
+        <div class="badge">
+            <img src="/statics/logodelmico.png" alt="Logo El Amarradero del Mico">
+        </div>
+
+        <p class="greet">Bienvenida</p>
         <h1>Panel de pedidos</h1>
-        <p class="sub">El Amarradero del Mico</p>
+
+        <div class="divider"><span></span><i class="fa-solid fa-pepper-hot"></i><span></span></div>
+        <p class="sub">Ingresa para gestionar los domicilios</p>
 
         {% if form.errors %}
             <div class="error"><i class="fa-solid fa-circle-exclamation"></i> Usuario o contraseña incorrectos.</div>
@@ -79,7 +307,8 @@
         <div class="field"><i class="fa-solid fa-lock"></i>{{ form.password }}</div>
 
         <button type="submit"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
-        <p class="foot">Acceso exclusivo del personal</p>
+
+        <p class="foot"><i class="fa-solid fa-shield-halved"></i> Acceso exclusivo del personal</p>
     </form>
 </body>
 </html>
