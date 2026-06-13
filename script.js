@@ -412,12 +412,12 @@ function setMarker(lat, lng, reverseGeocode = false) {
     if (reverseGeocode) reverseLookup(lat, lng);
 }
 
-function updateCoordsDisplay(status = null) {
+function updateCoordsDisplay(status = null, pinned = false) {
     const el = document.getElementById('mapCoords');
     if (!el) return;
     if (status) {
         el.textContent = status;
-        el.classList.remove('has-pin');
+        el.classList.toggle('has-pin', pinned);
         return;
     }
     if (!pickedLocation) return;
@@ -464,27 +464,70 @@ function useMyLocation() {
         alert('Tu navegador no soporta geolocalización.');
         return;
     }
+    const resetBtn = () => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-location-arrow"></i> Usar mi ubicación';
+    };
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Detectando...';
-    navigator.geolocation.getCurrentPosition(
+    updateCoordsDisplay('Buscando tu ubicación… espera unos segundos sin cerrar.');
+
+    // El GPS del celular empieza con una lectura tosca (basada en red) y se va
+    // afinando. En vez de tomar la primera, OBSERVAMOS hasta 9 s y nos quedamos
+    // con la lectura más precisa (la de menor margen de error).
+    let best = null;          // { lat, lng, acc }
+    let watchId = null;
+    let done = false;
+
+    const finish = () => {
+        if (done) return;
+        done = true;
+        if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+        clearTimeout(maxWait);
+        resetBtn();
+        if (!best) {
+            updateCoordsDisplay('No pudimos obtener tu ubicación. Tócala manualmente en el mapa.');
+            return;
+        }
+        // Una sola búsqueda de dirección, con la mejor lectura conseguida.
+        reverseLookup(best.lat, best.lng);
+        if (best.acc > 150) {
+            // Precisión pobre: típico de computador sin GPS. Pedimos ajuste manual.
+            updateCoordsDisplay(`Ubicación aproximada (±${Math.round(best.acc)} m). Arrastra el pin hasta tu casa, o usa el celular con el GPS activado para más precisión.`, true);
+        } else {
+            updateCoordsDisplay(`Ubicación detectada (±${Math.round(best.acc)} m). Si no quedó exacta, arrastra el pin.`, true);
+        }
+    };
+
+    const maxWait = setTimeout(finish, 9000);
+
+    watchId = navigator.geolocation.watchPosition(
         (pos) => {
-            setMarker(pos.coords.latitude, pos.coords.longitude, true);
-            drawAccuracy(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy);
-            // Acercamos más cuando el GPS es preciso, para ubicar la casa exacta.
-            const zoom = pos.coords.accuracy && pos.coords.accuracy <= 50 ? 18 : 17;
-            leafletMap.setView([pos.coords.latitude, pos.coords.longitude], zoom);
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-location-arrow"></i> Usar mi ubicación';
+            const { latitude: lat, longitude: lng, accuracy: acc } = pos.coords;
+            if (!best || acc < best.acc) {
+                best = { lat, lng, acc };
+                setMarker(lat, lng, false);   // sin reverse-geocoding en cada paso
+                drawAccuracy(lat, lng, acc);
+                const zoom = acc <= 50 ? 18 : acc <= 200 ? 16 : 15;
+                leafletMap.setView([lat, lng], zoom);
+                updateCoordsDisplay(`Afinando ubicación… ±${Math.round(acc)} m`);
+            }
+            // Ya es suficientemente precisa: terminamos antes de los 9 s.
+            if (acc <= 30) finish();
         },
         (err) => {
+            if (done) return;
+            done = true;
+            if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+            clearTimeout(maxWait);
+            resetBtn();
             const msg = err.code === err.PERMISSION_DENIED
                 ? '¿Diste permiso? Activa la ubicación en tu navegador.'
                 : 'No pudimos obtener tu ubicación. Tócala manualmente en el mapa.';
             alert(msg);
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-location-arrow"></i> Usar mi ubicación';
+            updateCoordsDisplay('No pudimos obtener tu ubicación. Tócala manualmente en el mapa.');
         },
-        { enableHighAccuracy: true, timeout: 10000 }
+        { enableHighAccuracy: true, timeout: 9000, maximumAge: 0 }
     );
 }
 function showMenuView() {
