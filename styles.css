@@ -2213,6 +2213,21 @@ a { text-decoration: none; color: inherit; }
     color: rgba(255,255,255,0.5);
 }
 
+/* Acceso discreto al panel interno (solo personal) */
+.staff-access {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 12px;
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.22);
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    transition: color 0.25s ease;
+}
+.staff-access i { font-size: 0.68rem; }
+.staff-access:hover { color: var(--color-gold-bright); }
+
 /* ============= RESPONSIVE ============= */
 
 /* --- Laptops pequeños / Tablets grandes --- */
