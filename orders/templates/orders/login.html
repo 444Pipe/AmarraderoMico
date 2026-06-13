@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingresar · El Amarradero del Mico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg: #FAF6F0; --cream: #F5E6D3; --brown-dark: #2D1810; --brown: #4A2C1F;
+            --rust: #B8541F; --orange: #D2691E; --gold-bright: #E6B85C; --text-soft: #5C4538; --red: #B83227;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            font-family: 'Inter', -apple-system, sans-serif; padding: 20px;
+            background: linear-gradient(135deg, var(--brown-dark), var(--brown) 55%, var(--rust));
+            position: relative; overflow: hidden;
+        }
+        body::before, body::after {
+            content: ''; position: absolute; border-radius: 50%; filter: blur(2px); opacity: .12;
+        }
+        body::before { width: 380px; height: 380px; background: var(--orange); top: -120px; right: -100px; }
+        body::after { width: 320px; height: 320px; background: var(--gold-bright); bottom: -120px; left: -90px; }
+        .card {
+            position: relative; background: #fff; border-radius: 22px; padding: 40px 34px; width: 100%;
+            max-width: 400px; box-shadow: 0 30px 70px rgba(0,0,0,.4); animation: rise .5s ease both;
+        }
+        @keyframes rise { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .logo {
+            width: 64px; height: 64px; border-radius: 18px; margin: 0 auto 18px;
+            background: linear-gradient(135deg, var(--rust), var(--orange)); display: grid; place-items: center;
+            font-size: 1.8rem; color: #fff; box-shadow: 0 10px 26px rgba(184,84,31,.45);
+        }
+        h1 { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--brown-dark); text-align: center; }
+        p.sub { text-align: center; color: var(--text-soft); font-size: .88rem; margin: 4px 0 26px; }
+        label { display: block; font-size: .82rem; font-weight: 600; color: var(--brown); margin: 16px 0 7px; }
+        .field { position: relative; }
+        .field i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--gold-bright); }
+        input {
+            width: 100%; padding: 13px 14px 13px 42px; border: 1.5px solid #e6ddd0; border-radius: 12px;
+            font-size: 1rem; font-family: 'Inter', sans-serif; outline: none; transition: border-color .2s, box-shadow .2s;
+        }
+        input:focus { border-color: var(--rust); box-shadow: 0 0 0 4px rgba(184,84,31,.12); }
+        button {
+            width: 100%; margin-top: 26px; padding: 14px; border: none; border-radius: 12px; cursor: pointer;
+            background: linear-gradient(135deg, var(--rust), var(--orange)); color: #fff;
+            font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 700; transition: all .2s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+            box-shadow: 0 10px 24px rgba(184,84,31,.4);
+        }
+        button:hover { transform: translateY(-2px); filter: brightness(1.05); }
+        button:active { transform: scale(.98); }
+        .error {
+            background: #f8e3e0; color: var(--red); padding: 11px 14px; border-radius: 10px;
+            font-size: .85rem; margin-top: 18px; display: flex; align-items: center; gap: 9px;
+        }
+        .foot { text-align: center; margin-top: 22px; font-size: .78rem; color: #b6a796; }
+    </style>
+</head>
+<body>
+    <form class="card" method="post">
+        {% csrf_token %}
+        <div class="logo"><i class="fa-solid fa-drumstick-bite"></i></div>
+        <h1>Panel de pedidos</h1>
+        <p class="sub">El Amarradero del Mico</p>
+
+        {% if form.errors %}
+            <div class="error"><i class="fa-solid fa-circle-exclamation"></i> Usuario o contraseña incorrectos.</div>
+        {% endif %}
+
+        <label for="id_username">Usuario</label>
+        <div class="field"><i class="fa-solid fa-user"></i>{{ form.username }}</div>
+
+        <label for="id_password">Contraseña</label>
+        <div class="field"><i class="fa-solid fa-lock"></i>{{ form.password }}</div>
+
+        <button type="submit"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
+        <p class="foot">Acceso exclusivo del personal</p>
+    </form>
+</body>
+</html>

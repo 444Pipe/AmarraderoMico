@@ -322,8 +322,23 @@ function setOrderType(type) {
 // ============= MAP PICKER (Leaflet + Nominatim) =============
 let leafletMap = null;
 let mapMarker = null;
+let accuracyCircle = null;
 let addressDebounce = null;
 const VILLAVO_CENTER = [4.142, -73.626];
+
+// Dibuja un círculo con el margen de error del GPS, para que el cliente vea
+// qué tan precisa es su ubicación y ajuste el pin si hace falta.
+function drawAccuracy(lat, lng, accuracy) {
+    if (!leafletMap || !accuracy) return;
+    if (accuracyCircle) leafletMap.removeLayer(accuracyCircle);
+    accuracyCircle = L.circle([lat, lng], {
+        radius: accuracy,
+        color: '#4A2C1F',
+        weight: 1,
+        fillColor: '#4A2C1F',
+        fillOpacity: 0.12,
+    }).addTo(leafletMap);
+}
 
 function initMapPicker() {
     if (typeof L === 'undefined') return;
@@ -378,6 +393,11 @@ function initMapPicker() {
 
 function setMarker(lat, lng, reverseGeocode = false) {
     pickedLocation = { lat, lng };
+    // Si el cliente movió el pin a mano, el círculo de precisión del GPS deja de aplicar.
+    if (reverseGeocode && accuracyCircle) {
+        leafletMap.removeLayer(accuracyCircle);
+        accuracyCircle = null;
+    }
     if (!mapMarker) {
         mapMarker = L.marker([lat, lng], { draggable: true }).addTo(leafletMap);
         mapMarker.on('dragend', (e) => {
@@ -449,6 +469,10 @@ function useMyLocation() {
     navigator.geolocation.getCurrentPosition(
         (pos) => {
             setMarker(pos.coords.latitude, pos.coords.longitude, true);
+            drawAccuracy(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy);
+            // Acercamos más cuando el GPS es preciso, para ubicar la casa exacta.
+            const zoom = pos.coords.accuracy && pos.coords.accuracy <= 50 ? 18 : 17;
+            leafletMap.setView([pos.coords.latitude, pos.coords.longitude], zoom);
             btn.disabled = false;
             btn.innerHTML = '<i class="fa-solid fa-location-arrow"></i> Usar mi ubicación';
         },
@@ -551,6 +575,37 @@ function buildWhatsappMessage(data) {
     ].filter(Boolean).join('\n');
 }
 
+// Envia el pedido al backend (Django) para que la mesera lo vea en el panel.
+function savePedido(data) {
+    const items = [...cart.values()].map(({ item, qty }) => ({
+        id: item.id,
+        name: item.name,
+        qty,
+        price: item.price,
+    }));
+    const subtotal = items.reduce((s, it) => s + it.price * it.qty, 0);
+
+    const payload = {
+        nombre: data.nombre || '',
+        telefono: data.telefono || '',
+        tipo: orderType, // 'delivery' | 'pickup'
+        direccion: data.direccion || '',
+        notas: data.notas || '',
+        lat: pickedLocation ? pickedLocation.lat : null,
+        lng: pickedLocation ? pickedLocation.lng : null,
+        items,
+        subtotal,
+    };
+
+    // keepalive permite que el envio termine aunque la pestaña navegue a WhatsApp.
+    fetch('/api/pedidos/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        keepalive: true,
+    }).catch((err) => console.warn('No se pudo registrar el pedido en el panel:', err));
+}
+
 // ----- EVENTS -----
 if (dom.fab) {
     renderMenu();
@@ -588,6 +643,12 @@ if (dom.fab) {
     dom.form.addEventListener('submit', (e) => {
         e.preventDefault();
         const data = Object.fromEntries(new FormData(dom.form));
+
+        // 1) Guardar el pedido en el backend (para que aparezca en el panel de la mesera).
+        //    Si falla (sin conexión, etc.), igual continuamos a WhatsApp: no bloquea al cliente.
+        savePedido(data);
+
+        // 2) Abrir WhatsApp con el resumen, como siempre.
         const msg = buildWhatsappMessage(data);
         const url = `https://wa.me/${DELIVERY_CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
         window.open(url, '_blank');
