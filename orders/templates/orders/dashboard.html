@@ -59,15 +59,20 @@
         }
         .brand h1 { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; line-height: 1.1; }
         .brand p { font-size: .76rem; color: var(--gold-bright); letter-spacing: .5px; text-transform: uppercase; }
-        .header-user { display: flex; align-items: center; gap: 14px; font-size: .85rem; }
+        .header-user { display: flex; align-items: center; gap: 10px; font-size: .85rem; flex-wrap: wrap; }
         .header-user .who { display: flex; align-items: center; gap: 7px; opacity: .92; }
         .header-user .who i { color: var(--gold-bright); }
-        .btn-logout {
+        .logout-form { margin: 0; }
+        .btn-home, .btn-logout {
             color: var(--white); text-decoration: none; border: 1.5px solid rgba(255,255,255,.28);
             padding: 7px 14px; border-radius: 999px; font-size: .82rem; font-weight: 600;
             transition: all .2s; display: inline-flex; align-items: center; gap: 6px;
+            cursor: pointer; background: transparent; font-family: 'Inter', sans-serif;
         }
+        .btn-home:hover { background: rgba(255,255,255,.14); border-color: var(--gold-bright); }
+        .btn-logout { border-color: rgba(255,255,255,.45); }
         .btn-logout:hover { background: rgba(255,255,255,.14); border-color: var(--gold-bright); }
+        .btn-logout:active, .btn-home:active { transform: scale(.96); }
 
         /* ---------- STATS ---------- */
         .stats { max-width: 1240px; margin: 0 auto; padding: 22px; display: grid;
@@ -197,6 +202,35 @@
         .toast.show { transform: translateX(-50%) translateY(0); }
         .toast i { font-size: 1.3rem; }
 
+        /* ---------- DESKTOP / PC (solo pantallas anchas) ---------- */
+        @media (min-width: 721px) {
+            /* Más aire general y mejor uso del alto en monitores grandes */
+            .stats { padding: 26px 22px 4px; gap: 18px; }
+
+            /* KPIs balanceados: etiqueta a la izquierda, número grande a la
+               derecha — sin el hueco vacío que se veía al 100% */
+            .stat { padding: 18px 24px; min-height: 86px; }
+            .stat .ic { width: 54px; height: 54px; font-size: 1.45rem; }
+            .stat > div:last-child {
+                flex: 1; display: flex; flex-direction: row-reverse;
+                align-items: center; justify-content: space-between; gap: 10px;
+            }
+            .stat .num { font-size: 2.5rem; }
+            .stat .lbl { margin-top: 0; font-size: .82rem; }
+            .stat.nuevos.has::after { top: 14px; right: 16px; }
+
+            .toolbar { margin: 14px 0 22px; }
+
+            /* Estado vacío con más presencia vertical en vez de una franja baja */
+            .empty { padding: 88px 28px; }
+            .empty .big { font-size: 3.4rem; margin-bottom: 16px; }
+            .empty h3 { font-size: 1.55rem; }
+            .empty p { font-size: 1rem; }
+
+            /* Tarjetas un poco más amplias para llenar mejor el ancho */
+            .grid { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+        }
+
         /* ---------- RESPONSIVE ---------- */
         @media (max-width: 720px) {
             .stats { grid-template-columns: 1fr; gap: 10px; padding: 16px; }
@@ -208,8 +242,10 @@
             .filters { width: 100%; justify-content: space-between; }
             .filter-btn { flex: 1; justify-content: center; padding: 9px 8px; }
             .brand h1 { font-size: 1.1rem; }
-            .header-user { font-size: .8rem; }
+            .header-user { font-size: .8rem; gap: 8px; }
             .header-user .who span { display: none; }
+            .btn-home span { display: none; }
+            .btn-home, .btn-logout { padding: 7px 11px; }
         }
         @media (max-width: 380px) {
             .actions { flex-direction: column; }
@@ -228,7 +264,11 @@
             </div>
             <div class="header-user">
                 <span class="who"><i class="fa-solid fa-circle-user"></i> <span>{{ request.user.username }}</span></span>
-                <a class="btn-logout" href="{% url 'logout' %}"><i class="fa-solid fa-right-from-bracket"></i> Salir</a>
+                <a class="btn-home" href="{% url 'home' %}"><i class="fa-solid fa-house"></i> <span>Página principal</span></a>
+                <form method="post" action="{% url 'logout' %}" class="logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</button>
+                </form>
             </div>
         </div>
     </header>

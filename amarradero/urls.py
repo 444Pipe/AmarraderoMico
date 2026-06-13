@@ -30,7 +30,7 @@ urlpatterns = [
 
     # Login / logout del panel
     path('panel/login/', auth_views.LoginView.as_view(template_name='orders/login.html'), name='login'),
-    path('panel/logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('panel/logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
 
     # Admin de Django en una ruta secreta (configurable con ADMIN_URL en producción)
     path(f'{settings.ADMIN_URL}/', admin.site.urls),
