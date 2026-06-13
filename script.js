@@ -333,10 +333,10 @@ function drawAccuracy(lat, lng, accuracy) {
     if (accuracyCircle) leafletMap.removeLayer(accuracyCircle);
     accuracyCircle = L.circle([lat, lng], {
         radius: accuracy,
-        color: '#4A2C1F',
-        weight: 1,
-        fillColor: '#4A2C1F',
-        fillOpacity: 0.12,
+        color: '#FFFFFF',
+        weight: 2,
+        fillColor: '#FFFFFF',
+        fillOpacity: 0.15,
     }).addTo(leafletMap);
 }
 
@@ -351,9 +351,22 @@ function initMapPicker() {
             zoom: 13,
             scrollWheelZoom: false,
         });
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap',
+        // Capa base: imágenes satelitales de Esri (sin API key).
+        // maxNativeZoom evita los recuadros grises "Map data not yet available":
+        // si no hay foto a ese zoom, Leaflet escala la última disponible en vez de pedir tiles vacíos.
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 20,
+            maxNativeZoom: 17,
+            attribution: 'Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics',
+        }).addTo(leafletMap);
+        // Capas de referencia transparentes encima del satélite: calles y lugares.
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 20,
+            maxNativeZoom: 18,
+        }).addTo(leafletMap);
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 20,
+            maxNativeZoom: 18,
         }).addTo(leafletMap);
 
         const DefaultIcon = L.icon({
