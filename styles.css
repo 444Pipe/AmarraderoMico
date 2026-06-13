@@ -666,17 +666,32 @@ body.loading { overflow: hidden; height: 100vh; }
 }
 .checkout-form {
     display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
+    max-width: 1000px;
+}
+.checkout-fields {
+    display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
-    max-width: 720px;
+    align-content: start;
+}
+.checkout-aside {
+    position: sticky;
+    top: 8px;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 .checkout-form label {
     display: flex;
     flex-direction: column;
     gap: 6px;
 }
-.checkout-form label.full,
-.checkout-form .full { grid-column: 1 / -1; }
+.checkout-fields label.full,
+.checkout-fields .full { grid-column: 1 / -1; }
 .checkout-form span {
     font-size: 0.85rem;
     font-weight: 600;
@@ -700,11 +715,10 @@ body.loading { overflow: hidden; height: 100vh; }
     border-color: var(--color-rust);
 }
 .checkout-summary {
-    grid-column: 1 / -1;
     background: linear-gradient(180deg, var(--color-cream) 0%, #F2DEBE 100%);
     padding: 24px;
     border-radius: 16px;
-    margin-top: 12px;
+    margin-top: 0;
     box-shadow: 0 4px 20px rgba(74, 44, 31, 0.08);
     border: 1px solid rgba(201, 169, 97, 0.3);
 }
@@ -915,7 +929,8 @@ body.loading { overflow: hidden; height: 100vh; }
 
 /* --- Tablets pequenas (900px) --- */
 @media (max-width: 900px) {
-    .checkout-form { grid-template-columns: 1fr; }
+    .checkout-form { grid-template-columns: 1fr; max-width: 760px; gap: 20px; }
+    .checkout-aside { position: static; top: auto; }
 }
 
 /* --- Mobile (768px y menos): rediseno tipo Rappi --- */
@@ -1080,6 +1095,7 @@ body.loading { overflow: hidden; height: 100vh; }
     .checkout-sub { font-size: 0.88rem; margin-bottom: 18px; }
     .checkout-back { margin-bottom: 14px; font-size: 0.88rem; }
     .checkout-form { gap: 14px; }
+    .checkout-fields { grid-template-columns: 1fr; gap: 14px; }
     .checkout-form input,
     .checkout-form textarea { font-size: 0.95rem; padding: 11px 13px; }
     .checkout-summary { padding: 16px 18px; }

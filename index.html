@@ -107,6 +107,7 @@
                 <p class="checkout-sub">Diligencia tus datos y enviaremos tu pedido por WhatsApp a la sede.</p>
 
                 <form class="checkout-form" id="checkoutForm">
+                    <div class="checkout-fields">
                     <label>
                         <span>Nombre completo *</span>
                         <input type="text" name="nombre" required placeholder="Ej: Juan Pérez">
@@ -150,7 +151,9 @@
                         <span>Detalles adicionales</span>
                         <textarea name="notas" rows="3" placeholder="Ej: Apartamento 302, sin cebolla, pagar con $50.000..."></textarea>
                     </label>
+                    </div><!-- /.checkout-fields -->
 
+                    <aside class="checkout-aside">
                     <div class="checkout-summary">
                         <h4>Resumen del pedido</h4>
                         <div id="checkoutSummary"></div>
@@ -161,6 +164,7 @@
                     <button type="submit" class="btn btn-wa">
                         <i class="fa-brands fa-whatsapp"></i> Enviar pedido por WhatsApp
                     </button>
+                    </aside><!-- /.checkout-aside -->
                 </form>
             </div>
         </div>

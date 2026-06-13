@@ -9,9 +9,13 @@ Landing de una sola vista con un sistema de pedidos a domicilio + un panel para 
   pedidos y el panel protegido con login. Reemplazó al viejo `app.py` (Flask).
 - **Frontend de la landing**: `index.html` + `styles.css` + `script.js` (vanilla JS, una sola página).
 - **Base de datos**: SQLite en local; en Railway se usa Postgres vía `DATABASE_URL`.
+  En producción hay un servicio **Postgres** conectado al servicio web con la variable de
+  referencia `DATABASE_URL = ${{Postgres.DATABASE_URL}}` (red interna de Railway). Las tablas
+  se crean solas en el deploy (`migrate`); confirmado funcionando (tablas creadas en Postgres).
 - **Despliegue**: Railway (`railway.json` / `Procfile`) con gunicorn + whitenoise. Python 3.11.
-- **Imágenes/Video**: carpeta `statics/`. La landing puede reescribir imágenes a Cloudinary
-  (variables `CLOUDINARY_CLOUD_NAME` + `SITE_URL`), igual que antes.
+  `DEBUG=false` en producción.
+- **Imágenes/Video**: carpeta `statics/`. La landing reescribe imágenes a Cloudinary
+  (Cloudinary **activo** en producción: `CLOUDINARY_CLOUD_NAME` + `SITE_URL` definidas).
 
 ## Flujo de un pedido
 
@@ -58,10 +62,6 @@ python manage.py createsuperuser     # crea el usuario admin
 python manage.py runserver
 ```
 
-- Landing: http://127.0.0.1:8000/
-- Panel mesera: http://127.0.0.1:8000/panel/
-- Admin: http://127.0.0.1:8000/gestion-mico-9q2x/ (ruta secreta por defecto; cámbiala con `ADMIN_URL`. La ruta `/admin/` no existe).
-
 ### Crear el usuario de la mesera
 
 La mesera necesita una cuenta para entrar al panel. Crea un superusuario (acceso total) o,
@@ -80,8 +80,9 @@ desde el admin (ruta secreta `/gestion-mico-9q2x/`) → Usuarios, crea un usuari
 | `ADMIN_USERNAME`, `ADMIN_PASSWORD` | Crean la cuenta del panel en el despliegue. |
 | `CLOUDINARY_CLOUD_NAME`, `SITE_URL` | Reescritura de imágenes a Cloudinary (opcional). |
 
-> ⚠️ En Railway, agrega un servicio **Postgres** y define `DATABASE_URL`. Con SQLite, la base
-> se borra en cada despliegue (se perderían los pedidos).
+> ✅ Ya configurado en producción: servicio **Postgres** conectado con
+> `DATABASE_URL = ${{Postgres.DATABASE_URL}}`, `DEBUG=false` y Cloudinary activo.
+> ⚠️ No quites `DATABASE_URL`: con SQLite la base se borra en cada despliegue (se perderían los pedidos).
 
 ## WhatsApp de la sede
 
