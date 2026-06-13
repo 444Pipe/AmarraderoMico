@@ -60,13 +60,13 @@ python manage.py runserver
 
 - Landing: http://127.0.0.1:8000/
 - Panel mesera: http://127.0.0.1:8000/panel/
-- Admin: http://127.0.0.1:8000/admin/
+- Admin: http://127.0.0.1:8000/gestion-mico-9q2x/ (ruta secreta por defecto; cámbiala con `ADMIN_URL`. La ruta `/admin/` no existe).
 
 ### Crear el usuario de la mesera
 
 La mesera necesita una cuenta para entrar al panel. Crea un superusuario (acceso total) o,
-desde `/admin/` → Usuarios, crea un usuario con permiso de "staff". Con `createsuperuser` basta
-para empezar.
+desde el admin (ruta secreta `/gestion-mico-9q2x/`) → Usuarios, crea un usuario con permiso de
+"staff". Con `createsuperuser` basta para empezar.
 
 ## Variables de entorno (Railway)
 
