@@ -675,7 +675,8 @@ body.loading { overflow: hidden; height: 100vh; }
     flex-direction: column;
     gap: 6px;
 }
-.checkout-form label.full { grid-column: 1 / -1; }
+.checkout-form label.full,
+.checkout-form .full { grid-column: 1 / -1; }
 .checkout-form span {
     font-size: 0.85rem;
     font-weight: 600;
