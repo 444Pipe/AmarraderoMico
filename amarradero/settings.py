@@ -139,6 +139,12 @@ LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'login'
 
 
+# --- Ruta secreta del admin de Django ---
+# El repo es público, así que la ruta real debe venir de una variable de entorno en
+# Railway (ADMIN_URL). El valor por defecto ya es poco obvio como respaldo.
+ADMIN_URL = os.environ.get('ADMIN_URL', 'gestion-mico-9q2x').strip().strip('/')
+
+
 # --- Cloudinary (reescritura de imágenes de la landing, igual que el viejo Flask) ---
 CLOUDINARY_CLOUD = os.environ.get('CLOUDINARY_CLOUD_NAME', '').strip()
 SITE_URL = os.environ.get('SITE_URL', '').strip().rstrip('/')

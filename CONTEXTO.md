@@ -33,7 +33,9 @@ Landing de una sola vista con un sistema de pedidos a domicilio + un panel para 
   2. **Cancelar**.
   3. **WhatsApp** → abre la conversación con el teléfono del cliente (`wa.me`).
 - Se refresca solo cuando entra un pedido nuevo (chequeo cada 12 s contra `/panel/datos/`).
-- Gestión avanzada / exportar: admin de Django en `/admin/`.
+- Acceso discreto desde la web: enlace "Personal" al final del footer.
+- Gestión avanzada / exportar: admin de Django en una **ruta secreta** (`ADMIN_URL`,
+  por defecto `/gestion-mico-9q2x/`). La ruta `/admin/` ya no existe (404).
 
 ## Archivos clave
 
@@ -74,6 +76,8 @@ para empezar.
 | `DEBUG` | `false` en producción. |
 | `DATABASE_URL` | Postgres de Railway (si no, usa SQLite efímero). |
 | `ALLOWED_HOSTS` | Dominios permitidos (ej. `amarradero.up.railway.app`). |
+| `ADMIN_URL` | Ruta secreta del admin (ej. `mi-clave-secreta`). Recomendado en producción. |
+| `ADMIN_USERNAME`, `ADMIN_PASSWORD` | Crean la cuenta del panel en el despliegue. |
 | `CLOUDINARY_CLOUD_NAME`, `SITE_URL` | Reescritura de imágenes a Cloudinary (opcional). |
 
 > ⚠️ En Railway, agrega un servicio **Postgres** y define `DATABASE_URL`. Con SQLite, la base
