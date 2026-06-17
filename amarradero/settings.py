@@ -156,3 +156,17 @@ ADMIN_URL = os.environ.get('ADMIN_URL', 'gestion-mico-9q2x').strip().strip('/')
 CLOUDINARY_CLOUD = os.environ.get('CLOUDINARY_CLOUD_NAME', '').strip()
 SITE_URL = os.environ.get('SITE_URL', '').strip().rstrip('/')
 CLOUDINARY_TRANSFORM = os.environ.get('CLOUDINARY_TRANSFORM', 'f_auto,q_auto').strip()
+
+
+# --- Wompi (pasarela de pagos PSE) ---
+# Llaves en sandbox por defecto para empezar a probar. En produccion: setear en Railway.
+WOMPI_PUBLIC_KEY = os.environ.get('WOMPI_PUBLIC_KEY', '').strip()
+WOMPI_PRIVATE_KEY = os.environ.get('WOMPI_PRIVATE_KEY', '').strip()
+WOMPI_INTEGRITY_SECRET = os.environ.get('WOMPI_INTEGRITY_SECRET', '').strip()
+WOMPI_EVENTS_SECRET = os.environ.get('WOMPI_EVENTS_SECRET', '').strip()
+WOMPI_ENV = os.environ.get('WOMPI_ENV', 'sandbox').strip()  # 'sandbox' o 'production'
+WOMPI_CHECKOUT_URL = (
+    'https://checkout.wompi.co/p/'
+    if WOMPI_ENV == 'production'
+    else 'https://checkout.wompi.co/p/'
+)

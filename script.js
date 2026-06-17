@@ -618,13 +618,13 @@ function buildWhatsappMessage(data) {
 
     const totalLabel = isPickup ? '*Total a pagar:*' : '*Subtotal productos:*';
 
-    const paymentMethod = data.metodo_pago === 'bold' ? 'BOLD (tarjeta / PSE / Nequi)' : 'Efectivo';
+    const paymentMethod = data.metodo_pago === 'pse' ? 'PSE (transferencia bancaria)' : 'Efectivo';
     const paymentLines = ['', '*Método de pago:*', `💳 ${paymentMethod}`];
     if (data.metodo_pago === 'efectivo' && data.paga_con && data.paga_con.trim()) {
         paymentLines.push(`💵 Paga con: ${data.paga_con.trim()}`);
     }
-    if (data.metodo_pago === 'bold') {
-        paymentLines.push('_(la sede te enviará el link de pago)_');
+    if (data.metodo_pago === 'pse') {
+        paymentLines.push('🏦 _(la sede te enviará el link de pago PSE)_');
     }
 
     return [
@@ -644,6 +644,7 @@ function buildWhatsappMessage(data) {
 }
 
 // Envia el pedido al backend (Django) para que la mesera lo vea en el panel.
+// Devuelve una Promise con la respuesta JSON.
 function savePedido(data) {
     const items = [...cart.values()].map(({ item, qty }) => ({
         id: item.id,
@@ -668,12 +669,17 @@ function savePedido(data) {
     };
 
     // keepalive permite que el envio termine aunque la pestaña navegue a WhatsApp.
-    fetch('/api/pedidos/', {
+    return fetch('/api/pedidos/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
         keepalive: true,
-    }).catch((err) => console.warn('No se pudo registrar el pedido en el panel:', err));
+    })
+    .then((r) => r.json())
+    .catch((err) => {
+        console.warn('No se pudo registrar el pedido en el panel:', err);
+        return null;
+    });
 }
 
 // ----- EVENTS -----
@@ -722,15 +728,20 @@ if (dom.fab) {
         });
     }
 
-    dom.form.addEventListener('submit', (e) => {
+    dom.form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const data = Object.fromEntries(new FormData(dom.form));
 
         // 1) Guardar el pedido en el backend (para que aparezca en el panel de la mesera).
-        //    Si falla (sin conexión, etc.), igual continuamos a WhatsApp: no bloquea al cliente.
-        savePedido(data);
+        const resp = await savePedido(data);
 
-        // 2) Abrir WhatsApp con el resumen, como siempre.
+        // 2a) Si el pago es PSE y backend devolvio URL de checkout Wompi -> redirigir a Wompi.
+        if (data.metodo_pago === 'pse' && resp && resp.wompi_checkout_url) {
+            window.location.href = resp.wompi_checkout_url;
+            return;
+        }
+
+        // 2b) Sino, abrir WhatsApp con el resumen (efectivo o si PSE no esta configurado).
         const msg = buildWhatsappMessage(data);
         const url = `https://wa.me/${DELIVERY_CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
         window.open(url, '_blank');

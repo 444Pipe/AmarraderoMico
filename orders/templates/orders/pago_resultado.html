@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultado del pago — El Amarradero del Mico</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        body { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #F5F2EE; padding: 20px; }
+        .pago-result { max-width: 480px; width: 100%; background: #fff; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); padding: 40px 28px; text-align: center; }
+        .pago-icon { width: 90px; height: 90px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 2.4rem; margin-bottom: 20px; }
+        .pago-icon.ok { background: linear-gradient(135deg, #2EAE5E, #34A853); color: #fff; box-shadow: 0 8px 24px rgba(52, 168, 83, 0.35); }
+        .pago-icon.pending { background: linear-gradient(135deg, #F5B23E, #E69400); color: #fff; }
+        .pago-icon.fail { background: linear-gradient(135deg, #DC3545, #B02A37); color: #fff; }
+        .pago-result h1 { font-family: 'Playfair Display', serif; font-size: 1.6rem; margin: 0 0 10px; color: #2D1810; }
+        .pago-result p { color: #5C4538; line-height: 1.5; font-size: 0.98rem; margin: 0 0 24px; }
+        .pago-result .btn { display: inline-block; padding: 14px 28px; background: #25D366; color: #fff; border-radius: 14px; text-decoration: none; font-weight: 700; font-size: 0.95rem; }
+        .pago-result .btn.secondary { background: #4A2C1F; }
+        .pago-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    </style>
+</head>
+<body>
+    <div class="pago-result">
+        {% if pedido and pedido.estado_pago == 'aprobado' %}
+            <div class="pago-icon ok"><i class="fa-solid fa-check"></i></div>
+            <h1>¡Pago aprobado!</h1>
+            <p>Tu pedido #{{ pedido.pk }} ya fue confirmado y está en preparación. Te llegará a la dirección indicada.</p>
+        {% elif pedido and pedido.estado_pago == 'rechazado' %}
+            <div class="pago-icon fail"><i class="fa-solid fa-xmark"></i></div>
+            <h1>Pago rechazado</h1>
+            <p>No pudimos procesar tu pago para el pedido #{{ pedido.pk }}. Puedes intentar de nuevo o elegir pagar en efectivo al recibir.</p>
+        {% else %}
+            <div class="pago-icon pending"><i class="fa-solid fa-clock"></i></div>
+            <h1>Pago en proceso</h1>
+            <p>Estamos verificando tu pago. Esto puede tardar unos minutos. Apenas se confirme, te avisaremos por WhatsApp.</p>
+        {% endif %}
+
+        <div class="pago-buttons">
+            <a href="/" class="btn">Volver al inicio</a>
+            <a href="https://wa.me/573208583991" target="_blank" class="btn secondary"><i class="fa-brands fa-whatsapp"></i> Hablar con la sede</a>
+        </div>
+    </div>
+</body>
+</html>

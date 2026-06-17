@@ -23,10 +23,10 @@ class Pedido(models.Model):
     ]
 
     PAGO_EFECTIVO = 'efectivo'
-    PAGO_BOLD = 'bold'
+    PAGO_PSE = 'pse'
     METODOS_PAGO = [
         (PAGO_EFECTIVO, 'Efectivo'),
-        (PAGO_BOLD, 'BOLD (tarjeta/PSE/Nequi)'),
+        (PAGO_PSE, 'PSE (transferencia bancaria)'),
     ]
 
     # Datos del cliente
@@ -41,6 +41,21 @@ class Pedido(models.Model):
     # Pago
     metodo_pago = models.CharField('Método de pago', max_length=12, choices=METODOS_PAGO, default=PAGO_EFECTIVO)
     paga_con = models.CharField('Paga con', max_length=60, blank=True)
+
+    # Wompi (solo si metodo_pago=pse)
+    ESTADO_PAGO_PENDIENTE = 'pendiente'
+    ESTADO_PAGO_APROBADO = 'aprobado'
+    ESTADO_PAGO_RECHAZADO = 'rechazado'
+    ESTADO_PAGO_NO_APLICA = 'no_aplica'
+    ESTADOS_PAGO = [
+        (ESTADO_PAGO_NO_APLICA, 'No aplica (efectivo)'),
+        (ESTADO_PAGO_PENDIENTE, 'Pendiente'),
+        (ESTADO_PAGO_APROBADO, 'Aprobado'),
+        (ESTADO_PAGO_RECHAZADO, 'Rechazado'),
+    ]
+    estado_pago = models.CharField('Estado del pago', max_length=12, choices=ESTADOS_PAGO, default=ESTADO_PAGO_NO_APLICA)
+    wompi_reference = models.CharField('Referencia Wompi', max_length=80, blank=True)
+    wompi_transaction_id = models.CharField('Transaction ID Wompi', max_length=120, blank=True)
 
     # Detalle del pedido. items = [{id, name, qty, price}, ...]
     items = models.JSONField('Artículos', default=list)

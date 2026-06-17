@@ -1,3 +1,4 @@
+import hashlib
 import json
 import re
 
@@ -92,8 +93,13 @@ def crear_pedido(request):
             return None
 
     metodo_pago = data.get('metodo_pago')
-    if metodo_pago not in (Pedido.PAGO_EFECTIVO, Pedido.PAGO_BOLD):
+    if metodo_pago not in (Pedido.PAGO_EFECTIVO, Pedido.PAGO_PSE):
         metodo_pago = Pedido.PAGO_EFECTIVO
+
+    estado_pago = (
+        Pedido.ESTADO_PAGO_PENDIENTE if metodo_pago == Pedido.PAGO_PSE
+        else Pedido.ESTADO_PAGO_NO_APLICA
+    )
 
     pedido = Pedido.objects.create(
         nombre=nombre[:120],
@@ -107,8 +113,119 @@ def crear_pedido(request):
         subtotal=subtotal,
         metodo_pago=metodo_pago,
         paga_con=(data.get('paga_con') or '').strip()[:60],
+        estado_pago=estado_pago,
     )
-    return JsonResponse({'ok': True, 'id': pedido.pk})
+
+    payload = {'ok': True, 'id': pedido.pk}
+
+    # Si es PSE, devolvemos la URL de checkout de Wompi para redirigir al cliente
+    if metodo_pago == Pedido.PAGO_PSE and settings.WOMPI_PUBLIC_KEY:
+        checkout = _build_wompi_checkout_url(pedido)
+        if checkout:
+            payload['wompi_checkout_url'] = checkout
+
+    return JsonResponse(payload)
+
+
+# ---------------- Wompi (pasarela PSE) ----------------
+
+def _build_wompi_checkout_url(pedido):
+    """Construye la URL de checkout de Wompi con firma de integridad."""
+    if not settings.WOMPI_PUBLIC_KEY or not settings.WOMPI_INTEGRITY_SECRET:
+        return None
+
+    # Referencia unica por intento de pago (incluye pk para idempotencia + sufijo)
+    import time
+    reference = f'pedido-{pedido.pk}-{int(time.time())}'
+    pedido.wompi_reference = reference
+    pedido.save(update_fields=['wompi_reference'])
+
+    # Wompi usa amount_in_cents (subtotal en COP * 100, sin decimales)
+    amount_in_cents = pedido.subtotal * 100
+    currency = 'COP'
+
+    # Firma de integridad: SHA256(reference + amount + currency + secret)
+    raw = f'{reference}{amount_in_cents}{currency}{settings.WOMPI_INTEGRITY_SECRET}'
+    signature = hashlib.sha256(raw.encode('utf-8')).hexdigest()
+
+    # URL de retorno (cliente vuelve aqui despues del pago)
+    redirect_url = f'{settings.SITE_URL or ""}/pago/resultado/'
+
+    from urllib.parse import urlencode
+    params = {
+        'public-key': settings.WOMPI_PUBLIC_KEY,
+        'currency': currency,
+        'amount-in-cents': amount_in_cents,
+        'reference': reference,
+        'signature:integrity': signature,
+        'redirect-url': redirect_url,
+        'customer-data:email': '',  # opcional
+        'customer-data:full-name': pedido.nombre,
+        'customer-data:phone-number': pedido.telefono,
+        # Forzar metodo PSE
+        'payment-method:type': 'PSE',
+    }
+    return f'{settings.WOMPI_CHECKOUT_URL}?{urlencode(params)}'
+
+
+@csrf_exempt
+@require_POST
+def wompi_webhook(request):
+    """Webhook de Wompi: notifica cuando una transaccion cambia de estado."""
+    try:
+        body = json.loads(request.body.decode('utf-8'))
+    except (ValueError, UnicodeDecodeError):
+        return JsonResponse({'ok': False}, status=400)
+
+    # Verificar firma del evento (HMAC-SHA256-like, en realidad concatena props ordenadas)
+    signature = (body.get('signature') or {}).get('checksum', '')
+    properties = (body.get('signature') or {}).get('properties', [])
+    timestamp = body.get('timestamp', '')
+    data = body.get('data') or {}
+
+    if settings.WOMPI_EVENTS_SECRET:
+        concat = ''
+        for prop in properties:
+            # prop puede ser "transaction.id", navegamos el data dict
+            value = data
+            for part in prop.split('.'):
+                if isinstance(value, dict):
+                    value = value.get(part)
+                else:
+                    value = None
+                    break
+            concat += str(value if value is not None else '')
+        concat += str(timestamp) + settings.WOMPI_EVENTS_SECRET
+        expected = hashlib.sha256(concat.encode('utf-8')).hexdigest()
+        if expected != signature:
+            return JsonResponse({'ok': False, 'error': 'firma invalida'}, status=403)
+
+    # Actualizar pedido segun el evento
+    tx = (data.get('transaction') or {})
+    reference = tx.get('reference', '')
+    status = tx.get('status', '')
+    tx_id = tx.get('id', '')
+
+    if reference:
+        pedido = Pedido.objects.filter(wompi_reference=reference).first()
+        if pedido:
+            pedido.wompi_transaction_id = tx_id
+            if status == 'APPROVED':
+                pedido.estado_pago = Pedido.ESTADO_PAGO_APROBADO
+            elif status in ('DECLINED', 'VOIDED', 'ERROR'):
+                pedido.estado_pago = Pedido.ESTADO_PAGO_RECHAZADO
+            pedido.save(update_fields=['wompi_transaction_id', 'estado_pago'])
+
+    return JsonResponse({'ok': True})
+
+
+def pago_resultado(request):
+    """Pagina simple que muestra el resultado del pago tras el redirect de Wompi."""
+    tx_id = request.GET.get('id', '')
+    pedido = None
+    if tx_id:
+        pedido = Pedido.objects.filter(wompi_transaction_id=tx_id).first()
+    return TemplateResponse(request, 'orders/pago_resultado.html', {'pedido': pedido, 'tx_id': tx_id})
 
 
 # ---------------- Panel de la mesera (protegido) ----------------

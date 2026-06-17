@@ -23,6 +23,10 @@ urlpatterns = [
     # API de pedidos (la usa el formulario de la web)
     path('api/pedidos/', order_views.crear_pedido, name='crear_pedido'),
 
+    # Wompi (pasarela PSE)
+    path('api/wompi/webhook/', order_views.wompi_webhook, name='wompi_webhook'),
+    path('pago/resultado/', order_views.pago_resultado, name='pago_resultado'),
+
     # Panel de la mesera (requiere login)
     path('panel/', order_views.dashboard, name='dashboard'),
     path('panel/pedido/<int:pk>/<str:accion>/', order_views.cambiar_estado, name='cambiar_estado'),
