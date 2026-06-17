@@ -1170,13 +1170,37 @@ body.loading { overflow: hidden; height: 100vh; }
     box-shadow: 0 4px 14px rgba(37, 211, 102, 0.25) !important;
 }
 
-/* Mobile refinements - cards aprovechando todo el ancho */
+/* Mobile - TODAS las cards edge-to-edge */
 @media (max-width: 768px) {
     .delivery-checkout.rappi-style .checkout-form {
-        padding: 12px !important;
-        gap: 12px !important;
+        padding: 0 !important;
+        gap: 10px !important;
         max-width: 100% !important;
+        background: #F5F2EE;
     }
+    /* Padding solo vertical en el form para gap entre cards */
+    .delivery-checkout.rappi-style .checkout-form > * { margin: 0 !important; }
+    .delivery-checkout.rappi-style .checkout-form > :first-child { margin-top: 10px !important; }
+    .delivery-checkout.rappi-style .checkout-form > :last-child { margin-bottom: 14px !important; }
+
+    /* Cards full-width sin esquinas redondas en los lados */
+    .rappi-style .checkout-card,
+    .rappi-style .checkout-summary {
+        border-radius: 0 !important;
+        border-left: none !important;
+        border-right: none !important;
+    }
+    .rappi-style .map-card {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    /* Boton WA con margen lateral para que se vea como boton */
+    .rappi-style .btn-wa {
+        margin: 14px 14px 0 !important;
+        border-radius: 14px !important;
+    }
+
     .rappi-style .checkout-topbar { padding: 14px 16px; }
     .rappi-style .checkout-topbar h2 { font-size: 1.05rem !important; }
     .rappi-style .checkout-back-icon { width: 38px !important; height: 38px !important; }
@@ -1186,8 +1210,7 @@ body.loading { overflow: hidden; height: 100vh; }
     .rappi-style .row-label { font-size: 0.7rem !important; }
     .rappi-style .checkout-row input,
     .rappi-style .checkout-row textarea { font-size: 0.98rem !important; }
-    .rappi-style .map-card { margin-left: -12px; margin-right: -12px; }
-    .rappi-style .map-card .map-wrap { height: 300px; }
+    .rappi-style .map-card .map-wrap { height: 280px; }
     .rappi-style .payment-option { padding: 14px 16px; grid-template-columns: 44px 1fr 24px !important; gap: 14px; }
     .rappi-style .payment-icon { width: 44px; height: 44px; font-size: 1.05rem; }
     .rappi-style .payment-text strong { font-size: 0.98rem; }
@@ -1196,14 +1219,12 @@ body.loading { overflow: hidden; height: 100vh; }
     .rappi-style .adjust-pin-btn { padding: 11px 20px !important; font-size: 0.85rem !important; }
 }
 
-/* Mobile small - aún más optimizado */
+/* Mobile small */
 @media (max-width: 380px) {
-    .delivery-checkout.rappi-style .checkout-form { padding: 10px !important; gap: 10px !important; }
     .rappi-style .checkout-row { padding: 14px 16px !important; gap: 12px !important; grid-template-columns: 40px 1fr !important; }
     .rappi-style .address-row { grid-template-columns: 40px 1fr 14px !important; }
     .rappi-style .row-icon { width: 40px !important; height: 40px !important; font-size: 1rem !important; }
-    .rappi-style .map-card { margin-left: -10px; margin-right: -10px; }
-    .rappi-style .map-card .map-wrap { height: 260px; }
+    .rappi-style .map-card .map-wrap { height: 250px; }
     .rappi-style .payment-option { padding: 12px 14px; grid-template-columns: 40px 1fr 22px !important; gap: 12px; }
     .rappi-style .payment-icon { width: 40px; height: 40px; }
 }
