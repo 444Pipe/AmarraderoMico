@@ -927,11 +927,18 @@ body.loading { overflow: hidden; height: 100vh; }
 }
 .rappi-style .card-title i { color: var(--color-rust); }
 
-/* Map card */
-.rappi-style .map-card { padding: 0; }
+/* Map card - extiende a todo el ancho de la pantalla */
+.rappi-style .map-card {
+    padding: 0;
+    margin-left: -14px;
+    margin-right: -14px;
+    border-radius: 0 !important;
+    border-left: none;
+    border-right: none;
+}
 .rappi-style .map-card .map-wrap {
     position: relative !important;
-    height: 240px;
+    height: 280px;
     overflow: hidden;
     background: #e8e8e8;
 }
@@ -1065,6 +1072,9 @@ body.loading { overflow: hidden; height: 100vh; }
 }
 .rappi-style .row-fields input:last-child { border-bottom: none !important; }
 
+/* Divisor entre filas de una misma card */
+.rappi-style .row-divider { border-top: 1px solid rgba(74, 44, 31, 0.06); }
+
 /* Payment card - clearly clickable cards */
 .rappi-style .payment-card { padding-bottom: 16px; }
 .rappi-style .payment-options {
@@ -1176,7 +1186,8 @@ body.loading { overflow: hidden; height: 100vh; }
     .rappi-style .row-label { font-size: 0.7rem !important; }
     .rappi-style .checkout-row input,
     .rappi-style .checkout-row textarea { font-size: 0.98rem !important; }
-    .rappi-style .map-card .map-wrap { height: 240px; }
+    .rappi-style .map-card { margin-left: -12px; margin-right: -12px; }
+    .rappi-style .map-card .map-wrap { height: 300px; }
     .rappi-style .payment-option { padding: 14px 16px; grid-template-columns: 44px 1fr 24px !important; gap: 14px; }
     .rappi-style .payment-icon { width: 44px; height: 44px; font-size: 1.05rem; }
     .rappi-style .payment-text strong { font-size: 0.98rem; }
@@ -1191,7 +1202,8 @@ body.loading { overflow: hidden; height: 100vh; }
     .rappi-style .checkout-row { padding: 14px 16px !important; gap: 12px !important; grid-template-columns: 40px 1fr !important; }
     .rappi-style .address-row { grid-template-columns: 40px 1fr 14px !important; }
     .rappi-style .row-icon { width: 40px !important; height: 40px !important; font-size: 1rem !important; }
-    .rappi-style .map-card .map-wrap { height: 220px; }
+    .rappi-style .map-card { margin-left: -10px; margin-right: -10px; }
+    .rappi-style .map-card .map-wrap { height: 260px; }
     .rappi-style .payment-option { padding: 12px 14px; grid-template-columns: 40px 1fr 22px !important; gap: 12px; }
     .rappi-style .payment-icon { width: 40px; height: 40px; }
 }

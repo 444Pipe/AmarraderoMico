@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <link rel="stylesheet" href="styles.css?v=20260524f">
+    <link rel="stylesheet" href="styles.css?v=20260524h">
 </head>
 <body class="loading">
 
@@ -156,11 +156,15 @@
                         <div class="checkout-row">
                             <div class="row-icon"><i class="fa-solid fa-user"></i></div>
                             <div class="row-content">
-                                <label class="row-label">Tus datos</label>
-                                <div class="row-fields">
-                                    <input type="text" name="nombre" placeholder="Nombre completo" required>
-                                    <input type="tel" name="telefono" placeholder="Teléfono" required>
-                                </div>
+                                <label class="row-label">Nombre completo</label>
+                                <input type="text" name="nombre" placeholder="¿Cómo te llamas?" required>
+                            </div>
+                        </div>
+                        <div class="checkout-row row-divider">
+                            <div class="row-icon"><i class="fa-solid fa-phone"></i></div>
+                            <div class="row-content">
+                                <label class="row-label">Teléfono de contacto</label>
+                                <input type="tel" name="telefono" placeholder="Ej: 320 858 3991" required>
                             </div>
                         </div>
                     </div>
@@ -589,6 +593,6 @@
         </div>
     </footer>
 
-    <script src="script.js?v=20260524f"></script>
+    <script src="script.js?v=20260524h"></script>
 </body>
 </html>
