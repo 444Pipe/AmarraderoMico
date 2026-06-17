@@ -1290,19 +1290,17 @@ body.loading { overflow: hidden; height: 100vh; }
     .fab-delivery {
         bottom: 18px;
         right: 18px;
-        width: 60px;
-        height: 60px;
-        padding: 0;
-        justify-content: center;
-        border-radius: 50%;
-        font-size: 0;
+        padding: 12px 18px 12px 16px;
+        gap: 10px;
+        font-size: 0.85rem;
+        border-radius: 50px;
     }
-    .fab-text { display: none; }
-    .fab-delivery i { font-size: 1.55rem; }
+    .fab-text { display: inline-block !important; font-weight: 700; }
+    .fab-delivery i { font-size: 1.2rem; }
     .fab-count {
-        position: absolute;
-        top: -4px;
-        right: -4px;
+        position: relative;
+        top: auto;
+        right: auto;
         font-size: 0.72rem;
         min-width: 22px;
         height: 22px;
