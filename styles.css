@@ -31,15 +31,15 @@ html {
     text-rendering: optimizeSpeed;
 }
 
-/* Performance: secciones offscreen no se renderizan hasta llegar */
+/* Performance: secciones offscreen no se renderizan hasta llegar.
+   .sedes excluida porque contiene iframe de Google Maps y se cortaba. */
 .historia,
 .carta,
 .experiencia,
-.sedes,
 .noticias,
 .cta {
     content-visibility: auto;
-    contain-intrinsic-size: 1px 800px;
+    contain-intrinsic-size: 1px 1200px;
 }
 
 /* Respeta a usuarios que prefieren menos movimiento (accesibilidad + perf) */
