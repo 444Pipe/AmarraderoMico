@@ -27,6 +27,30 @@ html {
     scroll-behavior: smooth;
     overflow-x: clip;
     max-width: 100%;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeSpeed;
+}
+
+/* Performance: secciones offscreen no se renderizan hasta llegar */
+.historia,
+.carta,
+.experiencia,
+.sedes,
+.noticias,
+.cta {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 800px;
+}
+
+/* Respeta a usuarios que prefieren menos movimiento (accesibilidad + perf) */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    .reveal { opacity: 1 !important; transform: none !important; }
 }
 
 body {

@@ -28,15 +28,25 @@ def _cloudinary_url(path):
     )
 
 
+# Cache en memoria del HTML procesado (evita leer el archivo + regex en cada request)
+_INDEX_HTML_CACHE = None
+
+
 def home(request):
-    """Sirve la landing. Reescribe imágenes a Cloudinary si está configurado (igual que el Flask viejo)."""
-    html = INDEX_PATH.read_text(encoding='utf-8')
-    if settings.CLOUDINARY_CLOUD and settings.SITE_URL:
-        html = IMG_PATTERN.sub(
-            lambda m: f'{m.group(1)}="{_cloudinary_url(m.group(2))}"',
-            html,
-        )
-    return HttpResponse(html)
+    """Sirve la landing. Reescribe imágenes a Cloudinary si está configurado."""
+    global _INDEX_HTML_CACHE
+    if _INDEX_HTML_CACHE is None or settings.DEBUG:
+        html = INDEX_PATH.read_text(encoding='utf-8')
+        if settings.CLOUDINARY_CLOUD and settings.SITE_URL:
+            html = IMG_PATTERN.sub(
+                lambda m: f'{m.group(1)}="{_cloudinary_url(m.group(2))}"',
+                html,
+            )
+        _INDEX_HTML_CACHE = html
+    response = HttpResponse(_INDEX_HTML_CACHE)
+    # Permite al navegador cachear el HTML por 5 min (con revalidacion)
+    response['Cache-Control'] = 'public, max-age=300, must-revalidate'
+    return response
 
 
 def healthz(request):

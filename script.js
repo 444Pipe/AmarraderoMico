@@ -47,15 +47,17 @@
     setTimeout(hideLoader, 7000); // failsafe
 })();
 
-// Navbar scroll effect
+// Navbar scroll effect (con rAF + passive para no bloquear)
 const navbar = document.getElementById('navbar');
+let navTicking = false;
+const updateNavbar = () => {
+    if (window.scrollY > 60) navbar.classList.add('scrolled');
+    else navbar.classList.remove('scrolled');
+    navTicking = false;
+};
 window.addEventListener('scroll', () => {
-    if (window.scrollY > 60) {
-        navbar.classList.add('scrolled');
-    } else {
-        navbar.classList.remove('scrolled');
-    }
-});
+    if (!navTicking) { requestAnimationFrame(updateNavbar); navTicking = true; }
+}, { passive: true });
 
 // Mobile menu toggle
 const navToggle = document.getElementById('navToggle');
@@ -344,7 +346,29 @@ let leafletMap = null;
 let mapMarker = null;
 let accuracyCircle = null;
 let addressDebounce = null;
+let leafletPromise = null;
 const VILLAVO_CENTER = [4.142, -73.626];
+
+// Carga Leaflet on-demand (solo cuando se abre el checkout)
+// Ahorra ~40KB en el initial load del sitio
+function loadLeaflet() {
+    if (typeof L !== 'undefined') return Promise.resolve();
+    if (leafletPromise) return leafletPromise;
+    leafletPromise = new Promise((resolve, reject) => {
+        const css = document.createElement('link');
+        css.rel = 'stylesheet';
+        css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        document.head.appendChild(css);
+
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = reject;
+        document.head.appendChild(script);
+    });
+    return leafletPromise;
+}
 
 // Dibuja un círculo con el margen de error del GPS, para que el cliente vea
 // qué tan precisa es su ubicación y ajuste el pin si hace falta.
@@ -360,7 +384,8 @@ function drawAccuracy(lat, lng, accuracy) {
     }).addTo(leafletMap);
 }
 
-function initMapPicker() {
+async function initMapPicker() {
+    try { await loadLeaflet(); } catch (e) { console.warn('Leaflet no cargo', e); return; }
     if (typeof L === 'undefined') return;
     const container = document.getElementById('mapContainer');
     if (!container) return;
