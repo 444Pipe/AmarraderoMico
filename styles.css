@@ -732,7 +732,7 @@ body.loading { overflow: hidden; height: 100vh; }
     gap: 10px;
 }
 .checkout-summary h4::before {
-    content: '\f818';
+    content: '\f543'; /* fa-receipt */
     font-family: 'Font Awesome 6 Free';
     font-weight: 900;
     color: var(--color-rust);
