@@ -98,45 +98,38 @@
                 <div class="cart-backdrop" id="cartBackdrop"></div>
             </div>
 
-            <!-- CHECKOUT FORM (slides over) -->
-            <div class="delivery-checkout" id="deliveryCheckout" hidden>
-                <button class="checkout-back" id="checkoutBack">
-                    <i class="fa-solid fa-arrow-left"></i> Volver al menú
-                </button>
-                <h2>Datos para tu domicilio</h2>
-                <p class="checkout-sub">Diligencia tus datos y enviaremos tu pedido por WhatsApp a la sede.</p>
+            <!-- CHECKOUT FORM (Rappi-style) -->
+            <div class="delivery-checkout rappi-style" id="deliveryCheckout" hidden>
+                <header class="checkout-topbar">
+                    <button class="checkout-back-icon" id="checkoutBack" aria-label="Volver">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <h2>Terminar y pagar</h2>
+                </header>
 
                 <form class="checkout-form" id="checkoutForm">
-                    <div class="checkout-fields">
-                    <label>
-                        <span>Nombre completo *</span>
-                        <input type="text" name="nombre" required placeholder="Ej: Juan Pérez">
-                    </label>
-                    <label>
-                        <span>Teléfono *</span>
-                        <input type="tel" name="telefono" required placeholder="Ej: 300 123 4567">
-                    </label>
-                    <div class="delivery-only-fields full" id="deliveryOnlyFields">
-                        <label class="full">
-                            <span>Dirección de entrega *</span>
-                            <input type="text" name="direccion" id="addressInput" placeholder="Ej: Calle 12 # 45-67, Barrio La Esperanza">
-                        </label>
 
-                        <div class="map-picker">
-                            <div class="map-picker-head">
-                                <div>
-                                    <h4><i class="fa-solid fa-location-crosshairs"></i> Pinea tu ubicación exacta</h4>
-                                    <p>Arrastra el marcador o toca el mapa donde estás.</p>
-                                </div>
-                                <button type="button" class="btn-locate" id="btnLocate">
-                                    <i class="fa-solid fa-location-arrow"></i> Usar mi ubicación
-                                </button>
-                            </div>
+                    <!-- MAPA + DIRECCION (solo domicilio) -->
+                    <div class="checkout-card map-card delivery-only-fields" id="deliveryOnlyFields">
+                        <div class="map-wrap">
                             <div class="map-container" id="mapContainer"></div>
-                            <p class="map-coords" id="mapCoords">Aún no has seleccionado ubicación</p>
+                            <button type="button" class="adjust-pin-btn" id="btnLocate">
+                                <i class="fa-solid fa-location-crosshairs"></i> Ajustar punto de entrega
+                            </button>
+                        </div>
+                        <p class="map-coords" id="mapCoords" hidden></p>
+
+                        <div class="checkout-row address-row">
+                            <div class="row-icon"><i class="fa-solid fa-location-dot"></i></div>
+                            <div class="row-content">
+                                <label class="row-label">Dirección de entrega</label>
+                                <input type="text" name="direccion" id="addressInput" placeholder="Ej: Calle 12 # 45-67, Barrio La Esperanza">
+                            </div>
+                            <i class="fa-solid fa-chevron-right row-chevron"></i>
                         </div>
                     </div>
 
+                    <!-- PICKUP INFO (solo pickup) -->
                     <div class="pickup-info full" id="pickupInfo" hidden>
                         <div class="pickup-icon"><i class="fa-solid fa-store"></i></div>
                         <h4>Recoges en Sede Vanguardia</h4>
@@ -147,24 +140,70 @@
                         </a>
                     </div>
 
-                    <label class="full">
-                        <span>Detalles adicionales</span>
-                        <textarea name="notas" rows="3" placeholder="Ej: Apartamento 302, sin cebolla, pagar con $50.000..."></textarea>
-                    </label>
-                    </div><!-- /.checkout-fields -->
+                    <!-- DETALLES ADICIONALES -->
+                    <div class="checkout-card">
+                        <div class="checkout-row">
+                            <div class="row-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+                            <div class="row-content">
+                                <label class="row-label">Detalles</label>
+                                <textarea name="notas" rows="2" placeholder="Apartamento 302, sin cebolla, dejar en portería..."></textarea>
+                            </div>
+                        </div>
+                    </div>
 
-                    <aside class="checkout-aside">
+                    <!-- TUS DATOS -->
+                    <div class="checkout-card">
+                        <div class="checkout-row">
+                            <div class="row-icon"><i class="fa-solid fa-user"></i></div>
+                            <div class="row-content">
+                                <label class="row-label">Tus datos</label>
+                                <div class="row-fields">
+                                    <input type="text" name="nombre" placeholder="Nombre completo" required>
+                                    <input type="tel" name="telefono" placeholder="Teléfono" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- METODO DE PAGO -->
+                    <div class="checkout-card payment-card">
+                        <h4 class="card-title"><i class="fa-solid fa-credit-card"></i> Método de pago</h4>
+                        <div class="payment-options" id="paymentOptions">
+                            <label class="payment-option active">
+                                <input type="radio" name="metodo_pago" value="efectivo" checked>
+                                <div class="payment-icon cash"><i class="fa-solid fa-money-bills"></i></div>
+                                <div class="payment-text">
+                                    <strong>Efectivo</strong>
+                                    <span>Paga al recibir tu pedido</span>
+                                </div>
+                                <i class="fa-solid fa-circle-check payment-check"></i>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="metodo_pago" value="bold">
+                                <div class="payment-icon bold"><strong>B</strong></div>
+                                <div class="payment-text">
+                                    <strong>BOLD</strong>
+                                    <span>Tarjeta, PSE o Nequi (te enviamos link)</span>
+                                </div>
+                                <i class="fa-solid fa-circle-check payment-check"></i>
+                            </label>
+                        </div>
+                        <div class="payment-extra" id="paymentExtra">
+                            <label class="row-label-sm">¿Con cuánto vas a pagar? (opcional)</label>
+                            <input type="text" name="paga_con" placeholder="Ej: $100.000 — para alistar el cambio">
+                        </div>
+                    </div>
+
+                    <!-- RESUMEN DEL PEDIDO -->
                     <div class="checkout-summary">
                         <h4>Resumen del pedido</h4>
                         <div id="checkoutSummary"></div>
                         <div class="cart-row cart-total"><span>Total a pagar</span><strong id="checkoutTotal">$0</strong></div>
-                        <p class="checkout-note">El pago se coordina directamente con la sede. No se procesa pago en línea.</p>
                     </div>
 
                     <button type="submit" class="btn btn-wa">
-                        <i class="fa-brands fa-whatsapp"></i> Enviar pedido por WhatsApp
+                        <i class="fa-brands fa-whatsapp"></i> Confirmar pedido
                     </button>
-                    </aside><!-- /.checkout-aside -->
                 </form>
             </div>
         </div>

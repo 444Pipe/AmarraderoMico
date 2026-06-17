@@ -22,6 +22,13 @@ class Pedido(models.Model):
         (TIPO_PICKUP, 'Recoger en sede'),
     ]
 
+    PAGO_EFECTIVO = 'efectivo'
+    PAGO_BOLD = 'bold'
+    METODOS_PAGO = [
+        (PAGO_EFECTIVO, 'Efectivo'),
+        (PAGO_BOLD, 'BOLD (tarjeta/PSE/Nequi)'),
+    ]
+
     # Datos del cliente
     nombre = models.CharField('Nombre', max_length=120)
     telefono = models.CharField('Teléfono', max_length=30)
@@ -30,6 +37,10 @@ class Pedido(models.Model):
     notas = models.TextField('Notas', blank=True)
     lat = models.FloatField('Latitud', null=True, blank=True)
     lng = models.FloatField('Longitud', null=True, blank=True)
+
+    # Pago
+    metodo_pago = models.CharField('Método de pago', max_length=12, choices=METODOS_PAGO, default=PAGO_EFECTIVO)
+    paga_con = models.CharField('Paga con', max_length=60, blank=True)
 
     # Detalle del pedido. items = [{id, name, qty, price}, ...]
     items = models.JSONField('Artículos', default=list)

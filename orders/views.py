@@ -91,6 +91,10 @@ def crear_pedido(request):
         except (TypeError, ValueError):
             return None
 
+    metodo_pago = data.get('metodo_pago')
+    if metodo_pago not in (Pedido.PAGO_EFECTIVO, Pedido.PAGO_BOLD):
+        metodo_pago = Pedido.PAGO_EFECTIVO
+
     pedido = Pedido.objects.create(
         nombre=nombre[:120],
         telefono=telefono[:30],
@@ -101,6 +105,8 @@ def crear_pedido(request):
         lng=_coord(data.get('lng')),
         items=limpios,
         subtotal=subtotal,
+        metodo_pago=metodo_pago,
+        paga_con=(data.get('paga_con') or '').strip()[:60],
     )
     return JsonResponse({'ok': True, 'id': pedido.pk})
 

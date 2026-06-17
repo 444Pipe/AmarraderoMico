@@ -136,6 +136,8 @@ const dom = {
     orderTypeToggle: document.getElementById('orderTypeToggle'),
     deliveryOnlyFields: document.getElementById('deliveryOnlyFields'),
     pickupInfo: document.getElementById('pickupInfo'),
+    paymentOptions: document.getElementById('paymentOptions'),
+    paymentExtra: document.getElementById('paymentExtra'),
     cartDeliveryRow: null, // se setea dinamicamente
 };
 
@@ -616,6 +618,15 @@ function buildWhatsappMessage(data) {
 
     const totalLabel = isPickup ? '*Total a pagar:*' : '*Subtotal productos:*';
 
+    const paymentMethod = data.metodo_pago === 'bold' ? 'BOLD (tarjeta / PSE / Nequi)' : 'Efectivo';
+    const paymentLines = ['', '*Método de pago:*', `💳 ${paymentMethod}`];
+    if (data.metodo_pago === 'efectivo' && data.paga_con && data.paga_con.trim()) {
+        paymentLines.push(`💵 Paga con: ${data.paga_con.trim()}`);
+    }
+    if (data.metodo_pago === 'bold') {
+        paymentLines.push('_(la sede te enviará el link de pago)_');
+    }
+
     return [
         header,
         '',
@@ -628,6 +639,7 @@ function buildWhatsappMessage(data) {
         '',
         ...customerInfo,
         data.notas ? `📝 ${data.notas}` : null,
+        ...paymentLines,
     ].filter(Boolean).join('\n');
 }
 
@@ -651,6 +663,8 @@ function savePedido(data) {
         lng: pickedLocation ? pickedLocation.lng : null,
         items,
         subtotal,
+        metodo_pago: data.metodo_pago || 'efectivo',
+        paga_con: data.paga_con || '',
     };
 
     // keepalive permite que el envio termine aunque la pestaña navegue a WhatsApp.
@@ -693,6 +707,18 @@ if (dom.fab) {
         dom.orderTypeToggle.addEventListener('click', (e) => {
             const btn = e.target.closest('[data-order-type]');
             if (btn) setOrderType(btn.getAttribute('data-order-type'));
+        });
+    }
+
+    // Metodo de pago: estado visual + mostrar campo "paga con" solo en efectivo
+    if (dom.paymentOptions) {
+        dom.paymentOptions.addEventListener('change', () => {
+            const checked = dom.paymentOptions.querySelector('input[name="metodo_pago"]:checked');
+            const value = checked ? checked.value : 'efectivo';
+            dom.paymentOptions.querySelectorAll('.payment-option').forEach(opt => {
+                opt.classList.toggle('active', opt.querySelector('input').value === value);
+            });
+            if (dom.paymentExtra) dom.paymentExtra.style.display = value === 'efectivo' ? '' : 'none';
         });
     }
 
