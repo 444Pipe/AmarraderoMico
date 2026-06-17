@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <link rel="stylesheet" href="styles.css?v=20260524q">
+    <link rel="stylesheet" href="styles.css?v=20260524r">
 </head>
 <body class="loading">
 
@@ -172,29 +172,33 @@
                     <!-- METODO DE PAGO -->
                     <div class="checkout-card payment-card">
                         <h4 class="card-title"><i class="fa-solid fa-credit-card"></i> Método de pago</h4>
-                        <div class="payment-options" id="paymentOptions">
+                        <div class="payment-options payment-grid" id="paymentOptions">
                             <label class="payment-option active">
                                 <input type="radio" name="metodo_pago" value="efectivo" checked>
                                 <div class="payment-icon cash"><i class="fa-solid fa-money-bills"></i></div>
                                 <div class="payment-text">
                                     <strong>Efectivo</strong>
-                                    <span>Paga al recibir tu pedido</span>
+                                    <span>Paga al recibir</span>
                                 </div>
-                                <i class="fa-solid fa-circle-check payment-check"></i>
+                                <span class="payment-badge"><i class="fa-solid fa-check"></i></span>
                             </label>
                             <label class="payment-option">
                                 <input type="radio" name="metodo_pago" value="pse">
                                 <div class="payment-icon pse"><i class="fa-solid fa-building-columns"></i></div>
                                 <div class="payment-text">
                                     <strong>Wompi</strong>
-                                    <span>Paga con PSE, tarjeta o Nequi al instante</span>
+                                    <span>PSE, tarjeta o Nequi</span>
                                 </div>
-                                <i class="fa-solid fa-circle-check payment-check"></i>
+                                <span class="payment-badge"><i class="fa-solid fa-check"></i></span>
                             </label>
                         </div>
                         <div class="payment-extra" id="paymentExtra">
                             <label class="row-label-sm">¿Con cuánto vas a pagar? (opcional)</label>
                             <input type="text" name="paga_con" placeholder="Ej: $100.000 — para alistar el cambio">
+                        </div>
+                        <div class="payment-info" id="paymentInfo" hidden>
+                            <i class="fa-solid fa-circle-info"></i>
+                            <span id="paymentInfoText"></span>
                         </div>
                     </div>
 
@@ -602,6 +606,6 @@
         </div>
     </footer>
 
-    <script src="script.js?v=20260524q"></script>
+    <script src="script.js?v=20260524r"></script>
 </body>
 </html>

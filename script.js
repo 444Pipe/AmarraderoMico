@@ -736,15 +736,29 @@ if (dom.fab) {
 
     // Metodo de pago: estado visual + mostrar campo "paga con" solo en efectivo
     if (dom.paymentOptions) {
-        dom.paymentOptions.addEventListener('change', () => {
+        const paymentInfo = document.getElementById('paymentInfo');
+        const paymentInfoText = document.getElementById('paymentInfoText');
+        const updatePaymentVisuals = () => {
             const checked = dom.paymentOptions.querySelector('input[name="metodo_pago"]:checked');
             const value = checked ? checked.value : 'efectivo';
             dom.paymentOptions.querySelectorAll('.payment-option').forEach(opt => {
                 opt.classList.toggle('active', opt.querySelector('input').value === value);
             });
             if (dom.paymentExtra) dom.paymentExtra.style.display = value === 'efectivo' ? '' : 'none';
+            if (paymentInfo && paymentInfoText) {
+                if (value === 'pse') {
+                    paymentInfoText.textContent = 'Te redirigiremos al portal seguro de Wompi para que pagues con tu banco favorito.';
+                    paymentInfo.hidden = false;
+                } else {
+                    paymentInfoText.textContent = 'Paga al repartidor cuando llegue tu pedido.';
+                    paymentInfo.hidden = false;
+                }
+            }
             updateConfirmButton();
-        });
+        };
+        dom.paymentOptions.addEventListener('change', updatePaymentVisuals);
+        // Llamar una vez al cargar el checkout para mostrar el info correcto
+        updatePaymentVisuals();
     }
 
     dom.form.addEventListener('submit', async (e) => {
