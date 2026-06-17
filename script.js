@@ -138,8 +138,25 @@ const dom = {
     pickupInfo: document.getElementById('pickupInfo'),
     paymentOptions: document.getElementById('paymentOptions'),
     paymentExtra: document.getElementById('paymentExtra'),
+    confirmBtn: document.getElementById('confirmBtn'),
+    confirmLabel: document.getElementById('confirmLabel'),
+    confirmTotal: document.getElementById('confirmTotal'),
     cartDeliveryRow: null, // se setea dinamicamente
 };
+
+// Actualiza el texto y total del boton de confirmar pedido
+function updateConfirmButton() {
+    if (!dom.confirmBtn) return;
+    const subtotal = [...cart.values()].reduce((s, { item, qty }) => s + item.price * qty, 0);
+    const selected = document.querySelector('input[name="metodo_pago"]:checked');
+    const method = selected ? selected.value : 'efectivo';
+    if (dom.confirmLabel) {
+        dom.confirmLabel.textContent = method === 'pse' ? 'Pagar con Wompi' : 'Confirmar pedido';
+    }
+    if (dom.confirmTotal) {
+        dom.confirmTotal.textContent = formatCOP(subtotal);
+    }
+}
 
 const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
 
@@ -296,6 +313,7 @@ function showCheckoutView() {
     dom.mobileBar.classList.remove('show');
     renderCheckoutSummary();
     applyOrderTypeToCheckout();
+    updateConfirmButton();
     if (orderType === 'delivery') initMapPicker();
 }
 
@@ -725,12 +743,19 @@ if (dom.fab) {
                 opt.classList.toggle('active', opt.querySelector('input').value === value);
             });
             if (dom.paymentExtra) dom.paymentExtra.style.display = value === 'efectivo' ? '' : 'none';
+            updateConfirmButton();
         });
     }
 
     dom.form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const data = Object.fromEntries(new FormData(dom.form));
+
+        // Loading state en el boton
+        if (dom.confirmBtn) {
+            dom.confirmBtn.disabled = true;
+            dom.confirmBtn.classList.add('loading');
+        }
 
         // 1) Guardar el pedido en el backend (para que aparezca en el panel de la mesera).
         const resp = await savePedido(data);
