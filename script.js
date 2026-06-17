@@ -624,7 +624,7 @@ function buildWhatsappMessage(data) {
         paymentLines.push(`💵 Paga con: ${data.paga_con.trim()}`);
     }
     if (data.metodo_pago === 'pse') {
-        paymentLines.push('🏦 _(la sede te enviará el link de pago PSE)_');
+        paymentLines.push('🏦 _(pagado en línea con PSE)_');
     }
 
     return [
