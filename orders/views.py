@@ -162,8 +162,7 @@ def _build_wompi_checkout_url(pedido):
         'customer-data:email': '',  # opcional
         'customer-data:full-name': pedido.nombre,
         'customer-data:phone-number': pedido.telefono,
-        # Forzar metodo PSE
-        'payment-method:type': 'PSE',
+        # Sin forzar metodo: el cliente elige PSE, tarjeta o Nequi en Wompi
     }
     return f'{settings.WOMPI_CHECKOUT_URL}?{urlencode(params)}'
 

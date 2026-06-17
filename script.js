@@ -618,13 +618,13 @@ function buildWhatsappMessage(data) {
 
     const totalLabel = isPickup ? '*Total a pagar:*' : '*Subtotal productos:*';
 
-    const paymentMethod = data.metodo_pago === 'pse' ? 'PSE (transferencia bancaria)' : 'Efectivo';
+    const paymentMethod = data.metodo_pago === 'pse' ? 'Wompi (PSE, tarjeta o Nequi)' : 'Efectivo';
     const paymentLines = ['', '*Método de pago:*', `💳 ${paymentMethod}`];
     if (data.metodo_pago === 'efectivo' && data.paga_con && data.paga_con.trim()) {
         paymentLines.push(`💵 Paga con: ${data.paga_con.trim()}`);
     }
     if (data.metodo_pago === 'pse') {
-        paymentLines.push('🏦 _(pagado en línea con PSE)_');
+        paymentLines.push('🏦 _(pagado en línea por Wompi)_');
     }
 
     return [
