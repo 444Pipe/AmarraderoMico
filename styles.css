@@ -1152,20 +1152,33 @@ body.loading { overflow: hidden; height: 100vh; }
     margin: 0 !important;
     border-radius: 20px !important;
 }
-.rappi-style .btn-wa {
+.rappi-style .btn-wa,
+.rappi-style .btn-confirm {
     margin-top: 4px !important;
     border-radius: 16px !important;
     padding: 16px 24px !important;
     font-size: 1rem !important;
     font-weight: 800 !important;
-    background: #25D366 !important;
-    box-shadow: 0 8px 24px rgba(37, 211, 102, 0.35) !important;
+    background: linear-gradient(135deg, var(--color-brown-dark), var(--color-brown)) !important;
+    color: var(--color-gold-bright) !important;
+    box-shadow: 0 8px 24px rgba(45, 24, 16, 0.3) !important;
     transition: all 0.2s;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.5px;
+    border: none;
+    width: 100%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
-.rappi-style .btn-wa:active {
+.rappi-style .btn-confirm:hover {
+    background: linear-gradient(135deg, var(--color-brown), var(--color-rust)) !important;
+}
+.rappi-style .btn-wa:active,
+.rappi-style .btn-confirm:active {
     transform: scale(0.98);
-    box-shadow: 0 4px 14px rgba(37, 211, 102, 0.25) !important;
+    box-shadow: 0 4px 14px rgba(45, 24, 16, 0.2) !important;
 }
 
 /* Mobile - TODAS las cards edge-to-edge */
