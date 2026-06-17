@@ -1155,13 +1155,17 @@ body.loading { overflow: hidden; height: 100vh; }
 /* Confirmar pedido: barra sticky con boton premium */
 .rappi-style .confirm-bar {
     background: var(--color-white);
-    padding: 16px;
+    padding: 16px !important;
     border-top: 1px solid rgba(74, 44, 31, 0.08);
     box-shadow: 0 -4px 20px rgba(45, 24, 16, 0.06);
     position: sticky;
     bottom: 0;
     z-index: 10;
     margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    display: block !important;
 }
 .rappi-style .confirm-note {
     margin: 12px 0 0 !important;
@@ -1176,8 +1180,10 @@ body.loading { overflow: hidden; height: 100vh; }
 .rappi-style .confirm-note i { color: #34A853; }
 
 .rappi-style .btn-confirm {
-    width: 100%;
-    border: none;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    border: none !important;
     cursor: pointer;
     padding: 14px 18px !important;
     border-radius: 16px !important;
@@ -1185,10 +1191,12 @@ body.loading { overflow: hidden; height: 100vh; }
     color: var(--color-gold-bright) !important;
     box-shadow: 0 8px 24px rgba(45, 24, 16, 0.28) !important;
     transition: all 0.25s;
-    display: grid !important;
-    grid-template-columns: auto 1fr auto !important;
+    display: flex !important;
+    flex-direction: row !important;
+    grid-template-columns: none !important;
     gap: 14px;
     align-items: center;
+    justify-content: space-between;
     font-family: 'Inter', sans-serif;
     letter-spacing: 0.3px;
     position: relative;
@@ -1219,24 +1227,35 @@ body.loading { overflow: hidden; height: 100vh; }
     color: var(--color-gold-bright);
 }
 .rappi-style .confirm-content {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    gap: 3px !important;
     text-align: left;
+    flex: 1 1 auto !important;
+    min-width: 0;
 }
 .rappi-style .confirm-label {
-    font-size: 0.78rem;
-    font-weight: 600;
+    display: block !important;
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
     opacity: 0.85;
     text-transform: uppercase;
     letter-spacing: 1px;
+    color: var(--color-gold-bright);
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
 }
 .rappi-style .confirm-total {
-    font-size: 1.4rem;
-    font-weight: 900;
-    color: var(--color-white);
-    line-height: 1;
+    display: block !important;
+    font-size: 1.25rem !important;
+    font-weight: 900 !important;
+    color: var(--color-white) !important;
+    line-height: 1.1;
 }
 .rappi-style .confirm-arrow {
     width: 38px;
