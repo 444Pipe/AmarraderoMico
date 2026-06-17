@@ -1482,12 +1482,12 @@ body.loading { overflow: hidden; height: 100vh; }
     .checkout-summary .cart-total { padding: 14px; font-size: 0.95rem; }
     .checkout-summary .cart-total strong { font-size: 1.3rem; }
 
-    .delivery-checkout {
+    .delivery-checkout:not(.rappi-style) {
         padding: 20px 16px 30px;
         top: 0;
         z-index: 9300;
     }
-    .delivery-checkout h2 { font-size: 1.4rem; }
+    .delivery-checkout:not(.rappi-style) h2 { font-size: 1.4rem; }
     .checkout-sub { font-size: 0.88rem; margin-bottom: 18px; }
     .checkout-back { margin-bottom: 14px; font-size: 0.88rem; }
     .checkout-form { gap: 14px; }
@@ -1517,8 +1517,8 @@ body.loading { overflow: hidden; height: 100vh; }
     .delivery-cart { padding: 22px 14px 16px; }
     .mobile-cart-bar { left: 12px; right: 12px; bottom: 12px; padding: 12px 14px; }
     .bar-label { font-size: 0.88rem; }
-    .delivery-checkout { padding: 18px 14px 24px; }
-    .checkout-summary { padding: 14px 16px; }
+    .delivery-checkout:not(.rappi-style) { padding: 18px 14px 24px; }
+    .delivery-checkout:not(.rappi-style) .checkout-summary { padding: 14px 16px; }
 
     /* Order type toggle ultra-compacto en mobile pequeno */
     .order-type-toggle { padding: 10px 12px; gap: 6px; }
@@ -2871,4 +2871,68 @@ a { text-decoration: none; color: inherit; }
     .hero { min-height: 480px; height: auto; padding: 100px 20px 60px; }
     .hero-title { font-size: 2.5rem; }
     .hero-scroll { display: none; }
+}
+
+/* ============= OVERRIDE FINAL CHECKOUT RAPPI - garantiza edge-to-edge ============= */
+.delivery-checkout.rappi-style {
+    background: #F5F2EE !important;
+    padding: 0 !important;
+    top: 0 !important;
+    inset: 0 !important;
+    overflow-y: auto;
+}
+.delivery-checkout.rappi-style .checkout-form {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    gap: 12px !important;
+    background: #F5F2EE;
+}
+.delivery-checkout.rappi-style .checkout-card,
+.delivery-checkout.rappi-style .checkout-summary,
+.delivery-checkout.rappi-style .pickup-info {
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+@media (max-width: 768px) {
+    .delivery-checkout.rappi-style .checkout-card,
+    .delivery-checkout.rappi-style .checkout-summary,
+    .delivery-checkout.rappi-style .pickup-info {
+        border-radius: 0 !important;
+        border-left: none !important;
+        border-right: none !important;
+        box-shadow: 0 1px 0 rgba(45, 24, 16, 0.04) !important;
+    }
+    .delivery-checkout.rappi-style .map-card { margin: 0 !important; }
+    .delivery-checkout.rappi-style .btn-wa {
+        margin: 16px !important;
+        width: calc(100% - 32px) !important;
+        border-radius: 14px !important;
+    }
+    .delivery-checkout.rappi-style .checkout-form > *:first-child { margin-top: 0 !important; }
+}
+
+/* Limpieza visual general del checkout rappi */
+.delivery-checkout.rappi-style {
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+.delivery-checkout.rappi-style .checkout-row {
+    align-items: center !important;
+}
+.delivery-checkout.rappi-style .row-label {
+    color: #8a6a55 !important;
+    font-weight: 700 !important;
+}
+.delivery-checkout.rappi-style .checkout-row input,
+.delivery-checkout.rappi-style .checkout-row textarea {
+    color: var(--color-brown-dark) !important;
+    font-weight: 500;
+}
+.delivery-checkout.rappi-style .checkout-card + .checkout-card,
+.delivery-checkout.rappi-style .checkout-card + .checkout-summary,
+.delivery-checkout.rappi-style .checkout-summary + button {
+    margin-top: 0 !important;
 }
