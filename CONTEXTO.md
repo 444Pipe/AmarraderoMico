@@ -86,4 +86,4 @@ desde el admin (ruta secreta `/gestion-mico-9q2x/`) → Usuarios, crea un usuari
 
 ## WhatsApp de la sede
 
-`script.js` → `DELIVERY_CONFIG.whatsapp = '573208583991'` (número al que llega el pedido).
+`script.js` → `DELIVERY_CONFIG.whatsapp = '573159265910'` (número de la Sede Principal / Vanguardia, al que llega el pedido).
