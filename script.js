@@ -75,7 +75,7 @@ document.querySelectorAll('.nav-menu a').forEach(link => {
 
 // ============= SISTEMA DE DOMICILIOS =============
 const DELIVERY_CONFIG = {
-    whatsapp: '573208583991',
+    whatsapp: '573159265910', // Número de la Sede Principal (Vanguardia)
     branchName: 'Sede Vanguardia',
     // El costo de domicilio se coordina con la sede segun distancia
     // (no se cobra fijo en linea, solo se muestra el subtotal de productos)
