@@ -351,8 +351,8 @@ body.loading { overflow: hidden; height: 100vh; }
     border-color: var(--color-brown-dark);
     transform: translateY(-1px);
 }
-.menu-chip-icon { font-size: 0.95rem; }
-.menu-cat-emoji { margin-right: 6px; }
+.menu-chip-icon { font-size: 0.9rem; }
+.menu-cat-emoji { margin-right: 6px; color: var(--color-rust); }
 .menu-category {
     margin-bottom: 36px;
     scroll-margin-top: 72px;
@@ -451,11 +451,11 @@ body.loading { overflow: hidden; height: 100vh; }
     justify-content: center;
     background: linear-gradient(135deg, var(--color-cream), #F2DEBE);
     border: 1px solid rgba(201, 169, 97, 0.45);
-    font-size: 1.45rem;
     line-height: 1;
     flex-shrink: 0;
     overflow: hidden;
 }
+.thumb-icon i { color: var(--color-rust); font-size: 1.2rem; }
 /* El menu del domicilio pasa a lista compacta con icono a la izquierda */
 .menu-item { grid-template-columns: 54px 1fr auto; }
 .menu-item-thumb {
@@ -2436,10 +2436,10 @@ a { text-decoration: none; color: inherit; }
 .menu-full-cta { display: inline-flex; }
 
 .menu-full-body {
-    max-width: 1200px;
+    max-width: 1280px;
     margin: 0 auto;
-    columns: 2;
-    column-gap: 40px;
+    columns: 3;
+    column-gap: 30px;
 }
 .fmenu-cat {
     break-inside: avoid;
@@ -2462,7 +2462,7 @@ a { text-decoration: none; color: inherit; }
     margin-bottom: 10px;
     border-bottom: 2px solid var(--color-gold);
 }
-.fmenu-cat-emoji { font-size: 1.35rem; }
+.fmenu-cat-emoji { font-size: 1.2rem; color: var(--color-rust); }
 .fmenu-list { list-style: none; margin: 0; padding: 0; }
 .fmenu-dish {
     padding: 9px 0;
@@ -2473,6 +2473,15 @@ a { text-decoration: none; color: inherit; }
     display: flex;
     align-items: baseline;
     gap: 6px;
+}
+.fmenu-dish-icon {
+    flex-shrink: 0;
+    width: 18px;
+    text-align: center;
+    color: var(--color-rust);
+    font-size: 0.82rem;
+    opacity: 0.9;
+    align-self: center;
 }
 .fmenu-dish-name {
     font-family: 'Inter', sans-serif;
@@ -2496,6 +2505,7 @@ a { text-decoration: none; color: inherit; }
 }
 .fmenu-dish-desc {
     margin: 3px 0 0;
+    padding-left: 24px;
     font-size: 0.82rem;
     color: var(--color-text-soft);
     line-height: 1.4;
@@ -2510,6 +2520,9 @@ a { text-decoration: none; color: inherit; }
 }
 .menu-full-note i { color: var(--color-rust); margin-right: 6px; }
 
+@media (max-width: 1024px) {
+    .menu-full-body { columns: 2; }
+}
 @media (max-width: 768px) {
     .menu-full { padding: 70px 20px; }
     .menu-full-header { margin-bottom: 40px; }

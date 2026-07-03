@@ -87,7 +87,7 @@ const DELIVERY_CONFIG = {
 // del plato en el carrito, ya que la carta no maneja foto por plato.
 const MENU_DATA = [
     {
-        id: 'desayunos', name: 'Desayunos', icon: '🍳',
+        id: 'desayunos', name: 'Desayunos', icon: 'fa-egg',
         items: [
             { id: 'caldo-hueso', name: 'Caldo de Hueso', price: 15000 },
             { id: 'caldo-picado', name: 'Caldo de Picado', price: 20000 },
@@ -105,7 +105,7 @@ const MENU_DATA = [
         ]
     },
     {
-        id: 'sopitas', name: 'Sopitas', icon: '🍲',
+        id: 'sopitas', name: 'Sopitas', icon: 'fa-bowl-food',
         items: [
             { id: 'sancocho-res', name: 'Sancocho de Res Especial', desc: 'Preparado en leña, acompañado de arroz y aguacate.', price: 20000 },
             { id: 'mondongo', name: 'Mondongo', desc: 'Acompañado de arroz y banano.', price: 25000 },
@@ -113,7 +113,7 @@ const MENU_DATA = [
         ]
     },
     {
-        id: 'pa-empezar', name: "Pa' Empezar", icon: '🫓',
+        id: 'pa-empezar', name: "Pa' Empezar", icon: 'fa-plate-wheat',
         items: [
             { id: 'chicharrones', name: 'Chicharrones Carnudos', price: 25000 },
             { id: 'arepa-casa', name: 'Arepa de la Casa', price: 5000 },
@@ -126,7 +126,7 @@ const MENU_DATA = [
         ]
     },
     {
-        id: 'lo-tipico', name: 'Lo Típico', icon: '🔥',
+        id: 'lo-tipico', name: 'Lo Típico', icon: 'fa-fire',
         items: [
             { id: 'plato-mamona', name: 'Plato de Mamona', price: 38000 },
             { id: 'carne-cerdo', name: 'Carne de Cerdo', price: 38000 },
@@ -138,14 +138,14 @@ const MENU_DATA = [
         ]
     },
     {
-        id: 'pa-compartir', name: "Pa' Compartir", icon: '👥',
+        id: 'pa-compartir', name: "Pa' Compartir", icon: 'fa-users',
         items: [
             { id: 'picada-3', name: 'Picada del Mico (3 pax aprox)', desc: 'Cortes de res y cerdo con papa, yuca, plátano, papa criolla, morcilla, arepa dulce de la casa y buen ají.', price: 90000 },
             { id: 'picada-4', name: 'Picada del Mico (4 pax aprox)', desc: 'Cortes de res y cerdo con papa, yuca, plátano, papa criolla, morcilla, arepa dulce de la casa y buen ají.', price: 110000 },
         ]
     },
     {
-        id: 'otras-opciones', name: 'Otras Opciones', icon: '🍽️',
+        id: 'otras-opciones', name: 'Otras Opciones', icon: 'fa-utensils',
         items: [
             { id: 'hamburguesa-mamona', name: 'Hamburguesa de Mamona', price: 32000 },
             { id: 'arroz-vegetariano', name: 'Arroz Vegetariano', price: 32000 },
@@ -157,7 +157,7 @@ const MENU_DATA = [
         ]
     },
     {
-        id: 'pescados', name: 'Pescados', icon: '🐟',
+        id: 'pescados', name: 'Pescados', icon: 'fa-fish',
         items: [
             { id: 'mojarra', name: 'Mojarra Frita o en Salsa', price: 50000 },
             { id: 'trucha-ajillo', name: 'Trucha al Ajillo', price: 50000 },
@@ -170,7 +170,7 @@ const MENU_DATA = [
         ]
     },
     {
-        id: 'parrilla', name: 'Parrilla', icon: '🥩',
+        id: 'parrilla', name: 'Parrilla', icon: 'fa-drumstick-bite',
         items: [
             { id: 'sobrebarriga', name: 'Sobrebarriga a la Parrilla', price: 45000 },
             { id: 'pechuga-plancha', name: 'Pechuga a la Plancha', price: 40000 },
@@ -183,7 +183,7 @@ const MENU_DATA = [
         ]
     },
     {
-        id: 'porciones', name: 'Porciones', icon: '🍟',
+        id: 'porciones', name: 'Porciones', icon: 'fa-plate-wheat',
         items: [
             { id: 'papa-criolla', name: 'Papa Criolla', price: 10000 },
             { id: 'papa-salada', name: 'Papa Salada', price: 5000 },
@@ -194,7 +194,7 @@ const MENU_DATA = [
         ]
     },
     {
-        id: 'postres', name: 'Postres', icon: '🍮',
+        id: 'postres', name: 'Postres', icon: 'fa-ice-cream',
         items: [
             { id: 'merengon', name: 'Merengón', price: 14000 },
             { id: 'postre-casa', name: 'Postre de la Casa', price: 12000 },
@@ -204,7 +204,7 @@ const MENU_DATA = [
         ]
     },
     {
-        id: 'bebidas', name: 'Bebidas', icon: '🥤',
+        id: 'bebidas', name: 'Bebidas', icon: 'fa-glass-water',
         items: [
             { id: 'sodas', name: 'Sodas', desc: 'Arándanos, berry o té limón.', price: 13000 },
             { id: 'jarra-panela', name: 'Jarra de Panela y Limón', price: 15000 },
@@ -222,7 +222,7 @@ const MENU_DATA = [
         ]
     },
     {
-        id: 'bebidas-calientes', name: 'Bebidas Calientes', icon: '☕',
+        id: 'bebidas-calientes', name: 'Bebidas Calientes', icon: 'fa-mug-hot',
         items: [
             { id: 'tinto', name: 'Tinto', price: 4000 },
             { id: 'americano', name: 'Americano', price: 4000 },
@@ -231,7 +231,7 @@ const MENU_DATA = [
         ]
     },
     {
-        id: 'cervezas-licores', name: 'Cervezas & Licores', icon: '🍺',
+        id: 'cervezas-licores', name: 'Cervezas & Licores', icon: 'fa-beer-mug-empty',
         items: [
             { id: 'cerveza-corona', name: 'Cerveza Corona', price: 10000 },
             { id: 'cerveza-coronita', name: 'Cerveza Coronita', price: 6000 },
@@ -245,11 +245,79 @@ const MENU_DATA = [
     },
 ];
 
-// Índice plano id -> item (con el icono y la categoría de su grupo incrustados),
+// Icono representativo por categoría, usado como respaldo cuando el nombre del
+// plato no coincide con ninguna palabra clave.
+const CAT_FALLBACK_ICON = {
+    'desayunos': 'fa-egg', 'sopitas': 'fa-bowl-food', 'pa-empezar': 'fa-plate-wheat',
+    'lo-tipico': 'fa-drumstick-bite', 'pa-compartir': 'fa-drumstick-bite', 'otras-opciones': 'fa-utensils',
+    'pescados': 'fa-fish', 'parrilla': 'fa-drumstick-bite', 'porciones': 'fa-plate-wheat',
+    'postres': 'fa-ice-cream', 'bebidas': 'fa-glass-water', 'bebidas-calientes': 'fa-mug-hot',
+    'cervezas-licores': 'fa-beer-mug-empty',
+};
+
+// Elige el icono de Font Awesome que mejor representa el plato según su nombre:
+// si es sopa -> bowl, si son huevos -> egg, carne -> cow, cerdo -> bacon, etc.
+// El orden importa: lo más específico primero (p. ej. "caldo de pez" es sopa,
+// no pescado; "salmón con camarón" resalta el marisco).
+function iconFor(item, cat) {
+    const n = (item.name || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
+    const any = (...ws) => ws.some(w => n.includes(w));
+
+    // --- Bebidas y licores (antes que la comida) ---
+    if (any('aguardiente')) return 'fa-wine-bottle';
+    if (any('cerveza', 'corona', 'coronita', 'poker', 'aguila', 'stella', 'club colombia', 'llanera')) return 'fa-beer-mug-empty';
+    if (any('tinto', 'americano', 'capuchino', 'chocolate')) return 'fa-mug-hot';
+    if (any('limonada', 'citrica', 'naranja', 'coco', 'limon', 'panela')) return 'fa-martini-glass-citrus';
+    if (any('agua')) return 'fa-bottle-water';
+    if (any('gaseosa', 'soda', 'gatorade', 'jugo', 'hit')) return 'fa-glass-water';
+
+    // --- Postres (antes que "arroz", para "arroz con leche") ---
+    if (any('alfajor')) return 'fa-cookie-bite';
+    if (any('merengon', 'postre', 'paleta', 'con leche')) return 'fa-ice-cream';
+
+    // --- Mariscos y pescados ---
+    if (any('marisco', 'camaron')) return 'fa-shrimp';
+
+    // --- Sopas (antes que pescado/carne: "caldo de pez", "sancocho de gallina") ---
+    if (any('caldo', 'sancocho', 'mondongo', 'sopa', 'sudado', 'cazuela')) return 'fa-bowl-food';
+    if (any('mojarra', 'trucha', 'bagre', 'cachama', 'salmon', 'amarillo', 'pescado', 'pez')) return 'fa-fish';
+
+    // --- Huevos ---
+    if (any('huevo', 'omelette', 'perico', 'ranchero')) return 'fa-egg';
+
+    // --- Cerdo (antes que res: "lomo/costilla de cerdo") ---
+    if (any('cerdo', 'chicharr', 'tocineta', 'chunchull')) return 'fa-bacon';
+
+    // --- Hamburguesa y embutidos ---
+    if (any('hamburguesa')) return 'fa-burger';
+    if (any('salchipapa', 'chorizo', 'rellena', 'salchich')) return 'fa-hotdog';
+
+    // --- Pollo ---
+    if (any('pechuga', 'pollo', 'gallina')) return 'fa-drumstick-bite';
+
+    // --- Vegetariano ---
+    if (any('vegetarian')) return 'fa-seedling';
+
+    // --- Arroces ---
+    if (any('arroz')) return 'fa-bowl-rice';
+
+    // --- Guacamole ---
+    if (any('guacamole')) return 'fa-mortar-pestle';
+
+    // --- Almidones y entradas ---
+    if (any('arepa', 'hayaca', 'patacon', 'platano', 'calentao', 'empanad', 'queso', 'yuca', 'papa')) return 'fa-plate-wheat';
+
+    // --- Res y carnes ---
+    if (any('mamona', 'carne', 'res', 'chuleta', 'costilla', 'sobrebarriga', 'punta', 'churrasco', 'baby beef', 'lengua', 'bistec', 'higado', 'picada', 'lomo')) return 'fa-cow';
+
+    return CAT_FALLBACK_ICON[cat.id] || 'fa-utensils';
+}
+
+// Índice plano id -> item (con el icono resuelto por plato y la categoría),
 // para búsquedas O(1) desde el carrito y el checkout.
 const MENU_INDEX = new Map();
 MENU_DATA.forEach(cat => cat.items.forEach(item => {
-    MENU_INDEX.set(item.id, { ...item, icon: cat.icon, category: cat.name });
+    MENU_INDEX.set(item.id, { ...item, icon: iconFor(item, cat), catIcon: cat.icon, category: cat.name });
 }));
 
 const cart = new Map(); // id -> { item, qty }
@@ -324,16 +392,16 @@ function renderMenu() {
         <div class="menu-catnav" id="menuCatNav">
             ${MENU_DATA.map(cat => `
                 <button type="button" class="menu-chip" data-cat="${cat.id}">
-                    <span class="menu-chip-icon" aria-hidden="true">${cat.icon}</span> ${cat.name}
+                    <i class="fa-solid ${cat.icon} menu-chip-icon" aria-hidden="true"></i> ${cat.name}
                 </button>
             `).join('')}
         </div>`;
     const categories = MENU_DATA.map(cat => `
         <div class="menu-category" id="dcat-${cat.id}">
-            <h3><span class="menu-cat-emoji" aria-hidden="true">${cat.icon}</span> ${cat.name}</h3>
+            <h3><i class="fa-solid ${cat.icon} menu-cat-emoji" aria-hidden="true"></i> ${cat.name}</h3>
             ${cat.items.map(item => `
                 <div class="menu-item" data-item-id="${item.id}">
-                    ${itemThumb(item, 'menu-item-thumb')}
+                    ${itemThumb({ ...item, icon: iconFor(item, cat) }, 'menu-item-thumb')}
                     <div class="menu-item-info">
                         <h4>${item.name}</h4>
                         ${item.desc ? `<p>${item.desc}</p>` : ''}
@@ -355,11 +423,12 @@ function renderFullMenu() {
     if (!host) return;
     host.innerHTML = MENU_DATA.map(cat => `
         <div class="fmenu-cat">
-            <h3 class="fmenu-cat-title"><span class="fmenu-cat-emoji" aria-hidden="true">${cat.icon}</span> ${cat.name}</h3>
+            <h3 class="fmenu-cat-title"><i class="fa-solid ${cat.icon} fmenu-cat-emoji" aria-hidden="true"></i> ${cat.name}</h3>
             <ul class="fmenu-list">
                 ${cat.items.map(item => `
                     <li class="fmenu-dish">
                         <div class="fmenu-dish-row">
+                            <i class="fa-solid ${iconFor(item, cat)} fmenu-dish-icon" aria-hidden="true"></i>
                             <span class="fmenu-dish-name">${item.name}</span>
                             <span class="fmenu-dish-dots" aria-hidden="true"></span>
                             <span class="fmenu-dish-price">${formatCOP(item.price)}</span>
@@ -394,13 +463,13 @@ function getItemById(id) {
     return MENU_INDEX.get(id) || null;
 }
 
-// Avatar del plato: la carta no tiene foto por plato, así que usamos el emoji
-// de su categoría. Si en el futuro un plato trae `img`, se muestra la foto.
+// Avatar del plato: la carta no tiene foto por plato, así que usamos un icono
+// de Font Awesome según el tipo de plato. Si en el futuro trae `img`, va la foto.
 function itemThumb(item, cls) {
     if (item.img) {
         return `<img src="${item.img}" alt="${item.name}" class="${cls}" loading="lazy">`;
     }
-    return `<span class="${cls} thumb-icon" aria-hidden="true">${item.icon || '🍽️'}</span>`;
+    return `<span class="${cls} thumb-icon" aria-hidden="true"><i class="fa-solid ${item.icon || 'fa-utensils'}"></i></span>`;
 }
 
 function changeQty(id, delta) {
