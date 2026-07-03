@@ -346,6 +346,27 @@ MENU_DATA.forEach(cat => cat.items.forEach(item => {
     MENU_INDEX.set(item.id, { ...item, icon: iconFor(item, cat), catIcon: cat.icon, category: cat.name });
 }));
 
+// Normaliza texto para buscar sin importar acentos ni mayúsculas.
+const normalizeText = (s) => (s || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
+
+// Platos estrella (los más pedidos): llevan sello 🔥 y son filtrables por antojo.
+const POPULAR = new Set([
+    'plato-mamona', 'chicharrones', 'picada-3', 'mojarra',
+    'sancocho-gallina', 'punta-anca', 'carne-cerdo', 'costilla-cerdo-tulio',
+]);
+
+// Filtros rápidos por antojo. `match` recibe el dataset (data-*) del plato.
+const ANTOJOS = [
+    { key: 'todos', label: 'Todos', icon: null, match: () => true },
+    { key: 'populares', label: 'Más pedidos', icon: 'fa-fire', match: d => d.popular === '1' },
+    { key: 'desayunos', label: 'Desayunos', icon: 'fa-egg', match: d => d.cat === 'desayunos' },
+    { key: 'parrilla', label: 'Parrilla', icon: 'fa-drumstick-bite', match: d => d.cat === 'parrilla' },
+    { key: 'pescados', label: 'Pescados', icon: 'fa-fish', match: d => d.cat === 'pescados' },
+    { key: 'compartir', label: 'Compartir', icon: 'fa-users', match: d => d.cat === 'pa-compartir' },
+    { key: 'economicos', label: 'Económicos', icon: 'fa-tag', match: d => Number(d.price) <= 15000 },
+    { key: 'bebidas', label: 'Bebidas', icon: 'fa-beer-mug-empty', match: d => ['bebidas', 'bebidas-calientes', 'cervezas-licores'].includes(d.cat) },
+];
+
 const cart = new Map(); // id -> { item, qty }
 let pickedLocation = null; // { lat, lng } seleccionado en el mapa
 let orderType = 'delivery'; // 'delivery' | 'pickup'
@@ -422,36 +443,115 @@ function closeCartMobile() {
     dom.cartBackdrop.classList.remove('show');
 }
 
-function renderMenu() {
-    if (!dom.menu) return;
-    const cats = orderedCategories();
-    const catNav = `
-        <div class="menu-catnav" id="menuCatNav">
-            ${cats.map(cat => `
-                <button type="button" class="menu-chip" data-cat="${cat.id}">
-                    <i class="fa-solid ${cat.icon} menu-chip-icon" aria-hidden="true"></i> ${cat.name}
+// Buscador + filtros por antojo, reutilizable para la carta de la landing y el
+// menú del domicilio. Trabaja sobre el DOM ya renderizado (no re-renderiza):
+// oculta/muestra platos y categorías con la clase `filtered-out`.
+function setupMenuFilter(cfg) {
+    const listRoot = document.getElementById(cfg.listRootId);
+    if (!listRoot) return;
+
+    // Evita duplicar la barra si el menú se vuelve a renderizar.
+    const oldBar = document.getElementById(cfg.barId);
+    if (oldBar) oldBar.remove();
+    const oldNR = document.getElementById(cfg.barId + '-nr');
+    if (oldNR) oldNR.remove();
+
+    const bar = document.createElement('div');
+    bar.id = cfg.barId;
+    bar.className = 'menu-filter ' + cfg.barClass;
+    bar.innerHTML = `
+        <div class="menu-search">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <input type="search" class="menu-search-input" placeholder="¿Qué se te antoja?" aria-label="Buscar plato">
+            <button type="button" class="menu-search-clear" hidden aria-label="Limpiar búsqueda"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="menu-antojos">
+            ${ANTOJOS.map((a, i) => `
+                <button type="button" class="antojo-chip${i === 0 ? ' active' : ''}" data-antojo="${a.key}">
+                    ${a.icon ? `<i class="fa-solid ${a.icon}" aria-hidden="true"></i> ` : ''}${a.label}
                 </button>
             `).join('')}
         </div>`;
+
+    const noResults = document.createElement('p');
+    noResults.id = cfg.barId + '-nr';
+    noResults.className = 'menu-noresults';
+    noResults.hidden = true;
+    noResults.innerHTML = `<i class="fa-solid fa-utensils" aria-hidden="true"></i> No encontramos platos con ese nombre. Prueba con otra palabra.`;
+
+    cfg.mount(bar, noResults, listRoot);
+
+    const input = bar.querySelector('.menu-search-input');
+    const clearBtn = bar.querySelector('.menu-search-clear');
+    const chipsWrap = bar.querySelector('.menu-antojos');
+    let query = '';
+    let antojo = 'todos';
+
+    const apply = () => {
+        const q = normalizeText(query);
+        const pred = (ANTOJOS.find(a => a.key === antojo) || ANTOJOS[0]).match;
+        let anyVisible = false;
+        listRoot.querySelectorAll(cfg.catSel).forEach(catEl => {
+            let catVisible = false;
+            catEl.querySelectorAll(cfg.itemSel).forEach(itemEl => {
+                const okQ = !q || (itemEl.dataset.search || '').includes(q);
+                const okA = pred(itemEl.dataset);
+                const show = okQ && okA;
+                itemEl.classList.toggle('filtered-out', !show);
+                if (show) { catVisible = true; anyVisible = true; }
+            });
+            catEl.classList.toggle('filtered-out', !catVisible);
+        });
+        noResults.hidden = anyVisible;
+        clearBtn.hidden = !query;
+    };
+
+    input.addEventListener('input', () => { query = input.value.trim(); apply(); });
+    clearBtn.addEventListener('click', () => { input.value = ''; query = ''; input.focus(); apply(); });
+    chipsWrap.addEventListener('click', (e) => {
+        const chip = e.target.closest('[data-antojo]');
+        if (!chip) return;
+        antojo = chip.getAttribute('data-antojo');
+        chipsWrap.querySelectorAll('.antojo-chip').forEach(c => c.classList.toggle('active', c === chip));
+        apply();
+    });
+}
+
+function renderMenu() {
+    if (!dom.menu) return;
+    const cats = orderedCategories();
     const categories = cats.map(cat => `
-        <div class="menu-category" id="dcat-${cat.id}">
+        <div class="menu-category" id="dcat-${cat.id}" data-cat="${cat.id}">
             <h3><i class="fa-solid ${cat.icon} menu-cat-emoji" aria-hidden="true"></i> ${cat.name}</h3>
             <div class="menu-cat-items">
-                ${cat.items.map(item => `
-                    <div class="menu-item" data-item-id="${item.id}">
+                ${cat.items.map(item => {
+                    const pop = POPULAR.has(item.id);
+                    return `
+                    <div class="menu-item${pop ? ' is-popular' : ''}" data-item-id="${item.id}" data-cat="${cat.id}" data-price="${item.price}" data-popular="${pop ? '1' : '0'}" data-search="${normalizeText(item.name + ' ' + cat.name)}">
+                        ${pop ? '<span class="pop-badge"><i class="fa-solid fa-fire" aria-hidden="true"></i> Top</span>' : ''}
                         ${itemThumb({ ...item, icon: iconFor(item, cat) }, 'menu-item-thumb')}
                         <div class="menu-item-info">
                             <h4>${item.name}</h4>
-                            ${item.desc ? `<p>${item.desc}</p>` : ''}
                             <span class="menu-item-price">${formatCOP(item.price)}</span>
                         </div>
                         <div class="menu-item-add" data-add-slot="${item.id}"></div>
-                    </div>
-                `).join('')}
+                    </div>`;
+                }).join('')}
             </div>
         </div>
     `).join('');
-    dom.menu.innerHTML = catNav + categories;
+    dom.menu.innerHTML = categories;
+    setupMenuFilter({
+        listRootId: 'deliveryMenu',
+        barId: 'deliveryFilter',
+        barClass: 'in-delivery',
+        catSel: '.menu-category',
+        itemSel: '.menu-item',
+        mount: (bar, noResults, listRoot) => {
+            listRoot.insertBefore(bar, listRoot.firstChild);
+            listRoot.appendChild(noResults);
+        },
+    });
     refreshAddButtons();
 }
 
@@ -461,23 +561,35 @@ function renderFullMenu() {
     const host = document.getElementById('fullMenu');
     if (!host) return;
     host.innerHTML = orderedCategories().map(cat => `
-        <div class="fmenu-cat">
+        <div class="fmenu-cat" data-cat="${cat.id}">
             <h3 class="fmenu-cat-title"><i class="fa-solid ${cat.icon} fmenu-cat-emoji" aria-hidden="true"></i> ${cat.name}</h3>
             <ul class="fmenu-list">
-                ${cat.items.map(item => `
-                    <li class="fmenu-dish">
+                ${cat.items.map(item => {
+                    const pop = POPULAR.has(item.id);
+                    return `
+                    <li class="fmenu-dish${pop ? ' is-popular' : ''}" data-item-id="${item.id}" data-cat="${cat.id}" data-price="${item.price}" data-popular="${pop ? '1' : '0'}" data-search="${normalizeText(item.name + ' ' + cat.name)}">
                         <div class="fmenu-dish-row">
                             <i class="fa-solid ${iconFor(item, cat)} fmenu-dish-icon" aria-hidden="true"></i>
-                            <span class="fmenu-dish-name">${item.name}</span>
+                            <span class="fmenu-dish-name">${item.name}${pop ? ' <span class="fmenu-pop" title="De los más pedidos"><i class="fa-solid fa-fire" aria-hidden="true"></i></span>' : ''}</span>
                             <span class="fmenu-dish-dots" aria-hidden="true"></span>
                             <span class="fmenu-dish-price">${formatCOP(item.price)}</span>
                         </div>
-                        ${item.desc ? `<p class="fmenu-dish-desc">${item.desc}</p>` : ''}
-                    </li>
-                `).join('')}
+                    </li>`;
+                }).join('')}
             </ul>
         </div>
     `).join('');
+    setupMenuFilter({
+        listRootId: 'fullMenu',
+        barId: 'landingFilter',
+        barClass: 'in-landing',
+        catSel: '.fmenu-cat',
+        itemSel: '.fmenu-dish',
+        mount: (bar, noResults, listRoot) => {
+            listRoot.parentNode.insertBefore(bar, listRoot);
+            listRoot.parentNode.insertBefore(noResults, listRoot.nextSibling);
+        },
+    });
 }
 
 function refreshAddButtons() {
@@ -1098,17 +1210,6 @@ if (dom.fab) {
         if (add) changeQty(add.getAttribute('data-add'), 1);
         if (inc) changeQty(inc.getAttribute('data-inc'), 1);
         if (dec) changeQty(dec.getAttribute('data-dec'), -1);
-    });
-
-    // Navegacion por categorias: al tocar un chip, desplaza el menu (no la pagina)
-    // hasta la categoria correspondiente, dejandola justo debajo de la barra fija.
-    dom.menu.addEventListener('click', (e) => {
-        const chip = e.target.closest('[data-cat]');
-        if (!chip) return;
-        const target = document.getElementById('dcat-' + chip.getAttribute('data-cat'));
-        if (target) {
-            dom.menu.scrollTo({ top: Math.max(0, target.offsetTop - 70), behavior: 'smooth' });
-        }
     });
 
     dom.checkoutBtn.addEventListener('click', showCheckoutView);

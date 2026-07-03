@@ -372,6 +372,140 @@ body.loading { overflow: hidden; height: 100vh; }
     align-items: start;
 }
 .menu-cat-items .menu-item { margin-bottom: 0; }
+
+/* ----- BUSCADOR + FILTROS POR ANTOJO (landing y domicilio) ----- */
+.menu-filter { display: flex; flex-direction: column; gap: 12px; }
+.menu-search { position: relative; display: flex; align-items: center; }
+.menu-search > i {
+    position: absolute;
+    left: 16px;
+    color: var(--color-rust);
+    font-size: 0.95rem;
+    pointer-events: none;
+}
+.menu-search-input {
+    width: 100%;
+    padding: 12px 42px;
+    border: 1px solid rgba(74, 44, 31, 0.18);
+    border-radius: 30px;
+    background: var(--color-white);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    color: var(--color-brown-dark);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.menu-search-input:focus {
+    border-color: var(--color-rust);
+    box-shadow: 0 0 0 3px rgba(184, 84, 31, 0.12);
+}
+.menu-search-input::-webkit-search-cancel-button { display: none; }
+.menu-search-clear {
+    position: absolute;
+    right: 10px;
+    width: 26px; height: 26px;
+    border: none; border-radius: 50%;
+    background: rgba(74, 44, 31, 0.1);
+    color: var(--color-brown-dark);
+    cursor: pointer;
+    display: grid; place-items: center;
+    font-size: 0.75rem;
+    transition: background 0.2s;
+}
+.menu-search-clear:hover { background: rgba(74, 44, 31, 0.2); }
+.menu-antojos {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+}
+.menu-antojos::-webkit-scrollbar { display: none; }
+.antojo-chip {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid rgba(74, 44, 31, 0.18);
+    background: var(--color-white);
+    border-radius: 30px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-brown-dark);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
+}
+.antojo-chip i { color: var(--color-rust); transition: color 0.2s; }
+.antojo-chip:hover { transform: translateY(-1px); border-color: var(--color-rust); }
+.antojo-chip.active {
+    background: var(--color-rust);
+    border-color: var(--color-rust);
+    color: var(--color-white);
+}
+.antojo-chip.active i { color: var(--color-white); }
+.filtered-out { display: none !important; }
+.menu-noresults {
+    text-align: center;
+    padding: 34px 16px;
+    color: var(--color-text-soft);
+    font-size: 0.95rem;
+}
+.menu-noresults i { color: var(--color-rust); margin-right: 6px; }
+
+/* Barra de filtros pegada arriba dentro del domicilio */
+.menu-filter.in-delivery {
+    position: sticky;
+    top: 0;
+    z-index: 7;
+    background: var(--color-bg);
+    padding: 14px 0 12px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid rgba(74, 44, 31, 0.1);
+}
+/* Barra de filtros centrada en la carta de la landing */
+.menu-filter.in-landing {
+    max-width: 820px;
+    margin: 0 auto 40px;
+}
+.menu-filter.in-landing .menu-antojos {
+    justify-content: center;
+    flex-wrap: wrap;
+    overflow-x: visible;
+}
+
+/* Sello "Top" (más pedidos) en las tarjetas del domicilio */
+.menu-item.is-popular { position: relative; }
+.pop-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background: var(--color-rust);
+    color: var(--color-white);
+    border-radius: 20px;
+    font-size: 0.64rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    box-shadow: 0 2px 8px rgba(184, 84, 31, 0.35);
+}
+.pop-badge i { font-size: 0.6rem; }
+
+/* Sello más pedidos en la carta de la landing (junto al nombre) */
+.fmenu-pop {
+    display: inline-flex;
+    align-items: center;
+    color: var(--color-rust);
+    font-size: 0.72rem;
+    margin-left: 3px;
+}
 .menu-item {
     display: grid;
     grid-template-columns: 90px 1fr auto;
