@@ -2,6 +2,13 @@
 
 > Documento de consolidación de auditoría (6 dimensiones: Backend/Seguridad, Front JS, CSS/Responsive, Infra/DevOps, Producto/UX, y HTML/SEO). Los hallazgos marcados como "críticos" por los auditores fueron degradados tras verificación por mitigantes reales del proyecto (sin pasarela de pago, humano en el bucle vía WhatsApp, producción ya con `DEBUG=false` y `SECRET_KEY` configurada). La dimensión **HTML/SEO/redes sociales** se auditó directamente (ver **Anexo A**). Fecha: 2026-07-02.
 
+> **✅ Actualización 2026-07-02 — corregidos los 4 riesgos altos.** Se aplicaron los fixes de
+> **#1** (config *secure-by-default*: `DEBUG=False` por defecto + *fail-fast* de `SECRET_KEY`, y de paso **#8** `ALLOWED_HOSTS` sin `'*'`),
+> **#2** (anti-fuerza-bruta en el login con `django-axes`: 5 intentos → bloqueo 1 h por usuario+IP),
+> **#3** (dependencias: `Django 5.2.15` LTS y `gunicorn 23.0.0`, ambos con los CVE parcheados; se añadió `django-axes[ipware] 8.3.1`) y
+> **#4** (ciclo del pedido en `script.js`: se verifica `r.ok`, se bloquea el doble envío, hay pantalla de éxito con nº de pedido, se limpia el carrito y hay fallback si el navegador bloquea el popup de WhatsApp).
+> Verificado con `manage.py check --deploy` (0 issues) y `migrate` (tablas de axes creadas). Pendientes: los medios/bajos y de producto de las secciones siguientes.
+
 ## 1. Resumen ejecutivo
 
 El proyecto está **en un estado funcional y sano para su tamaño**: una landing con storytelling fuerte (historia familiar, prensa real) y un sistema de pedidos completo (carrito, domicilio/recoger, mapa Leaflet, guardado en BD + WhatsApp, panel de la mesera con estados y sonido). El backend es pequeño y con decisiones correctas (CSRF activo en el panel, `login_required`, whitelisting de tipo/estado/acciones, endurecimiento HTTPS/HSTS cuando `DEBUG=False`), y el despliegue en Railway es razonable (gunicorn + whitenoise, secretos externalizados, healthcheck).

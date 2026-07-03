@@ -83,167 +83,193 @@ const DELIVERY_CONFIG = {
 
 // Carta oficial de El Amarradero del Mico (menú 2026, Sede Vanguardia).
 // Fuente única: alimenta tanto la sección "Menú" de la landing como el menú
-// del domicilio. Cada categoría tiene un `icon` (emoji) que se usa como avatar
-// del plato en el carrito, ya que la carta no maneja foto por plato.
+// del domicilio. Cada categoría tiene un `icon` de Font Awesome (avatar por
+// tipo de plato, ya que la carta no maneja foto por plato).
+// El ORDEN base de las categorías es el de este arreglo; `orderedCategories()`
+// lo reordena dinámicamente según la hora (desayunos en la mañana, almuerzos
+// y picadas al mediodía).
 const MENU_DATA = [
-    {
-        id: 'desayunos', name: 'Desayunos', icon: 'fa-egg',
-        items: [
-            { id: 'caldo-hueso', name: 'Caldo de Hueso', price: 15000 },
-            { id: 'caldo-picado', name: 'Caldo de Picado', price: 20000 },
-            { id: 'caldo-pez', name: 'Caldo de Pez', price: 24000 },
-            { id: 'huevos-arroz', name: 'Huevos con Arroz', price: 15000 },
-            { id: 'huevos-gusto', name: 'Huevos al Gusto', desc: 'Pericos, revueltos o fritos.', price: 11000 },
-            { id: 'huevos-rancheros', name: 'Huevos Rancheros', price: 15000 },
-            { id: 'hayaca', name: 'Hayaca', price: 19000 },
-            { id: 'omelette', name: 'Omelette', price: 16000 },
-            { id: 'calentao-paisa', name: 'Calentao Paisa', price: 26000 },
-            { id: 'higado-plancha', name: 'Hígado a la Plancha', price: 23000 },
-            { id: 'carne-bisteck', name: 'Carne en Bisteck', price: 25000 },
-            { id: 'bisteck-caballo', name: 'Bisteck a Caballo', price: 28000 },
-            { id: 'carne-plancha-des', name: 'Carne a la Plancha', price: 23000 },
-        ]
-    },
-    {
-        id: 'sopitas', name: 'Sopitas', icon: 'fa-bowl-food',
-        items: [
-            { id: 'sancocho-res', name: 'Sancocho de Res Especial', desc: 'Preparado en leña, acompañado de arroz y aguacate.', price: 20000 },
-            { id: 'mondongo', name: 'Mondongo', desc: 'Acompañado de arroz y banano.', price: 25000 },
-            { id: 'sancocho-gallina', name: 'Sancocho de Gallina', desc: 'Preparado en leña, con arroz de menudencias y aguacate.', price: 40000 },
-        ]
-    },
     {
         id: 'pa-empezar', name: "Pa' Empezar", icon: 'fa-plate-wheat',
         items: [
-            { id: 'chicharrones', name: 'Chicharrones Carnudos', price: 25000 },
-            { id: 'arepa-casa', name: 'Arepa de la Casa', price: 5000 },
-            { id: 'rellena', name: 'Rellena', price: 15000 },
-            { id: 'patacones-hogao', name: 'Patacones con Hogao', price: 14000 },
-            { id: 'chunchullitas', name: 'Chunchullitas', price: 25000 },
-            { id: 'empanaditas-mamona', name: 'Empanaditas de Mamona', price: 19000 },
-            { id: 'chorizo-santarrosano', name: 'Chorizo Santarrosano', price: 12000 },
-            { id: 'platano-queso', name: 'Plátano con Queso y Bocadillo', price: 12000 },
+            { id: 'chicharrones', name: 'Chicharrones Carnudos', desc: 'Chicharrón crocante con buena carnita.', price: 25000 },
+            { id: 'arepa-casa', name: 'Arepa de la Casa', desc: 'Arepa asada, suave por dentro y dorada por fuera.', price: 5000 },
+            { id: 'rellena', name: 'Rellena', desc: 'Morcilla criolla bien condimentada.', price: 15000 },
+            { id: 'patacones-hogao', name: 'Patacones con Hogao', desc: 'Plátano verde frito y aplastado, con hogao.', price: 14000 },
+            { id: 'chunchullitas', name: 'Chunchullitas', desc: 'Chunchullo crocante asado a la brasa.', price: 25000 },
+            { id: 'empanaditas-mamona', name: 'Empanaditas de Mamona', desc: 'Empanaditas crocantes rellenas de mamona.', price: 19000 },
+            { id: 'chorizo-santarrosano', name: 'Chorizo Santarrosano', desc: 'Chorizo tradicional santarrosano, jugoso.', price: 12000 },
+            { id: 'platano-queso', name: 'Plátano con Queso y Bocadillo', desc: 'Plátano maduro con queso derretido y bocadillo.', price: 12000 },
         ]
     },
     {
         id: 'lo-tipico', name: 'Lo Típico', icon: 'fa-fire',
         items: [
-            { id: 'plato-mamona', name: 'Plato de Mamona', price: 38000 },
-            { id: 'carne-cerdo', name: 'Carne de Cerdo', price: 38000 },
-            { id: 'carne-mixta', name: 'Carne Mixta', price: 38000 },
-            { id: 'chuleta-res', name: 'Chuleta de Res', price: 45000 },
-            { id: 'costilla-cerdo-tulio', name: 'Costilla de Cerdo — Tulio', price: 55000 },
-            { id: 'palo-costilla-mixto', name: 'Palo de Costilla Mixto', price: 50000 },
-            { id: 'costilla-res', name: 'Costilla de Res', price: 65000 },
+            { id: 'plato-mamona', name: 'Plato de Mamona', desc: 'Nuestra insignia: ternera asada al palo, lenta y ahumada.', price: 38000 },
+            { id: 'carne-cerdo', name: 'Carne de Cerdo', desc: 'Cerdo asado a la llanera, jugoso y dorado.', price: 38000 },
+            { id: 'carne-mixta', name: 'Carne Mixta', desc: 'Mezcla de res y cerdo asados al palo.', price: 38000 },
+            { id: 'chuleta-res', name: 'Chuleta de Res', desc: 'Chuleta de res apanada, crocante y generosa.', price: 45000 },
+            { id: 'costilla-cerdo-tulio', name: 'Costilla de Cerdo — Tulio', desc: 'Costilla de cerdo tierna con sazón de la casa.', price: 55000 },
+            { id: 'palo-costilla-mixto', name: 'Palo de Costilla Mixto', desc: 'Costillas de res y cerdo asadas al palo.', price: 50000 },
+            { id: 'costilla-res', name: 'Costilla de Res', desc: 'Costilla de res asada a la brasa.', price: 65000 },
         ]
     },
     {
         id: 'pa-compartir', name: "Pa' Compartir", icon: 'fa-users',
         items: [
-            { id: 'picada-3', name: 'Picada del Mico (3 pax aprox)', desc: 'Cortes de res y cerdo con papa, yuca, plátano, papa criolla, morcilla, arepa dulce de la casa y buen ají.', price: 90000 },
-            { id: 'picada-4', name: 'Picada del Mico (4 pax aprox)', desc: 'Cortes de res y cerdo con papa, yuca, plátano, papa criolla, morcilla, arepa dulce de la casa y buen ají.', price: 110000 },
+            { id: 'picada-3', name: 'Picada del Mico (3 pax aprox)', desc: 'Cortes de res y cerdo con papa, yuca, plátano, papa criolla, morcilla, arepa dulce y ají. Ideal para 3.', price: 90000 },
+            { id: 'picada-4', name: 'Picada del Mico (4 pax aprox)', desc: 'Cortes de res y cerdo con papa, yuca, plátano, papa criolla, morcilla, arepa dulce y ají. Ideal para 4.', price: 110000 },
         ]
     },
     {
         id: 'otras-opciones', name: 'Otras Opciones', icon: 'fa-utensils',
         items: [
-            { id: 'hamburguesa-mamona', name: 'Hamburguesa de Mamona', price: 32000 },
-            { id: 'arroz-vegetariano', name: 'Arroz Vegetariano', price: 32000 },
-            { id: 'sudado-cola', name: 'Sudado de Cola', price: 40000 },
-            { id: 'arroz-mico', name: 'Arroz del Mico', price: 40000 },
-            { id: 'lengua-salsa', name: 'Lengua en Salsa', price: 42000 },
-            { id: 'costillas-bbq', name: 'Costillas BBQ', price: 35000 },
-            { id: 'salchipapa', name: 'Salchipapa', price: 20000 },
-        ]
-    },
-    {
-        id: 'pescados', name: 'Pescados', icon: 'fa-fish',
-        items: [
-            { id: 'mojarra', name: 'Mojarra Frita o en Salsa', price: 50000 },
-            { id: 'trucha-ajillo', name: 'Trucha al Ajillo', price: 50000 },
-            { id: 'bagre', name: 'Bagre Frito o en Salsa', price: 50000 },
-            { id: 'amarillo-monsenor', name: 'Amarillo a la Monseñor', price: 60000 },
-            { id: 'cachama', name: 'Cachama de Río', desc: 'Frita o en salsa.', price: 55000 },
-            { id: 'salmon-parrilla', name: 'Salmón a la Parrilla', price: 55000 },
-            { id: 'salmon-camaron', name: 'Salmón con Camarón', price: 65000 },
-            { id: 'cazuela-mariscos', name: 'Cazuela de Mariscos', price: 60000 },
+            { id: 'hamburguesa-mamona', name: 'Hamburguesa de Mamona', desc: 'Hamburguesa artesanal con carne de mamona.', price: 32000 },
+            { id: 'arroz-vegetariano', name: 'Arroz Vegetariano', desc: 'Arroz salteado con verduras frescas.', price: 32000 },
+            { id: 'sudado-cola', name: 'Sudado de Cola', desc: 'Cola de res sudada en salsa criolla.', price: 40000 },
+            { id: 'arroz-mico', name: 'Arroz del Mico', desc: 'Arroz mixto de la casa con carnes y verduras.', price: 40000 },
+            { id: 'lengua-salsa', name: 'Lengua en Salsa', desc: 'Lengua de res tierna en salsa criolla.', price: 42000 },
+            { id: 'costillas-bbq', name: 'Costillas BBQ', desc: 'Costillas bañadas en salsa BBQ de la casa.', price: 35000 },
+            { id: 'salchipapa', name: 'Salchipapa', desc: 'Papa a la francesa con salchicha y salsas.', price: 20000 },
         ]
     },
     {
         id: 'parrilla', name: 'Parrilla', icon: 'fa-drumstick-bite',
         items: [
-            { id: 'sobrebarriga', name: 'Sobrebarriga a la Parrilla', price: 45000 },
-            { id: 'pechuga-plancha', name: 'Pechuga a la Plancha', price: 40000 },
-            { id: 'pechuga-champinones', name: 'Pechuga en Salsa de Champiñones', price: 50000 },
-            { id: 'pechuga-hawaiana', name: 'Pechuga Hawaiana', price: 48000 },
-            { id: 'lomo-cerdo', name: 'Lomo de Cerdo a la Parrilla', price: 40000 },
-            { id: 'punta-anca', name: 'Punta de Anca', price: 55000 },
-            { id: 'churrasco', name: 'Churrasco', price: 48000 },
-            { id: 'baby-beef', name: 'Baby Beef', price: 52000 },
+            { id: 'sobrebarriga', name: 'Sobrebarriga a la Parrilla', desc: 'Sobrebarriga tierna asada a la parrilla.', price: 45000 },
+            { id: 'pechuga-plancha', name: 'Pechuga a la Plancha', desc: 'Pechuga de pollo jugosa a la plancha.', price: 40000 },
+            { id: 'pechuga-champinones', name: 'Pechuga en Salsa de Champiñones', desc: 'Pechuga en cremosa salsa de champiñones.', price: 50000 },
+            { id: 'pechuga-hawaiana', name: 'Pechuga Hawaiana', desc: 'Pechuga con piña, jamón y queso gratinado.', price: 48000 },
+            { id: 'lomo-cerdo', name: 'Lomo de Cerdo a la Parrilla', desc: 'Lomo de cerdo jugoso a la parrilla.', price: 40000 },
+            { id: 'punta-anca', name: 'Punta de Anca', desc: 'Punta de anca a la parrilla, tierna y sabrosa.', price: 55000 },
+            { id: 'churrasco', name: 'Churrasco', desc: 'Churrasco de res con chimichurri.', price: 48000 },
+            { id: 'baby-beef', name: 'Baby Beef', desc: 'Corte fino de res, suave y jugoso.', price: 52000 },
+        ]
+    },
+    {
+        id: 'pescados', name: 'Pescados', icon: 'fa-fish',
+        items: [
+            { id: 'mojarra', name: 'Mojarra Frita o en Salsa', desc: 'Mojarra entera, frita crocante o en salsa.', price: 50000 },
+            { id: 'trucha-ajillo', name: 'Trucha al Ajillo', desc: 'Trucha fresca salteada al ajillo.', price: 50000 },
+            { id: 'bagre', name: 'Bagre Frito o en Salsa', desc: 'Bagre de río, frito o en salsa criolla.', price: 50000 },
+            { id: 'amarillo-monsenor', name: 'Amarillo a la Monseñor', desc: 'Pescado amarillo en cremosa salsa de camarón.', price: 60000 },
+            { id: 'cachama', name: 'Cachama de Río', desc: 'Cachama de río, frita crocante o en salsa.', price: 55000 },
+            { id: 'salmon-parrilla', name: 'Salmón a la Parrilla', desc: 'Salmón a la parrilla, jugoso y saludable.', price: 55000 },
+            { id: 'salmon-camaron', name: 'Salmón con Camarón', desc: 'Salmón a la parrilla coronado con camarones.', price: 65000 },
+            { id: 'cazuela-mariscos', name: 'Cazuela de Mariscos', desc: 'Cazuela cremosa con variedad de mariscos.', price: 60000 },
+        ]
+    },
+    {
+        id: 'sopitas', name: 'Sopitas', icon: 'fa-bowl-food',
+        items: [
+            { id: 'sancocho-res', name: 'Sancocho de Res Especial', desc: 'Preparado en leña, con arroz y aguacate.', price: 20000 },
+            { id: 'mondongo', name: 'Mondongo', desc: 'Mondongo con verduras, arroz y banano.', price: 25000 },
+            { id: 'sancocho-gallina', name: 'Sancocho de Gallina', desc: 'Preparado en leña, con arroz de menudencias y aguacate.', price: 40000 },
+        ]
+    },
+    {
+        id: 'desayunos', name: 'Desayunos', icon: 'fa-egg',
+        items: [
+            { id: 'caldo-hueso', name: 'Caldo de Hueso', desc: 'Caldo sustancioso de hueso de res.', price: 15000 },
+            { id: 'caldo-picado', name: 'Caldo de Picado', desc: 'Caldo con carne picada, papa y cilantro.', price: 20000 },
+            { id: 'caldo-pez', name: 'Caldo de Pez', desc: 'Caldo de pescado fresco, reconfortante.', price: 24000 },
+            { id: 'huevos-arroz', name: 'Huevos con Arroz', desc: 'Huevos al gusto sobre arroz blanco.', price: 15000 },
+            { id: 'huevos-gusto', name: 'Huevos al Gusto', desc: 'Como los prefieras: pericos, revueltos o fritos.', price: 11000 },
+            { id: 'huevos-rancheros', name: 'Huevos Rancheros', desc: 'Huevos bañados en salsa criolla de tomate y cebolla.', price: 15000 },
+            { id: 'hayaca', name: 'Hayaca', desc: 'Masa de maíz rellena, cocida en hoja de plátano.', price: 19000 },
+            { id: 'omelette', name: 'Omelette', desc: 'Tortilla de huevos rellena, esponjosa y caliente.', price: 16000 },
+            { id: 'calentao-paisa', name: 'Calentao Paisa', desc: 'Arroz, frijol y carne recalentados, con arepa y huevo.', price: 26000 },
+            { id: 'higado-plancha', name: 'Hígado a la Plancha', desc: 'Hígado de res jugoso, dorado a la plancha.', price: 23000 },
+            { id: 'carne-bisteck', name: 'Carne en Bisteck', desc: 'Bistec de res en salsa criolla.', price: 25000 },
+            { id: 'bisteck-caballo', name: 'Bisteck a Caballo', desc: 'Bistec de res coronado con huevo frito.', price: 28000 },
+            { id: 'carne-plancha-des', name: 'Carne a la Plancha', desc: 'Carne de res a la plancha, jugosa.', price: 23000 },
         ]
     },
     {
         id: 'porciones', name: 'Porciones', icon: 'fa-plate-wheat',
         items: [
-            { id: 'papa-criolla', name: 'Papa Criolla', price: 10000 },
-            { id: 'papa-salada', name: 'Papa Salada', price: 5000 },
-            { id: 'papa-francesa', name: 'Papa a la Francesa', price: 6000 },
-            { id: 'yuca', name: 'Yuca', price: 5000 },
-            { id: 'guacamole', name: 'Guacamole', price: 6000 },
-            { id: 'platano-maduro', name: 'Plátano Maduro', price: 5000 },
+            { id: 'papa-criolla', name: 'Papa Criolla', desc: 'Papa criolla dorada, crocante por fuera.', price: 10000 },
+            { id: 'papa-salada', name: 'Papa Salada', desc: 'Papa cocida con sal.', price: 5000 },
+            { id: 'papa-francesa', name: 'Papa a la Francesa', desc: 'Papas a la francesa crocantes.', price: 6000 },
+            { id: 'yuca', name: 'Yuca', desc: 'Yuca cocida o frita.', price: 5000 },
+            { id: 'guacamole', name: 'Guacamole', desc: 'Aguacate machacado con cebolla y cilantro.', price: 6000 },
+            { id: 'platano-maduro', name: 'Plátano Maduro', desc: 'Tajadas de plátano maduro.', price: 5000 },
         ]
     },
     {
         id: 'postres', name: 'Postres', icon: 'fa-ice-cream',
         items: [
-            { id: 'merengon', name: 'Merengón', price: 14000 },
-            { id: 'postre-casa', name: 'Postre de la Casa', price: 12000 },
-            { id: 'arroz-leche', name: 'Arroz con Leche', price: 10000 },
-            { id: 'paletas-amarelo', name: 'Paletas de Amarelo', price: 8000 },
-            { id: 'alfajores', name: 'Alfajores (caja x8 und)', price: 20000 },
+            { id: 'merengon', name: 'Merengón', desc: 'Merengue crocante con crema y frutas.', price: 14000 },
+            { id: 'postre-casa', name: 'Postre de la Casa', desc: 'El postre especial del día.', price: 12000 },
+            { id: 'arroz-leche', name: 'Arroz con Leche', desc: 'Arroz con leche cremoso y canela.', price: 10000 },
+            { id: 'paletas-amarelo', name: 'Paletas de Amarelo', desc: 'Paletas artesanales bien heladas.', price: 8000 },
+            { id: 'alfajores', name: 'Alfajores (caja x8 und)', desc: 'Caja de 8 alfajores rellenos de arequipe.', price: 20000 },
         ]
     },
     {
         id: 'bebidas', name: 'Bebidas', icon: 'fa-glass-water',
         items: [
             { id: 'sodas', name: 'Sodas', desc: 'Arándanos, berry o té limón.', price: 13000 },
-            { id: 'jarra-panela', name: 'Jarra de Panela y Limón', price: 15000 },
-            { id: 'jarra-citrica', name: 'Jarra de Cítrica', price: 26000 },
-            { id: 'citrica-personal', name: 'Cítrica Personal', price: 9000 },
+            { id: 'jarra-panela', name: 'Jarra de Panela y Limón', desc: 'Refrescante jarra de panela con limón.', price: 15000 },
+            { id: 'jarra-citrica', name: 'Jarra de Cítrica', desc: 'Jarra de limonada cítrica para compartir.', price: 26000 },
+            { id: 'citrica-personal', name: 'Cítrica Personal', desc: 'Limonada cítrica personal, bien fría.', price: 9000 },
             { id: 'jugos-naturales', name: 'Jugos Naturales', desc: 'Maracuyá, mora, mango o guanábana.', price: 9000 },
-            { id: 'jugo-naranja', name: 'Jugo de Naranja', price: 7000 },
-            { id: 'limonada-coco', name: 'Limonada de Coco', price: 14000 },
-            { id: 'gatorade', name: 'Gatorade', price: 6000 },
-            { id: 'agua-botella', name: 'Agua en Botella', price: 5000 },
-            { id: 'gaseosa', name: 'Gaseosa', price: 5000 },
-            { id: 'gaseosa-15', name: 'Gaseosa (1.5 Lt)', price: 10000 },
-            { id: 'jugos-hit', name: 'Jugos Hit', price: 5000 },
-            { id: 'agua-h2o', name: 'Agua H2O', price: 5000 },
+            { id: 'jugo-naranja', name: 'Jugo de Naranja', desc: 'Jugo de naranja recién exprimido.', price: 7000 },
+            { id: 'limonada-coco', name: 'Limonada de Coco', desc: 'Cremosa limonada de coco.', price: 14000 },
+            { id: 'gatorade', name: 'Gatorade', desc: 'Bebida hidratante, bien fría.', price: 6000 },
+            { id: 'agua-botella', name: 'Agua en Botella', desc: 'Agua pura en botella.', price: 5000 },
+            { id: 'gaseosa', name: 'Gaseosa', desc: 'Gaseosa personal a elección.', price: 5000 },
+            { id: 'gaseosa-15', name: 'Gaseosa (1.5 Lt)', desc: 'Gaseosa familiar de 1.5 litros.', price: 10000 },
+            { id: 'jugos-hit', name: 'Jugos Hit', desc: 'Jugo Hit en varios sabores.', price: 5000 },
+            { id: 'agua-h2o', name: 'Agua H2O', desc: 'Agua saborizada H2O.', price: 5000 },
         ]
     },
     {
         id: 'bebidas-calientes', name: 'Bebidas Calientes', icon: 'fa-mug-hot',
         items: [
-            { id: 'tinto', name: 'Tinto', price: 4000 },
-            { id: 'americano', name: 'Americano', price: 4000 },
-            { id: 'capuchino', name: 'Capuchino', price: 5000 },
-            { id: 'chocolate', name: 'Chocolate', price: 5000 },
+            { id: 'tinto', name: 'Tinto', desc: 'Café negro, recién pasado.', price: 4000 },
+            { id: 'americano', name: 'Americano', desc: 'Café americano caliente.', price: 4000 },
+            { id: 'capuchino', name: 'Capuchino', desc: 'Capuchino cremoso y espumoso.', price: 5000 },
+            { id: 'chocolate', name: 'Chocolate', desc: 'Chocolate caliente espumoso.', price: 5000 },
         ]
     },
     {
         id: 'cervezas-licores', name: 'Cervezas & Licores', icon: 'fa-beer-mug-empty',
         items: [
-            { id: 'cerveza-corona', name: 'Cerveza Corona', price: 10000 },
-            { id: 'cerveza-coronita', name: 'Cerveza Coronita', price: 6000 },
-            { id: 'cerveza-llanera', name: 'Cerveza Llanera', price: 11000 },
-            { id: 'cerveza-aguila', name: 'Cerveza Águila / Poker / Light', price: 6000 },
-            { id: 'club-colombia', name: 'Club Colombia', price: 9000 },
-            { id: 'cerveza-stella', name: 'Cerveza Stella Artois', price: 6000 },
-            { id: 'aguardiente-botella', name: 'Aguardiente (Botella)', price: 120000 },
-            { id: 'aguardiente-media', name: 'Aguardiente (Media)', price: 70000 },
+            { id: 'cerveza-corona', name: 'Cerveza Corona', desc: 'Cerveza Corona, bien fría.', price: 10000 },
+            { id: 'cerveza-coronita', name: 'Cerveza Coronita', desc: 'Coronita personal, helada.', price: 6000 },
+            { id: 'cerveza-llanera', name: 'Cerveza Llanera', desc: 'Cerveza artesanal llanera.', price: 11000 },
+            { id: 'cerveza-aguila', name: 'Cerveza Águila / Poker / Light', desc: 'Nacional a elección, bien fría.', price: 6000 },
+            { id: 'club-colombia', name: 'Club Colombia', desc: 'Club Colombia, dorada o roja.', price: 9000 },
+            { id: 'cerveza-stella', name: 'Cerveza Stella Artois', desc: 'Stella Artois, suave y refrescante.', price: 6000 },
+            { id: 'aguardiente-botella', name: 'Aguardiente (Botella)', desc: 'Botella para la mesa.', price: 120000 },
+            { id: 'aguardiente-media', name: 'Aguardiente (Media)', desc: 'Media botella.', price: 70000 },
         ]
     },
 ];
+
+// Reordena las categorías según la hora del día (hora local del cliente):
+//  · 8:00–11:59  -> Desayunos y Sopitas de primeras.
+//  · 12:00–17:59 -> Almuerzos (Lo Típico, Otras, Parrilla, Pescados) y Picadas de primeras.
+//  · resto        -> orden base del arreglo MENU_DATA.
+function orderedCategories() {
+    let h = 12;
+    try { h = new Date().getHours(); } catch (e) { /* usa 12 por defecto */ }
+    let priority = [];
+    if (h >= 8 && h < 12) {
+        priority = ['desayunos', 'sopitas'];
+    } else if (h >= 12 && h < 18) {
+        priority = ['lo-tipico', 'pa-compartir', 'otras-opciones', 'parrilla', 'pescados'];
+    }
+    const byId = new Map(MENU_DATA.map(c => [c.id, c]));
+    const seen = new Set();
+    const result = [];
+    priority.forEach(id => {
+        if (byId.has(id)) { result.push(byId.get(id)); seen.add(id); }
+    });
+    MENU_DATA.forEach(c => { if (!seen.has(c.id)) result.push(c); });
+    return result;
+}
 
 // Icono representativo por categoría, usado como respaldo cuando el nombre del
 // plato no coincide con ninguna palabra clave.
@@ -357,8 +383,18 @@ const dom = {
     confirmBtn: document.getElementById('confirmBtn'),
     confirmLabel: document.getElementById('confirmLabel'),
     confirmTotal: document.getElementById('confirmTotal'),
+    // Pantalla de exito tras enviar el pedido
+    success: document.getElementById('deliverySuccess'),
+    successOrder: document.getElementById('successOrder'),
+    successOrderNum: document.getElementById('successOrderNum'),
+    successText: document.getElementById('successText'),
+    successWa: document.getElementById('successWa'),
+    successAgain: document.getElementById('successAgain'),
     cartDeliveryRow: null, // se setea dinamicamente
 };
+
+// Evita el doble/triple envio del pedido mientras uno esta en curso.
+let isSubmitting = false;
 
 // Actualiza el texto y total del boton de confirmar pedido
 function updateConfirmButton() {
@@ -388,15 +424,16 @@ function closeCartMobile() {
 
 function renderMenu() {
     if (!dom.menu) return;
+    const cats = orderedCategories();
     const catNav = `
         <div class="menu-catnav" id="menuCatNav">
-            ${MENU_DATA.map(cat => `
+            ${cats.map(cat => `
                 <button type="button" class="menu-chip" data-cat="${cat.id}">
                     <i class="fa-solid ${cat.icon} menu-chip-icon" aria-hidden="true"></i> ${cat.name}
                 </button>
             `).join('')}
         </div>`;
-    const categories = MENU_DATA.map(cat => `
+    const categories = cats.map(cat => `
         <div class="menu-category" id="dcat-${cat.id}">
             <h3><i class="fa-solid ${cat.icon} menu-cat-emoji" aria-hidden="true"></i> ${cat.name}</h3>
             <div class="menu-cat-items">
@@ -423,7 +460,7 @@ function renderMenu() {
 function renderFullMenu() {
     const host = document.getElementById('fullMenu');
     if (!host) return;
-    host.innerHTML = MENU_DATA.map(cat => `
+    host.innerHTML = orderedCategories().map(cat => `
         <div class="fmenu-cat">
             <h3 class="fmenu-cat-title"><i class="fa-solid ${cat.icon} fmenu-cat-emoji" aria-hidden="true"></i> ${cat.name}</h3>
             <ul class="fmenu-list">
@@ -846,6 +883,7 @@ function useMyLocation() {
 function showMenuView() {
     dom.body.style.display = '';
     dom.checkout.hidden = true;
+    if (dom.success) dom.success.hidden = true;
     renderCart();
 }
 
@@ -942,7 +980,9 @@ function buildWhatsappMessage(data) {
 }
 
 // Envia el pedido al backend (Django) para que la mesera lo vea en el panel.
-// Devuelve una Promise con la respuesta JSON.
+// Devuelve SIEMPRE un objeto: { ok, id, wompi_checkout_url?, status?, error? }.
+//   ok=true  -> el pedido quedo registrado en el panel (id disponible).
+//   ok=false -> fallo de red o el backend lo rechazo (4xx/5xx); WhatsApp sigue de respaldo.
 function savePedido(data) {
     const items = [...cart.values()].map(({ item, qty }) => ({
         id: item.id,
@@ -973,11 +1013,73 @@ function savePedido(data) {
         body: JSON.stringify(payload),
         keepalive: true,
     })
-    .then((r) => r.json())
+    .then(async (r) => {
+        let json = null;
+        try { json = await r.json(); } catch (_) { json = null; }
+        if (!r.ok) {
+            console.warn('El backend rechazo el pedido:', r.status, json);
+            return { ok: false, status: r.status, error: (json && json.error) || `http_${r.status}` };
+        }
+        // El backend responde { ok: true, id, wompi_checkout_url? }.
+        return { ok: true, ...(json || {}) };
+    })
     .catch((err) => {
         console.warn('No se pudo registrar el pedido en el panel:', err);
-        return null;
+        return { ok: false, error: 'network' };
     });
+}
+
+// Activa/desactiva el estado "enviando" del boton de confirmar (bloquea el doble envio).
+function setConfirmLoading(on) {
+    if (!dom.confirmBtn) return;
+    dom.confirmBtn.disabled = on;
+    dom.confirmBtn.classList.toggle('loading', on);
+    const spinner = dom.confirmBtn.querySelector('.confirm-spinner');
+    const arrow = dom.confirmBtn.querySelector('.confirm-arrow');
+    if (spinner) spinner.hidden = !on;
+    if (arrow) arrow.hidden = on;
+}
+
+// Muestra la pantalla de exito tras enviar el pedido.
+function showSuccessView({ waUrl, orderId, popupBlocked }) {
+    if (!dom.success) return;
+    dom.body.style.display = 'none';
+    dom.checkout.hidden = true;
+    dom.success.hidden = false;
+
+    if (dom.successOrder && dom.successOrderNum) {
+        if (orderId) {
+            dom.successOrderNum.textContent = `#${orderId}`;
+            dom.successOrder.hidden = false;
+        } else {
+            dom.successOrder.hidden = true; // fallo el guardado: WhatsApp sigue siendo el respaldo
+        }
+    }
+    if (dom.successWa && waUrl) dom.successWa.href = waUrl;
+    if (dom.successText) {
+        dom.successText.innerHTML = popupBlocked
+            ? 'Tu pedido está listo. Toca <strong>Abrir WhatsApp</strong> para enviarlo a la sede y confirmarlo.'
+            : 'Terminamos de confirmar tu pedido por <strong>WhatsApp</strong> con la sede. Si no se abrió solo, toca el botón de abajo.';
+    }
+    dom.success.scrollTop = 0;
+
+    // El pedido ya se envió: vaciamos el carrito para no reenviarlo si el cliente
+    // cierra el modal con la X en vez de tocar "Hacer otro pedido".
+    cart.clear();
+    refreshAddButtons();
+    updateFab();
+}
+
+// Reinicia el flujo para un nuevo pedido (carrito ya vaciado; limpia formulario y ubicación).
+function resetOrderFlow() {
+    cart.clear();
+    if (dom.form) dom.form.reset();
+    pickedLocation = null;
+    setConfirmLoading(false);
+    refreshAddButtons();
+    renderCart();
+    updateFab();
+    showMenuView(); // oculta la pantalla de exito y vuelve al menu
 }
 
 // ----- EVENTS -----
@@ -1054,28 +1156,39 @@ if (dom.fab) {
 
     dom.form.addEventListener('submit', async (e) => {
         e.preventDefault();
+        if (isSubmitting) return;          // ya hay un envio en curso -> evita duplicados
+        isSubmitting = true;
+        setConfirmLoading(true);
+
         const data = Object.fromEntries(new FormData(dom.form));
 
-        // Loading state en el boton
-        if (dom.confirmBtn) {
-            dom.confirmBtn.disabled = true;
-            dom.confirmBtn.classList.add('loading');
-        }
-
         // 1) Guardar el pedido en el backend (para que aparezca en el panel de la mesera).
+        //    savePedido nunca lanza: devuelve { ok:false } si falla la red o el backend.
         const resp = await savePedido(data);
 
-        // 2a) Si el pago es PSE y backend devolvio URL de checkout Wompi -> redirigir a Wompi.
-        if (data.metodo_pago === 'pse' && resp && resp.wompi_checkout_url) {
+        // 2a) Pago PSE con Wompi configurado -> redirigir al portal (la pagina navega fuera).
+        if (data.metodo_pago === 'pse' && resp && resp.ok && resp.wompi_checkout_url) {
             window.location.href = resp.wompi_checkout_url;
-            return;
+            return; // dejamos el boton en "enviando": la pagina esta navegando a Wompi
         }
 
-        // 2b) Sino, abrir WhatsApp con el resumen (efectivo o si PSE no esta configurado).
+        // 2b) Resto de casos -> WhatsApp como canal de confirmacion (respaldo de siempre).
+        //     Se abre aunque el guardado en BD falle: el pedido igual llega por WhatsApp.
         const msg = buildWhatsappMessage(data);
-        const url = `https://wa.me/${DELIVERY_CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
-        window.open(url, '_blank');
+        const waUrl = `https://wa.me/${DELIVERY_CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`;
+        const win = window.open(waUrl, '_blank'); // null si el navegador bloqueo el popup
+
+        const orderId = resp && resp.ok ? resp.id : null;
+        showSuccessView({ waUrl, orderId, popupBlocked: !win });
+
+        setConfirmLoading(false);
+        isSubmitting = false;
     });
+
+    // "Hacer otro pedido" desde la pantalla de exito
+    if (dom.successAgain) {
+        dom.successAgain.addEventListener('click', resetOrderFlow);
+    }
 
     // ESC cierra modal
     document.addEventListener('keydown', (e) => {

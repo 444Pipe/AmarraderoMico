@@ -40,6 +40,8 @@ Landing de una sola vista con un sistema de pedidos a domicilio + un panel para 
 - Acceso discreto desde la web: enlace "Personal" al final del footer.
 - Gestión avanzada / exportar: admin de Django en una **ruta secreta** (`ADMIN_URL`,
   por defecto `/gestion-mico-9q2x/`). La ruta `/admin/` ya no existe (404).
+- **Anti-fuerza-bruta**: el login está protegido con `django-axes`. Tras **5 intentos
+  fallidos** (por usuario+IP) se bloquea **1 hora**; un login correcto reinicia el contador.
 
 ## Archivos clave
 
@@ -55,10 +57,24 @@ Landing de una sola vista con un sistema de pedidos a domicilio + un panel para 
 
 ## Cómo correr en local
 
+`DEBUG` ahora es `False` por defecto (seguro en producción). En local hay que activarlo,
+si no la app no arranca (protección: no correr con la clave de desarrollo en producción).
+
+```powershell
+# PowerShell (Windows) — vale para la sesión actual de la terminal
+$env:DEBUG = "true"
+pip install -r requirements.txt
+python manage.py migrate        # crea también las tablas de django-axes
+python manage.py createsuperuser     # crea el usuario admin
+python manage.py runserver
+```
+
 ```bash
+# macOS / Linux
+export DEBUG=true
 pip install -r requirements.txt
 python manage.py migrate
-python manage.py createsuperuser     # crea el usuario admin
+python manage.py createsuperuser
 python manage.py runserver
 ```
 
@@ -72,10 +88,10 @@ desde el admin (ruta secreta `/gestion-mico-9q2x/`) → Usuarios, crea un usuari
 
 | Variable | Para qué |
 |---|---|
-| `SECRET_KEY` | Clave de Django (obligatoria en producción). |
-| `DEBUG` | `false` en producción. |
+| `SECRET_KEY` | Clave de Django. **Obligatoria en producción**: con `DEBUG=false` la app no arranca sin ella (ni con la clave de desarrollo por defecto). |
+| `DEBUG` | Por defecto `false`. En producción déjalo `false`; en local exporta `true`. |
 | `DATABASE_URL` | Postgres de Railway (si no, usa SQLite efímero). |
-| `ALLOWED_HOSTS` | Dominios permitidos (ej. `amarradero.up.railway.app`). |
+| `ALLOWED_HOSTS` | Dominios permitidos (ej. `amarradero.up.railway.app`). Ya no hay comodín `'*'` por defecto: en Railway se deriva de `RAILWAY_PUBLIC_DOMAIN`; en local, con `DEBUG=true`, se permiten `localhost`/`127.0.0.1`. |
 | `ADMIN_URL` | Ruta secreta del admin (ej. `mi-clave-secreta`). Recomendado en producción. |
 | `ADMIN_USERNAME`, `ADMIN_PASSWORD` | Crean la cuenta del panel en el despliegue. |
 | `CLOUDINARY_CLOUD_NAME`, `SITE_URL` | Reescritura de imágenes a Cloudinary (opcional). |

@@ -17,15 +17,27 @@ def env_bool(name, default=False):
 
 
 # --- Seguridad básica ---
-SECRET_KEY = os.environ.get(
-    'SECRET_KEY',
-    'dev-inseguro-cambiar-en-produccion-con-la-variable-SECRET_KEY',
-)
-DEBUG = env_bool('DEBUG', default=True)
+# Secure-by-default: DEBUG apagado por defecto y la clave de desarrollo SOLO se
+# tolera con DEBUG=True. En producción (DEBUG=False) la app NO arranca sin un
+# SECRET_KEY propio, en vez de degradarse en silencio a un estado inseguro.
+_DEV_SECRET = 'dev-inseguro-cambiar-en-produccion-con-la-variable-SECRET_KEY'
+SECRET_KEY = os.environ.get('SECRET_KEY', _DEV_SECRET)
+DEBUG = env_bool('DEBUG', default=False)
 
-# En Railway el dominio cambia; por defecto permitimos todo y se puede restringir
-# con la variable ALLOWED_HOSTS="midominio.com,www.midominio.com".
-ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', '*').split(',') if h.strip()]
+if not DEBUG and (not SECRET_KEY or SECRET_KEY == _DEV_SECRET):
+    from django.core.exceptions import ImproperlyConfigured
+
+    raise ImproperlyConfigured(
+        'Falta SECRET_KEY (o sigue con el valor de desarrollo) con DEBUG=False. '
+        'Define un SECRET_KEY propio en producción, o exporta DEBUG=true para correr '
+        'en local. La app no arranca con la clave por defecto en producción.'
+    )
+
+# En Railway el dominio cambia; se agrega solo (RAILWAY_PUBLIC_DOMAIN, abajo).
+# En local, con DEBUG=True, se permiten los hosts de desarrollo. En producción NO
+# se usa el comodín '*': hay que definir ALLOWED_HOSTS o derivarlo del dominio de Railway.
+_default_hosts = 'localhost,127.0.0.1,testserver' if DEBUG else ''
+ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', _default_hosts).split(',') if h.strip()]
 
 # Para que el login del panel funcione bajo HTTPS en Railway.
 CSRF_TRUSTED_ORIGINS = [
@@ -67,6 +79,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'orders',
+    'axes',  # Bloqueo del login del panel ante fuerza bruta.
 ]
 
 MIDDLEWARE = [
@@ -78,6 +91,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # AxesMiddleware debe ir de último para registrar los intentos de login.
+    'axes.middleware.AxesMiddleware',
 ]
 
 ROOT_URLCONF = 'amarradero.urls'
@@ -117,6 +132,25 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
+
+
+# --- Autenticación + protección de fuerza bruta (django-axes) ---
+# AxesStandaloneBackend debe ir primero: bloquea el login tras varios intentos
+# fallidos antes de que ModelBackend valide la contraseña.
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesStandaloneBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+AXES_FAILURE_LIMIT = 5              # intentos fallidos antes de bloquear
+AXES_COOLOFF_TIME = 1              # horas de bloqueo (se auto-desbloquea)
+AXES_RESET_ON_SUCCESS = True       # un login correcto limpia el contador
+# Bloquea por la COMBINACIÓN usuario+IP: un atacante no puede dejar fuera a la
+# mesera globalmente, y su propia IP queda bloqueada para ese usuario.
+AXES_LOCKOUT_PARAMETERS = [['username', 'ip_address']]
+# Railway sirve detrás de un proxy: la IP real viene en X-Forwarded-For.
+AXES_IPWARE_PROXY_COUNT = 1
+AXES_IPWARE_META_PRECEDENCE_ORDER = ['HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR']
 
 
 # --- Internacionalización ---
