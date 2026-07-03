@@ -487,7 +487,34 @@ function setupMenuFilter(cfg) {
     let query = '';
     let antojo = 'todos';
 
-    const apply = () => {
+    // Respeta a quien prefiere menos movimiento (accesibilidad).
+    const reduceMotion = () => window.matchMedia
+        && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Animación sutil al cambiar de filtro: los platos visibles entran con un
+    // fade + leve subida, escalonados. Web Animations API (re-disparable en cada cambio).
+    const animateVisible = () => {
+        if (typeof listRoot.animate !== 'function' || reduceMotion()) return;
+        let items = [...listRoot.querySelectorAll(cfg.itemSel)]
+            .filter(el => !el.classList.contains('filtered-out'));
+        if (cfg.accordion) {
+            items = items.filter(el => {
+                const c = el.closest(cfg.catSel);
+                return c && c.classList.contains('is-open');
+            });
+        }
+        items.forEach((el, i) => {
+            el.animate(
+                [
+                    { opacity: 0, transform: 'translateY(9px) scale(.985)' },
+                    { opacity: 1, transform: 'translateY(0) scale(1)' },
+                ],
+                { duration: 320, delay: Math.min(i * 22, 240), easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'backwards' }
+            );
+        });
+    };
+
+    const apply = (animate) => {
         const q = normalizeText(query);
         const pred = (ANTOJOS.find(a => a.key === antojo) || ANTOJOS[0]).match;
         let anyVisible = false;
@@ -515,16 +542,22 @@ function setupMenuFilter(cfg) {
         }
         noResults.hidden = anyVisible;
         clearBtn.hidden = !query;
+        if (animate) animateVisible();
     };
 
-    input.addEventListener('input', () => { query = input.value.trim(); apply(); });
-    clearBtn.addEventListener('click', () => { input.value = ''; query = ''; input.focus(); apply(); });
+    input.addEventListener('input', () => { query = input.value.trim(); apply(false); });
+    clearBtn.addEventListener('click', () => { input.value = ''; query = ''; input.focus(); apply(false); });
     chipsWrap.addEventListener('click', (e) => {
         const chip = e.target.closest('[data-antojo]');
         if (!chip) return;
         antojo = chip.getAttribute('data-antojo');
         chipsWrap.querySelectorAll('.antojo-chip').forEach(c => c.classList.toggle('active', c === chip));
-        apply();
+        // Rebote sutil del chip al seleccionarlo
+        if (typeof chip.animate === 'function' && !reduceMotion()) {
+            chip.animate([{ transform: 'scale(.9)' }, { transform: 'scale(1)' }],
+                { duration: 240, easing: 'cubic-bezier(.2,.8,.3,1.4)' });
+        }
+        apply(true);
     });
 }
 
@@ -539,7 +572,6 @@ function renderMenu() {
                     const pop = POPULAR.has(item.id);
                     return `
                     <div class="menu-item${pop ? ' is-popular' : ''}" data-item-id="${item.id}" data-cat="${cat.id}" data-price="${item.price}" data-popular="${pop ? '1' : '0'}" data-search="${normalizeText(item.name + ' ' + cat.name)}">
-                        ${pop ? '<span class="pop-badge"><i class="fa-solid fa-fire" aria-hidden="true"></i> Top</span>' : ''}
                         ${itemThumb({ ...item, icon: iconFor(item, cat) }, 'menu-item-thumb')}
                         <div class="menu-item-info">
                             <h4>${item.name}</h4>
