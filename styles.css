@@ -364,6 +364,14 @@ body.loading { overflow: hidden; height: 100vh; }
     padding-bottom: 10px;
     border-bottom: 2px solid var(--color-gold);
 }
+/* Platos del domicilio en dos columnas (el gap del grid maneja el espaciado) */
+.menu-cat-items {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    align-items: start;
+}
+.menu-cat-items .menu-item { margin-bottom: 0; }
 .menu-item {
     display: grid;
     grid-template-columns: 90px 1fr auto;
@@ -1663,6 +1671,8 @@ body.loading { overflow: hidden; height: 100vh; }
     .menu-catnav { padding: 12px 0 10px; margin-bottom: 14px; }
     .menu-category { margin-bottom: 24px; }
     .menu-category h3 { font-size: 1.15rem; margin-bottom: 12px; padding-bottom: 8px; }
+    /* En movil el menu es fullscreen: una sola columna para tocar comodo */
+    .menu-cat-items { grid-template-columns: 1fr; }
 
     .menu-item {
         grid-template-columns: 52px 1fr auto;

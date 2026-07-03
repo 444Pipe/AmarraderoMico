@@ -399,17 +399,19 @@ function renderMenu() {
     const categories = MENU_DATA.map(cat => `
         <div class="menu-category" id="dcat-${cat.id}">
             <h3><i class="fa-solid ${cat.icon} menu-cat-emoji" aria-hidden="true"></i> ${cat.name}</h3>
-            ${cat.items.map(item => `
-                <div class="menu-item" data-item-id="${item.id}">
-                    ${itemThumb({ ...item, icon: iconFor(item, cat) }, 'menu-item-thumb')}
-                    <div class="menu-item-info">
-                        <h4>${item.name}</h4>
-                        ${item.desc ? `<p>${item.desc}</p>` : ''}
-                        <span class="menu-item-price">${formatCOP(item.price)}</span>
+            <div class="menu-cat-items">
+                ${cat.items.map(item => `
+                    <div class="menu-item" data-item-id="${item.id}">
+                        ${itemThumb({ ...item, icon: iconFor(item, cat) }, 'menu-item-thumb')}
+                        <div class="menu-item-info">
+                            <h4>${item.name}</h4>
+                            ${item.desc ? `<p>${item.desc}</p>` : ''}
+                            <span class="menu-item-price">${formatCOP(item.price)}</span>
+                        </div>
+                        <div class="menu-item-add" data-add-slot="${item.id}"></div>
                     </div>
-                    <div class="menu-item-add" data-add-slot="${item.id}"></div>
-                </div>
-            `).join('')}
+                `).join('')}
+            </div>
         </div>
     `).join('');
     dom.menu.innerHTML = catNav + categories;
