@@ -363,7 +363,7 @@ const ANTOJOS = [
     { key: 'parrilla', label: 'Parrilla', icon: 'fa-drumstick-bite', match: d => d.cat === 'parrilla' },
     { key: 'pescados', label: 'Pescados', icon: 'fa-fish', match: d => d.cat === 'pescados' },
     { key: 'compartir', label: 'Compartir', icon: 'fa-users', match: d => d.cat === 'pa-compartir' },
-    { key: 'economicos', label: 'Económicos', icon: 'fa-tag', match: d => Number(d.price) <= 15000 },
+    { key: 'ratico', label: "Pa' un ratico", icon: 'fa-champagne-glasses', match: d => ['pa-empezar', 'pa-compartir', 'cervezas-licores'].includes(d.cat) },
     { key: 'bebidas', label: 'Bebidas', icon: 'fa-beer-mug-empty', match: d => ['bebidas', 'bebidas-calientes', 'cervezas-licores'].includes(d.cat) },
 ];
 
@@ -693,6 +693,79 @@ function updateFab() {
         dom.fabCount.textContent = totalQty;
     } else {
         dom.fabCount.hidden = true;
+    }
+}
+
+// ============= MICRO-ANIMACION "AGREGAR AL CARRITO" =============
+// Al sumar un plato, un clon de su icono "vuela" en arco hasta el carrito y el
+// contador rebota. El destino depende del contexto: en mobile la barra sticky
+// inferior, en PC el encabezado del carrito lateral.
+function cartAnchors() {
+    if (isMobile()) {
+        if (dom.mobileBar && dom.mobileBar.classList.contains('show')) {
+            const r = dom.mobileBar.getBoundingClientRect();
+            const h = r.height || 52;
+            // Punto de reposo de la barra (fixed bottom:16px), estable aunque
+            // esté animando su entrada (slideUpBar) en el primer plato.
+            return {
+                point: { x: window.innerWidth / 2, y: window.innerHeight - 16 - h / 2 },
+                pulse: dom.mobileBar.querySelector('.bar-count') || dom.mobileBar,
+            };
+        }
+        return null; // aún no hay nada visible a donde volar
+    }
+    const head = document.querySelector('#deliveryCart .cart-header');
+    if (head) return { fly: head, pulse: head.querySelector('i') || head };
+    return { fly: dom.fab, pulse: dom.fabCount || dom.fab };
+}
+
+function pulseEl(el) {
+    if (!el) return;
+    el.classList.remove('cart-bump');
+    void el.offsetWidth; // reinicia la animacion
+    el.classList.add('cart-bump');
+    el.addEventListener('animationend', () => el.classList.remove('cart-bump'), { once: true });
+}
+
+function flyToCart(sourceEl, dest, onArrive) {
+    const s = sourceEl.getBoundingClientRect();
+    if (!s.width || !dest) { if (onArrive) onArrive(); return; }
+    const clone = sourceEl.cloneNode(true);
+    clone.classList.add('fly-clone');
+    Object.assign(clone.style, {
+        position: 'fixed', left: s.left + 'px', top: s.top + 'px',
+        width: s.width + 'px', height: s.height + 'px', margin: '0',
+        borderRadius: '50%', zIndex: '99999', pointerEvents: 'none',
+        transition: 'transform 0.6s cubic-bezier(0.2, 0.7, 0.3, 1), opacity 0.55s ease-in',
+        willChange: 'transform, opacity',
+    });
+    document.body.appendChild(clone);
+    const dx = dest.x - (s.left + s.width / 2);
+    const dy = dest.y - (s.top + s.height / 2);
+    requestAnimationFrame(() => {
+        clone.style.transform = `translate(${dx}px, ${dy}px) scale(0.2)`;
+        clone.style.opacity = '0.2';
+    });
+    let done = false;
+    const finish = () => { if (done) return; done = true; clone.remove(); if (onArrive) onArrive(); };
+    clone.addEventListener('transitionend', finish, { once: true });
+    setTimeout(finish, 780); // failsafe por si no dispara transitionend
+}
+
+// Dispara la animacion de agregado desde la tarjeta del plato (itemEl) al carrito.
+function animateAdd(itemEl) {
+    const anchors = cartAnchors();
+    if (!anchors) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const thumb = itemEl ? itemEl.querySelector('.menu-item-thumb, .thumb-icon') : null;
+    if (thumb && !reduce) {
+        const dest = anchors.point || (() => {
+            const r = anchors.fly.getBoundingClientRect();
+            return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+        })();
+        flyToCart(thumb, dest, () => pulseEl(anchors.pulse));
+    } else {
+        pulseEl(anchors.pulse);
     }
 }
 
@@ -1203,12 +1276,22 @@ if (dom.fab) {
     );
 
     // Delegacion de eventos para botones +/-
+    // El itemEl se captura ANTES de changeQty porque refreshAddButtons reemplaza
+    // el boton "+" y lo desprende del DOM (perderíamos la tarjeta de origen).
     dom.modal.addEventListener('click', (e) => {
         const add = e.target.closest('[data-add]');
         const inc = e.target.closest('[data-inc]');
         const dec = e.target.closest('[data-dec]');
-        if (add) changeQty(add.getAttribute('data-add'), 1);
-        if (inc) changeQty(inc.getAttribute('data-inc'), 1);
+        if (add) {
+            const itemEl = add.closest('.menu-item');
+            changeQty(add.getAttribute('data-add'), 1);
+            animateAdd(itemEl);
+        }
+        if (inc) {
+            const itemEl = inc.closest('.menu-item');
+            changeQty(inc.getAttribute('data-inc'), 1);
+            animateAdd(itemEl);
+        }
         if (dec) changeQty(dec.getAttribute('data-dec'), -1);
     });
 
