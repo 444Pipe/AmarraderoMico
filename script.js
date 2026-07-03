@@ -619,8 +619,7 @@ function renderFullMenu() {
                         return `
                         <li class="fmenu-dish${pop ? ' is-popular' : ''}" data-item-id="${item.id}" data-cat="${cat.id}" data-price="${item.price}" data-popular="${pop ? '1' : '0'}" data-search="${normalizeText(item.name + ' ' + cat.name)}">
                             <div class="fmenu-dish-row">
-                                <i class="fa-solid ${iconFor(item, cat)} fmenu-dish-icon" aria-hidden="true"></i>
-                                <span class="fmenu-dish-name">${item.name}${pop ? ' <span class="fmenu-pop" title="De los más pedidos"><i class="fa-solid fa-fire" aria-hidden="true"></i></span>' : ''}</span>
+                                <span class="fmenu-dish-name">${item.name}</span>
                                 <span class="fmenu-dish-dots" aria-hidden="true"></span>
                                 <span class="fmenu-dish-price">${formatCOP(item.price)}</span>
                             </div>
