@@ -88,6 +88,10 @@ const DELIVERY_CONFIG = {
 // El ORDEN base de las categorías es el de este arreglo; `orderedCategories()`
 // lo reordena dinámicamente según la hora (desayunos en la mañana, almuerzos
 // y picadas al mediodía).
+// Catálogo. Cada plato: { id, name, price }. Opcionalmente `img` (ruta a una foto),
+// que hoy solo usa la vitrina "Los más pedidos" de la carta: si el plato está en
+// POPULAR y trae `img`, la tarjeta muestra la foto; si no, un marcador a la espera.
+// Ej: { id: 'plato-mamona', name: 'Plato de Mamona', price: 38000, img: 'statics/img/mamona.jpg' }
 const MENU_DATA = [
     {
         id: 'pa-empezar', name: "Pa' Empezar", icon: 'fa-plate-wheat',
@@ -598,17 +602,29 @@ function renderMenu() {
     refreshAddButtons();
 }
 
-// Menú público de la landing (sección "Menú"): la misma carta en formato lista
-// elegante estilo carta impresa, solo lectura (sin botón de agregar).
+// Menú público de la landing (sección "Menú"): la carta completa en formato
+// "tablero" — vitrina de "más pedidos" arriba + acordeón en grid de 2 columnas.
+// Solo lectura (sin botón de agregar).
 function renderFullMenu() {
     const host = document.getElementById('fullMenu');
     if (!host) return;
-    host.innerHTML = orderedCategories().map(cat => `
-        <div class="fmenu-cat" data-cat="${cat.id}">
-            <button type="button" class="fmenu-cat-title" data-acc-toggle aria-expanded="false">
-                <i class="fa-solid ${cat.icon} fmenu-cat-emoji" aria-hidden="true"></i>
-                <span class="fmenu-cat-name">${cat.name}</span>
-                <span class="fmenu-cat-count">${cat.items.length}</span>
+    const cats = orderedCategories();
+    host.innerHTML = cats.map((cat, idx) => {
+        // Abre las primeras categorías (que orderedCategories prioriza por el horario)
+        // para que siempre se vea comida sin tener que desplegar nada.
+        const open = idx < 2;
+        const desde = Math.min(...cat.items.map(i => i.price));
+        return `
+        <div class="fmenu-cat${open ? ' is-open' : ''}" data-cat="${cat.id}">
+            <button type="button" class="fmenu-cat-title" data-acc-toggle aria-expanded="${open ? 'true' : 'false'}">
+                <span class="fmenu-cat-ic"><i class="fa-solid ${cat.icon}" aria-hidden="true"></i></span>
+                <span class="fmenu-cat-meta">
+                    <span class="fmenu-cat-name">${cat.name}</span>
+                    <span class="fmenu-cat-sub">
+                        <span class="fmenu-cat-count">${cat.items.length}</span>
+                        <span class="fmenu-cat-desde">desde ${formatCOP(desde)}</span>
+                    </span>
+                </span>
                 <i class="fa-solid fa-chevron-down fmenu-chevron" aria-hidden="true"></i>
             </button>
             <div class="fmenu-panel">
@@ -619,7 +635,7 @@ function renderFullMenu() {
                         return `
                         <li class="fmenu-dish${pop ? ' is-popular' : ''}" data-item-id="${item.id}" data-cat="${cat.id}" data-price="${item.price}" data-popular="${pop ? '1' : '0'}" data-search="${normalizeText(item.name + ' ' + cat.name)}">
                             <div class="fmenu-dish-row">
-                                <span class="fmenu-dish-name">${item.name}</span>
+                                <span class="fmenu-dish-name">${item.name}${pop ? ' <i class="fa-solid fa-fire fmenu-pop" aria-hidden="true"></i>' : ''}</span>
                                 <span class="fmenu-dish-dots" aria-hidden="true"></span>
                                 <span class="fmenu-dish-price">${formatCOP(item.price)}</span>
                             </div>
@@ -628,8 +644,14 @@ function renderFullMenu() {
                 </ul>
               </div>
             </div>
-        </div>
-    `).join('');
+        </div>`;
+    }).join('');
+
+    // Vitrina "Los más pedidos": se pinta como hermano ANTES del grid (y antes de
+    // insertar la barra de filtros), quedando el orden: cabecera → vitrina → filtros → grid.
+    const oldStrip = document.getElementById('fullMenuPopular');
+    if (oldStrip) oldStrip.remove();
+    host.insertAdjacentHTML('beforebegin', popularStripHTML());
 
     // Acordeón: al tocar el título se despliega/colapsa la categoría.
     if (!host.dataset.accBound) {
@@ -655,6 +677,35 @@ function renderFullMenu() {
             listRoot.parentNode.insertBefore(noResults, listRoot.nextSibling);
         },
     });
+}
+
+// HTML de la vitrina "Los más pedidos del Mico": tarjetas horizontales con los
+// platos estrella (POPULAR). Cada tarjeta tiene un hueco de foto: si el item trae
+// `img` se muestra la foto; si no, un marcador ("Foto") a la espera de las imágenes.
+// Al tocar una tarjeta se abre el domicilio (el enlace [data-open-delivery] global).
+function popularStripHTML() {
+    const items = [...POPULAR].map(id => MENU_INDEX.get(id)).filter(Boolean);
+    const cards = items.map(it => `
+        <button type="button" class="fmp-card" data-open-delivery aria-label="Pedir ${it.name}">
+            <span class="fmp-photo">
+                <span class="fmp-flame"><i class="fa-solid fa-fire" aria-hidden="true"></i></span>
+                ${it.img
+                    ? `<img src="${it.img}" alt="${it.name}" loading="lazy">`
+                    : `<i class="fa-solid fa-image fmp-ph-ic" aria-hidden="true"></i><span class="fmp-ph-txt">Foto</span>`}
+            </span>
+            <span class="fmp-body">
+                <span class="fmp-name">${it.name}</span>
+                <span class="fmp-price">${formatCOP(it.price)}</span>
+            </span>
+        </button>`).join('');
+    return `
+        <div class="fmp-band" id="fullMenuPopular">
+            <div class="fmp-lead">
+                <h3>Los más pedidos del Mico</h3>
+                <span class="fmp-hint">desliza <i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i></span>
+            </div>
+            <div class="fmp-rail">${cards}</div>
+        </div>`;
 }
 
 function refreshAddButtons() {

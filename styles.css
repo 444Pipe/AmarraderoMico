@@ -2689,58 +2689,138 @@ a { text-decoration: none; color: inherit; }
 }
 .menu-full-cta { display: inline-flex; }
 
+/* Brasa ambiental en la parte superior de la sección (evoca el fogón) */
+.menu-full::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    height: 200px;
+    background: radial-gradient(60% 100% at 50% 0, rgba(184, 84, 31, 0.12), transparent 70%);
+    pointer-events: none;
+}
+.menu-full > * { position: relative; }
+
+/* ----- Vitrina "Los más pedidos del Mico" ----- */
+.fmp-band { max-width: 1040px; margin: 0 auto 34px; }
+.fmp-lead { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 16px; }
+.fmp-lead h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--color-brown-dark); }
+.fmp-hint { color: var(--color-text-soft); font-size: 0.84rem; display: inline-flex; align-items: center; gap: 5px; }
+.fmp-hint i { color: var(--color-rust); }
+.fmp-rail {
+    display: flex; gap: 14px; overflow-x: auto;
+    padding: 6px 4px 14px; scroll-snap-type: x mandatory; scrollbar-width: thin;
+}
+.fmp-rail::-webkit-scrollbar { height: 6px; }
+.fmp-rail::-webkit-scrollbar-thumb { background: rgba(201, 169, 97, 0.5); border-radius: 99px; }
+.fmp-card {
+    scroll-snap-align: start; flex: 0 0 184px; text-align: left; padding: 0;
+    background: linear-gradient(180deg, #fff, #fffaf2);
+    border: 1px solid rgba(201, 169, 97, 0.5); border-radius: var(--radius);
+    box-shadow: var(--shadow-soft); overflow: hidden; cursor: pointer;
+    font-family: inherit; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+.fmp-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-strong); border-color: var(--color-gold-bright); }
+.fmp-photo {
+    position: relative; display: grid; place-items: center; gap: 4px;
+    height: 124px; color: var(--color-brown-mid);
+    background:
+        repeating-linear-gradient(45deg, rgba(201, 169, 97, 0.07) 0 10px, transparent 10px 20px),
+        linear-gradient(160deg, rgba(245, 230, 211, 0.9), rgba(232, 212, 168, 0.6));
+}
+.fmp-photo::after {
+    content: ""; position: absolute; inset: 10px;
+    border: 1.5px dashed rgba(139, 69, 19, 0.35); border-radius: 10px; pointer-events: none;
+}
+.fmp-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.fmp-ph-ic { font-size: 1.7rem; opacity: 0.75; }
+.fmp-ph-txt { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.8; }
+.fmp-flame {
+    position: absolute; top: 10px; right: 10px; z-index: 2;
+    width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--color-rust); color: var(--color-white); font-size: 0.78rem;
+    box-shadow: 0 3px 10px rgba(184, 84, 31, 0.45);
+}
+.fmp-body { display: block; padding: 14px 16px 16px; }
+.fmp-name { display: block; font-weight: 600; font-size: 0.94rem; color: var(--color-brown-dark); line-height: 1.25; min-height: 2.4em; }
+.fmp-price { display: block; margin-top: 8px; font-weight: 800; color: var(--color-rust); font-size: 1.02rem; }
+
 .menu-full-body {
-    max-width: 820px;
+    max-width: 1040px;
     margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    align-items: start;
 }
 .fmenu-cat {
-    background: rgba(255, 255, 255, 0.65);
-    border: 1px solid rgba(201, 169, 97, 0.4);
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(201, 169, 97, 0.45);
     border-radius: var(--radius);
     box-shadow: var(--shadow-soft);
     overflow: hidden;
+    align-self: start;
+    transition: box-shadow 0.25s, border-color 0.25s;
 }
+.fmenu-cat.is-open { border-color: var(--color-gold-bright); box-shadow: 0 16px 40px rgba(45, 24, 16, 0.14); }
 /* Título = botón que despliega la categoría (acordeón) */
 .fmenu-cat-title {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     width: 100%;
-    padding: 18px 24px;
+    padding: 16px 18px;
     margin: 0;
     background: none;
     border: none;
-    font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
-    color: var(--color-brown-dark);
     text-align: left;
     cursor: pointer;
     transition: background 0.2s;
 }
 .fmenu-cat-title:hover { background: rgba(201, 169, 97, 0.12); }
 .fmenu-cat.is-open .fmenu-cat-title { background: rgba(201, 169, 97, 0.1); }
-.fmenu-cat-name { flex: 1; }
+/* Icono de la categoría dentro de una "ficha" con degradado cálido */
+.fmenu-cat-ic {
+    flex: 0 0 auto;
+    width: 46px; height: 46px;
+    display: grid; place-items: center;
+    border-radius: 13px;
+    color: var(--color-rust);
+    font-size: 1.4rem;
+    background: linear-gradient(140deg, rgba(230, 184, 92, 0.35), rgba(210, 105, 30, 0.22));
+    border: 1px solid rgba(201, 169, 97, 0.5);
+    box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.6);
+}
+.fmenu-cat-meta { flex: 1; min-width: 0; }
+.fmenu-cat-name {
+    display: block;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.32rem;
+    color: var(--color-brown-dark);
+    line-height: 1.1;
+}
+.fmenu-cat-sub {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 3px;
+    color: var(--color-text-soft);
+    font-size: 0.78rem;
+}
+.fmenu-cat-desde { font-variant-numeric: tabular-nums; }
 .fmenu-cat-count {
     font-family: 'Inter', sans-serif;
-    font-size: 0.78rem;
+    font-size: 0.72rem;
     font-weight: 700;
     color: var(--color-rust);
     background: rgba(184, 84, 31, 0.1);
     border-radius: 999px;
-    padding: 2px 10px;
-    min-width: 30px;
-    text-align: center;
+    padding: 1px 9px;
 }
 .fmenu-chevron {
-    font-size: 0.95rem;
+    flex: 0 0 auto;
+    font-size: 1rem;
     color: var(--color-rust);
     transition: transform 0.35s ease;
 }
 .fmenu-cat.is-open .fmenu-chevron { transform: rotate(180deg); }
-.fmenu-cat-emoji { font-size: 1.2rem; color: var(--color-rust); }
 
 /* Panel colapsable: anima la altura con el truco grid 0fr → 1fr (sin números mágicos).
    El padding/borde van en .fmenu-list (interno); el grid item (.fmenu-panel-inner) no
@@ -2763,6 +2843,14 @@ a { text-decoration: none; color: inherit; }
     border-bottom: 1px dashed rgba(74, 44, 31, 0.12);
 }
 .fmenu-dish:last-child { border-bottom: none; padding-bottom: 0; }
+/* Plato estrella: leve tinte cálido y filo rust a la izquierda */
+.fmenu-dish.is-popular {
+    background: linear-gradient(90deg, rgba(184, 84, 31, 0.09), transparent 72%);
+    border-left: 3px solid var(--color-rust);
+    border-radius: 8px;
+    margin: 0 -8px;
+    padding: 9px 8px 9px 9px;
+}
 .fmenu-dish-row {
     display: flex;
     align-items: baseline;
@@ -2817,15 +2905,20 @@ a { text-decoration: none; color: inherit; }
 @media (max-width: 768px) {
     .menu-full { padding: 70px 20px; }
     .menu-full-header { margin-bottom: 40px; }
-    .fmenu-cat-title { font-size: 1.32rem; padding: 16px 18px; }
+    .menu-full-body { grid-template-columns: 1fr; }
+    .fmenu-cat-name { font-size: 1.2rem; }
     .fmenu-list { padding-left: 18px; padding-right: 18px; }
 }
 @media (max-width: 480px) {
     .menu-full { padding: 56px 16px; }
-    .fmenu-cat-title { font-size: 1.2rem; gap: 9px; }
+    .fmenu-cat-title { gap: 11px; padding: 14px 14px; }
+    .fmenu-cat-ic { width: 40px; height: 40px; font-size: 1.2rem; }
+    .fmenu-cat-name { font-size: 1.1rem; }
     .fmenu-dish-name { font-size: 0.92rem; }
     .fmenu-dish-price { font-size: 0.92rem; }
     .fmenu-dish-desc { font-size: 0.78rem; }
+    .fmp-card { flex-basis: 158px; }
+    .fmp-photo { height: 108px; }
 }
 
 /* ============= EXPERIENCIA ============= */
