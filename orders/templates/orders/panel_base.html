@@ -46,7 +46,7 @@
         .brand h1 { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; line-height: 1.1; }
         .brand p { font-size: .72rem; color: var(--gold-bright); letter-spacing: .5px; text-transform: uppercase; }
 
-        .panel-nav { display: flex; gap: 6px; background: rgba(0,0,0,.18); padding: 5px; border-radius: 999px; order: 3; }
+        .panel-nav { display: flex; gap: 6px; background: rgba(0,0,0,.18); padding: 5px; border-radius: 999px; }
         .panel-nav a {
             display: inline-flex; align-items: center; gap: 7px; text-decoration: none;
             color: rgba(255,255,255,.82); font-size: .84rem; font-weight: 600;
@@ -162,7 +162,6 @@
             .grid-2 { grid-template-columns: 1fr; }
         }
         @media (max-width: 720px) {
-            .header-row { justify-content: center; }
             .panel-nav { order: 2; width: 100%; justify-content: space-between; }
             .panel-nav a { flex: 1; justify-content: center; padding: 8px 6px; }
             .panel-nav a span { display: none; }
@@ -191,10 +190,10 @@
             </nav>
             <div class="header-user">
                 <span class="who"><i class="fa-solid fa-circle-user"></i> <span>{{ request.user.username }}</span></span>
-                <a class="btn-home" href="{% url 'home' %}"><i class="fa-solid fa-house"></i> <span>Web</span></a>
+                <a class="btn-home" href="{% url 'home' %}"><i class="fa-solid fa-house"></i> <span>Página principal</span></a>
                 <form method="post" action="{% url 'logout' %}" class="logout-form">
                     {% csrf_token %}
-                    <button type="submit" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i></button>
+                    <button type="submit" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</button>
                 </form>
             </div>
         </div>
