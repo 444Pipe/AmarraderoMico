@@ -10,6 +10,7 @@ from django.template.response import TemplateResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
+from . import analytics
 from .models import Pedido
 
 INDEX_PATH = settings.BASE_DIR / 'index.html'
@@ -281,4 +282,50 @@ def pedidos_json(request):
         'activos': activos.count(),
         'nuevos': activos.filter(estado=Pedido.ESTADO_NUEVO).count(),
         'ultimo': activos.values_list('pk', flat=True).first() or 0,
+    })
+
+
+# ---------------- Clientes (agrupados por teléfono) ----------------
+
+@login_required
+def clientes(request):
+    """Lista de clientes con sus stats. Búsqueda por nombre o teléfono con ?q=."""
+    q = (request.GET.get('q') or '').strip()
+    lista = analytics.resumen_clientes()
+    if q:
+        ql = q.lower()
+        qd = re.sub(r'\D', '', q)
+        lista = [
+            c for c in lista
+            if ql in c['nombre'].lower() or (qd and qd in c['telefono_e164'])
+        ]
+    return TemplateResponse(request, 'orders/clientes.html', {
+        'seccion': 'clientes',
+        'clientes': lista,
+        'total_clientes': len(lista),
+        'total_gastado': sum(c['gastado'] for c in lista),
+        'q': q,
+    })
+
+
+@login_required
+def cliente_detalle(request, telefono):
+    """Ficha de un cliente: resumen, historial y platos favoritos."""
+    ficha = analytics.ficha_cliente(telefono)
+    if ficha is None:
+        return redirect('clientes')
+    return TemplateResponse(request, 'orders/cliente_detalle.html', {
+        'seccion': 'clientes',
+        'ficha': ficha,
+    })
+
+
+# ---------------- Estadísticas del negocio ----------------
+
+@login_required
+def estadisticas(request):
+    """Panel de estadísticas: KPIs, plato más vendido, horas pico y ventas por día."""
+    return TemplateResponse(request, 'orders/estadisticas.html', {
+        'seccion': 'estadisticas',
+        'stats': analytics.estadisticas_generales(),
     })

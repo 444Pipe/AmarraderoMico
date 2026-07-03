@@ -1,0 +1,114 @@
+{% extends 'orders/panel_base.html' %}
+{% load humanize %}
+{% block title %}Estadísticas · El Amarradero del Mico{% endblock %}
+{% block brand_title %}Estadísticas{% endblock %}
+
+{% block extra_style %}
+    .hero-stat { background: linear-gradient(135deg, var(--brown-dark), var(--brown) 65%, var(--brown-mid)); color: #fff; border-radius: 18px; padding: 22px 24px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .hero-stat .medal { width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, var(--gold-bright), var(--gold)); color: var(--brown-dark); display: grid; place-items: center; font-size: 1.9rem; flex-shrink: 0; box-shadow: 0 8px 20px rgba(201,169,97,.4); }
+    .hero-stat .k { font-size: .74rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gold-bright); font-weight: 700; }
+    .hero-stat .v { font-family: 'Playfair Display', serif; font-size: 1.7rem; font-weight: 700; margin-top: 2px; }
+    .hero-stat .d { font-size: .86rem; color: rgba(255,255,255,.75); margin-top: 4px; }
+    .hero-stat .spacer { flex: 1; }
+    .hero-stat .qty { text-align: center; }
+    .hero-stat .qty b { font-family: 'Playfair Display', serif; font-size: 2.2rem; display: block; }
+    .hero-stat .qty span { font-size: .74rem; color: rgba(255,255,255,.7); text-transform: uppercase; letter-spacing: 1px; }
+
+    .split-bar { height: 26px; border-radius: 999px; overflow: hidden; display: flex; background: var(--cream); font-size: .74rem; font-weight: 700; }
+    .split-bar .seg { display: flex; align-items: center; justify-content: center; color: #fff; gap: 6px; min-width: fit-content; padding: 0 10px; white-space: nowrap; }
+    .split-bar .seg.dom { background: linear-gradient(90deg, var(--orange), var(--rust)); }
+    .split-bar .seg.rec { background: linear-gradient(90deg, var(--green-bright), var(--green)); }
+    .split-legend { display: flex; gap: 16px; margin-top: 10px; font-size: .82rem; color: var(--text-soft); }
+    .split-legend b { color: var(--brown-dark); }
+    .dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
+    .peak-note { font-size: .86rem; color: var(--text-soft); margin-top: 14px; }
+    .peak-note b { color: var(--rust); }
+{% endblock %}
+
+{% block content %}
+    <div class="page-head">
+        <div>
+            <h2>Estadísticas del negocio</h2>
+            <p class="sub">Sobre todos los pedidos (los cancelados no cuentan para ventas)</p>
+        </div>
+    </div>
+
+    <div class="kpis">
+        <div class="kpi accent-green"><div class="ic"><i class="fa-solid fa-money-bill-trend-up"></i></div><div><div class="num">${{ stats.total_vendido|intcomma }}</div><div class="lbl">Vendido</div></div></div>
+        <div class="kpi accent-rust"><div class="ic"><i class="fa-solid fa-receipt"></i></div><div><div class="num">{{ stats.n_pedidos }}</div><div class="lbl">Pedidos</div></div></div>
+        <div class="kpi accent-gold"><div class="ic"><i class="fa-solid fa-tags"></i></div><div><div class="num">${{ stats.ticket|intcomma }}</div><div class="lbl">Ticket promedio</div></div></div>
+        <div class="kpi accent-brown"><div class="ic"><i class="fa-solid fa-users"></i></div><div><div class="num">{{ stats.n_clientes }}</div><div class="lbl">Clientes</div></div></div>
+        <div class="kpi"><div class="ic"><i class="fa-solid fa-ban"></i></div><div><div class="num">{{ stats.n_cancelados }}</div><div class="lbl">Cancelados</div></div></div>
+    </div>
+
+    {% if stats.top_plato %}
+    <div class="hero-stat">
+        <div class="medal"><i class="fa-solid fa-crown"></i></div>
+        <div>
+            <div class="k">Plato más vendido</div>
+            <div class="v">{{ stats.top_plato.nombre }}</div>
+            <div class="d">Ha generado ${{ stats.top_plato.ingreso|intcomma }} en ventas</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="qty"><b>{{ stats.top_plato.qty }}</b><span>unidades</span></div>
+    </div>
+    {% endif %}
+
+    <div class="grid-2" style="margin-top:18px;">
+        <div class="card">
+            <div class="card-title"><i class="fa-solid fa-ranking-star"></i> Top platos vendidos</div>
+            {% for p in stats.top_platos %}
+            <div class="bar-row">
+                <span class="bar-name">{{ p.nombre }}</span>
+                <span class="bar-track"><span class="bar-fill" style="width: {{ p.pct }}%;"></span></span>
+                <span class="bar-val">{{ p.qty }} <small>/ ${{ p.ingreso|intcomma }}</small></span>
+            </div>
+            {% empty %}
+            <p style="color:var(--text-soft); font-size:.9rem;">Aún no hay ventas registradas.</p>
+            {% endfor %}
+        </div>
+
+        <div class="card">
+            <div class="card-title"><i class="fa-solid fa-motorcycle"></i> Domicilio vs. recoger</div>
+            {% if stats.n_pedidos %}
+            <div class="split-bar">
+                {% if stats.pct_delivery %}<div class="seg dom" style="width: {{ stats.pct_delivery }}%;">{{ stats.pct_delivery }}%</div>{% endif %}
+                {% if stats.pct_pickup %}<div class="seg rec" style="width: {{ stats.pct_pickup }}%;">{{ stats.pct_pickup }}%</div>{% endif %}
+            </div>
+            <div class="split-legend">
+                <span><span class="dot" style="background:var(--rust);"></span> Domicilio: <b>{{ stats.n_delivery }}</b></span>
+                <span><span class="dot" style="background:var(--green);"></span> Recoger: <b>{{ stats.n_pickup }}</b></span>
+            </div>
+            {% else %}
+            <p style="color:var(--text-soft); font-size:.9rem;">Sin pedidos todavía.</p>
+            {% endif %}
+
+            <div class="card-title" style="margin-top:22px;"><i class="fa-regular fa-clock"></i> Horas pico</div>
+            <div class="cols">
+                {% for h in stats.horas %}
+                <div class="col {% if h.hora == stats.hora_pico %}peak{% endif %}">
+                    {% if h.count %}<span class="col-cnt">{{ h.count }}</span>{% endif %}
+                    <div class="col-bar" style="height: {{ h.pct }}%;"></div>
+                    <span class="col-lbl">{{ h.label }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% if stats.hora_pico is not None %}
+            <p class="peak-note"><i class="fa-solid fa-fire"></i> La hora con más pedidos es alrededor de las <b>{{ stats.hora_pico }}:00</b>.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:18px;">
+        <div class="card-title"><i class="fa-solid fa-chart-column"></i> Ventas de los últimos 14 días</div>
+        <div class="cols" style="height: 170px;">
+            {% for d in stats.serie_dias %}
+            <div class="col">
+                {% if d.total %}<span class="col-cnt" style="font-size:.58rem;">${{ d.total|intcomma }}</span>{% endif %}
+                <div class="col-bar green-day" style="height: {{ d.pct }}%; background: linear-gradient(180deg, var(--green-bright), var(--green));"></div>
+                <span class="col-lbl">{{ d.fecha|date:"d/m" }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

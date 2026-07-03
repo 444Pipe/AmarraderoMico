@@ -43,15 +43,37 @@ Landing de una sola vista con un sistema de pedidos a domicilio + un panel para 
 - **Anti-fuerza-bruta**: el login está protegido con `django-axes`. Tras **5 intentos
   fallidos** (por usuario+IP) se bloquea **1 hora**; un login correcto reinicia el contador.
 
+### Clientes y estadísticas (dentro del panel)
+
+El panel tiene tres pestañas (nav superior): **Pedidos**, **Clientes** y **Estadísticas**.
+
+- **Clientes** (`/panel/clientes/`): mini-CRM. No hay tabla `Cliente`; un cliente es el
+  conjunto de pedidos con el mismo **teléfono normalizado** (`Pedido.normalizar_telefono`,
+  agrupa aunque el formato cambie: `320 858 3991` == `3208583991`). Lista con nº de pedidos,
+  total gastado, ticket promedio y último pedido; buscador por nombre/teléfono.
+- **Ficha de cliente** (`/panel/cliente/<telefono>/`): resumen, historial completo de pedidos,
+  **platos favoritos** y última dirección/mapa, con botón de WhatsApp.
+- **Estadísticas** (`/panel/estadisticas/`): KPIs (vendido, pedidos, ticket, clientes,
+  cancelados), **plato más vendido**, top de platos, **horas pico** y ventas de los últimos
+  14 días, todo con barras simples (sin librerías externas).
+- Toda la lógica de agregación vive en `orders/analytics.py` y se calcula en Python sobre los
+  pedidos (el volumen de un restaurante pequeño lo permite).
+- En el **admin de Django** hay además una vista **Clientes** (proxy `Cliente`) que agrupa los
+  pedidos por teléfono, con enlace a los pedidos de cada uno y a su ficha del panel.
+
 ## Archivos clave
 
 | Archivo | Qué hace |
 |---|---|
-| `amarradero/settings.py` | Configuración (BD, estáticos, login, Cloudinary). |
-| `amarradero/urls.py` | Rutas: landing, assets, API, panel, login, admin. |
-| `orders/models.py` | Modelo `Pedido` (estados, items, helpers WhatsApp/maps). |
-| `orders/views.py` | Landing, API `crear_pedido`, dashboard, cambiar estado. |
-| `orders/templates/orders/dashboard.html` | Panel de la mesera. |
+| `amarradero/settings.py` | Configuración (BD, estáticos, login, axes, Cloudinary). |
+| `amarradero/urls.py` | Rutas: landing, assets, API, panel, clientes, estadísticas, login, admin. |
+| `orders/models.py` | Modelos `Pedido` y `Cliente` (proxy), helpers WhatsApp/maps/normalización. |
+| `orders/views.py` | Landing, API `crear_pedido`, Wompi, dashboard, clientes, estadísticas. |
+| `orders/analytics.py` | Agregaciones: fichas de cliente y estadísticas del negocio. |
+| `orders/admin.py` | Admin de `Pedido` + vista agrupada `Cliente`. |
+| `orders/templates/orders/panel_base.html` | Base común del panel (header + nav + estilos). |
+| `orders/templates/orders/dashboard.html` | Panel de pedidos en vivo. |
+| `orders/templates/orders/clientes.html` · `cliente_detalle.html` · `estadisticas.html` | Vistas de clientes y estadísticas. |
 | `index.html` | Landing + formulario de checkout. |
 | `script.js` | Carrito, mapa y envío del pedido (sección "SISTEMA DE DOMICILIOS"). |
 

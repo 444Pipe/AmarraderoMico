@@ -74,6 +74,21 @@
         .btn-logout:hover { background: rgba(255,255,255,.14); border-color: var(--gold-bright); }
         .btn-logout:active, .btn-home:active { transform: scale(.96); }
 
+        /* ---------- NAV ---------- */
+        .panel-nav { display: flex; gap: 6px; background: rgba(0,0,0,.18); padding: 5px; border-radius: 999px; }
+        .panel-nav a {
+            display: inline-flex; align-items: center; gap: 7px; text-decoration: none;
+            color: rgba(255,255,255,.82); font-size: .84rem; font-weight: 600;
+            padding: 8px 16px; border-radius: 999px; transition: all .2s; white-space: nowrap;
+        }
+        .panel-nav a:hover { background: rgba(255,255,255,.12); color: #fff; }
+        .panel-nav a.active { background: linear-gradient(135deg, var(--rust), var(--orange)); color: #fff; box-shadow: 0 5px 14px rgba(184,84,31,.4); }
+        @media (max-width: 720px) {
+            .panel-nav { order: 2; width: 100%; justify-content: space-between; }
+            .panel-nav a { flex: 1; justify-content: center; padding: 8px 6px; }
+            .panel-nav a span { display: none; }
+        }
+
         /* ---------- STATS ---------- */
         .stats { max-width: 1240px; margin: 0 auto; padding: 22px; display: grid;
                  grid-template-columns: repeat(3, 1fr); gap: 14px; }
@@ -262,6 +277,11 @@
                     <p>El Amarradero del Mico</p>
                 </div>
             </div>
+            <nav class="panel-nav">
+                <a href="{% url 'dashboard' %}" class="active"><i class="fa-solid fa-bell"></i> <span>Pedidos</span></a>
+                <a href="{% url 'clientes' %}"><i class="fa-solid fa-users"></i> <span>Clientes</span></a>
+                <a href="{% url 'estadisticas' %}"><i class="fa-solid fa-chart-simple"></i> <span>Estadísticas</span></a>
+            </nav>
             <div class="header-user">
                 <span class="who"><i class="fa-solid fa-circle-user"></i> <span>{{ request.user.username }}</span></span>
                 <a class="btn-home" href="{% url 'home' %}"><i class="fa-solid fa-house"></i> <span>Página principal</span></a>

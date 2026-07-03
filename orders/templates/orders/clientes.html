@@ -1,0 +1,85 @@
+{% extends 'orders/panel_base.html' %}
+{% load humanize %}
+{% block title %}Clientes · El Amarradero del Mico{% endblock %}
+{% block brand_title %}Clientes{% endblock %}
+
+{% block extra_style %}
+    .clientes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+    .cli-card { background: var(--white); border-radius: 16px; box-shadow: var(--shadow); padding: 18px; display: flex; flex-direction: column; gap: 12px; transition: transform .2s, box-shadow .2s; position: relative; overflow: hidden; }
+    .cli-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+    .cli-card .rank { position: absolute; top: 12px; right: 14px; font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--sand); font-weight: 700; }
+    .cli-top { display: flex; align-items: center; gap: 12px; }
+    .cli-avatar { width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg, var(--rust), var(--orange)); color: #fff; display: grid; place-items: center; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.2rem; flex-shrink: 0; }
+    .cli-name { font-family: 'Playfair Display', serif; font-size: 1.12rem; color: var(--brown-dark); line-height: 1.1; }
+    .cli-phone { font-size: .82rem; color: var(--text-soft); margin-top: 2px; }
+    .cli-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .cli-stat { background: var(--bg); border-radius: 11px; padding: 9px 11px; }
+    .cli-stat .v { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.15rem; color: var(--brown); }
+    .cli-stat .k { font-size: .68rem; color: var(--text-soft); text-transform: uppercase; letter-spacing: .4px; }
+    .cli-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 2px; }
+    .cli-meta { font-size: .76rem; color: var(--text-soft); display: flex; gap: 8px; flex-wrap: wrap; }
+    .cli-link { display: inline-flex; align-items: center; gap: 6px; color: var(--rust); font-weight: 700; text-decoration: none; font-size: .84rem; }
+    .cli-link:hover { gap: 9px; }
+{% endblock %}
+
+{% block content %}
+    <div class="page-head">
+        <div>
+            <h2>Clientes</h2>
+            <p class="sub">Agrupados por teléfono · ordenados por total gastado</p>
+        </div>
+        <form class="search" method="get" action="{% url 'clientes' %}">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="search" name="q" value="{{ q }}" placeholder="Buscar por nombre o teléfono…" autocomplete="off">
+        </form>
+    </div>
+
+    <div class="kpis">
+        <div class="kpi accent-rust">
+            <div class="ic"><i class="fa-solid fa-users"></i></div>
+            <div><div class="num">{{ total_clientes }}</div><div class="lbl">{% if q %}Coinciden{% else %}Clientes{% endif %}</div></div>
+        </div>
+        <div class="kpi accent-green">
+            <div class="ic"><i class="fa-solid fa-sack-dollar"></i></div>
+            <div><div class="num">${{ total_gastado|intcomma }}</div><div class="lbl">Facturado (sin cancelados)</div></div>
+        </div>
+    </div>
+
+    {% if clientes %}
+        <div class="clientes-grid">
+            {% for c in clientes %}
+            <div class="cli-card">
+                {% if not q and forloop.counter <= 3 %}<span class="rank">#{{ forloop.counter }}</span>{% endif %}
+                <div class="cli-top">
+                    <div class="cli-avatar">{{ c.nombre|first|upper }}</div>
+                    <div>
+                        <div class="cli-name">{{ c.nombre }}</div>
+                        <div class="cli-phone"><i class="fa-solid fa-phone"></i> {{ c.telefono }}</div>
+                    </div>
+                </div>
+                <div class="cli-stats">
+                    <div class="cli-stat"><div class="v">{{ c.pedidos }}</div><div class="k">Pedidos</div></div>
+                    <div class="cli-stat"><div class="v">${{ c.gastado|intcomma }}</div><div class="k">Gastado</div></div>
+                    <div class="cli-stat"><div class="v">${{ c.ticket|intcomma }}</div><div class="k">Ticket prom.</div></div>
+                    <div class="cli-stat"><div class="v">{{ c.ultimo|date:"d/m/y" }}</div><div class="k">Último pedido</div></div>
+                </div>
+                <div class="cli-meta">
+                    {% if c.delivery %}<span class="chip delivery"><i class="fa-solid fa-motorcycle"></i> {{ c.delivery }}</span>{% endif %}
+                    {% if c.pickup %}<span class="chip pickup"><i class="fa-solid fa-store"></i> {{ c.pickup }}</span>{% endif %}
+                    {% if c.cancelados %}<span class="chip" style="background:#f7e3e0;color:var(--red);"><i class="fa-solid fa-ban"></i> {{ c.cancelados }}</span>{% endif %}
+                </div>
+                <div class="cli-foot">
+                    {% if c.whatsapp_url %}<a class="btn-wa" href="{{ c.whatsapp_url }}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>{% else %}<span></span>{% endif %}
+                    <a class="cli-link" href="{% url 'cliente_detalle' c.key %}">Ver ficha <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty">
+            <div class="big"><i class="fa-solid fa-user-slash"></i></div>
+            <h3>{% if q %}Sin coincidencias{% else %}Aún no hay clientes{% endif %}</h3>
+            <p>{% if q %}No hay clientes que coincidan con “{{ q }}”.{% else %}Cuando entren pedidos, aquí verás a cada cliente con su historial.{% endif %}</p>
+        </div>
+    {% endif %}
+{% endblock %}

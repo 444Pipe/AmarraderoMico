@@ -1,0 +1,106 @@
+{% extends 'orders/panel_base.html' %}
+{% load humanize %}
+{% block title %}{{ ficha.resumen.nombre }} · Clientes{% endblock %}
+{% block brand_title %}Clientes{% endblock %}
+
+{% block extra_style %}
+    .cli-header { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .cli-header .avatar { width: 62px; height: 62px; border-radius: 50%; background: linear-gradient(135deg, var(--rust), var(--orange)); color: #fff; display: grid; place-items: center; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.7rem; flex-shrink: 0; }
+    .cli-header h2 { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--brown-dark); line-height: 1.1; }
+    .cli-header .meta { color: var(--text-soft); font-size: .88rem; margin-top: 4px; display: flex; gap: 12px; flex-wrap: wrap; }
+    .cli-header .meta i { color: var(--rust); }
+    .cli-header .spacer { flex: 1; }
+
+    .hist-order { border: 1px solid var(--cream); border-radius: 14px; padding: 14px 16px; margin-top: 12px; }
+    .hist-order:first-child { margin-top: 0; }
+    .hist-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+    .hist-when { font-size: .82rem; color: var(--text-soft); }
+    .hist-line { display: flex; justify-content: space-between; gap: 10px; font-size: .88rem; padding: 3px 0; }
+    .hist-line .q { color: var(--brown); font-weight: 500; }
+    .hist-total { border-top: 1px dashed var(--sand); margin-top: 7px; padding-top: 8px; display: flex; justify-content: space-between; font-weight: 700; color: var(--brown-dark); }
+    .hist-notes { font-size: .82rem; color: var(--brown-mid); background: #FFF8EC; border: 1px solid #F1E2C4; padding: 7px 11px; border-radius: 9px; margin-top: 8px; }
+    .addr-line { display: flex; align-items: flex-start; gap: 9px; font-size: .9rem; color: var(--text-soft); }
+    .addr-line i { color: var(--rust); margin-top: 3px; }
+    .maps-link { color: var(--rust); text-decoration: none; font-weight: 600; }
+    .maps-link:hover { text-decoration: underline; }
+{% endblock %}
+
+{% block content %}
+    <a class="back-link" href="{% url 'clientes' %}"><i class="fa-solid fa-arrow-left"></i> Todos los clientes</a>
+
+    <div class="card">
+        <div class="cli-header">
+            <div class="avatar">{{ ficha.resumen.nombre|first|upper }}</div>
+            <div>
+                <h2>{{ ficha.resumen.nombre }}</h2>
+                <div class="meta">
+                    <span><i class="fa-solid fa-phone"></i> {{ ficha.resumen.telefono }}</span>
+                    <span><i class="fa-solid fa-calendar-day"></i> Cliente desde {{ ficha.resumen.primero|date:"d/m/Y" }}</span>
+                </div>
+            </div>
+            <div class="spacer"></div>
+            {% if ficha.resumen.whatsapp_url %}<a class="btn-wa" href="{{ ficha.resumen.whatsapp_url }}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Escribir por WhatsApp</a>{% endif %}
+        </div>
+    </div>
+
+    <div class="kpis" style="margin-top:18px;">
+        <div class="kpi accent-rust"><div class="ic"><i class="fa-solid fa-receipt"></i></div><div><div class="num">{{ ficha.resumen.pedidos }}</div><div class="lbl">Pedidos</div></div></div>
+        <div class="kpi accent-green"><div class="ic"><i class="fa-solid fa-sack-dollar"></i></div><div><div class="num">${{ ficha.resumen.gastado|intcomma }}</div><div class="lbl">Total gastado</div></div></div>
+        <div class="kpi accent-gold"><div class="ic"><i class="fa-solid fa-tags"></i></div><div><div class="num">${{ ficha.resumen.ticket|intcomma }}</div><div class="lbl">Ticket promedio</div></div></div>
+        <div class="kpi accent-brown"><div class="ic"><i class="fa-solid fa-clock-rotate-left"></i></div><div><div class="num">{{ ficha.resumen.ultimo|date:"d/m/y" }}</div><div class="lbl">Último pedido</div></div></div>
+    </div>
+
+    <div class="grid-2">
+        <div>
+            {% if ficha.favoritos %}
+            <div class="card">
+                <div class="card-title"><i class="fa-solid fa-heart"></i> Platos favoritos</div>
+                {% for f in ficha.favoritos %}
+                <div class="bar-row">
+                    <span class="bar-name">{{ f.nombre }}</span>
+                    <span class="bar-track"><span class="bar-fill" style="width: {{ f.pct }}%;"></span></span>
+                    <span class="bar-val">{{ f.qty }} <small>uds</small></span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="card">
+                <div class="card-title"><i class="fa-solid fa-location-dot"></i> Entrega</div>
+                <div style="display:flex; gap:10px; margin-bottom:12px;">
+                    {% if ficha.resumen.delivery %}<span class="chip delivery"><i class="fa-solid fa-motorcycle"></i> {{ ficha.resumen.delivery }} a domicilio</span>{% endif %}
+                    {% if ficha.resumen.pickup %}<span class="chip pickup"><i class="fa-solid fa-store"></i> {{ ficha.resumen.pickup }} recoge</span>{% endif %}
+                    {% if ficha.resumen.cancelados %}<span class="chip" style="background:#f7e3e0;color:var(--red);"><i class="fa-solid fa-ban"></i> {{ ficha.resumen.cancelados }} cancelados</span>{% endif %}
+                </div>
+                {% if ficha.resumen.ultima_direccion %}
+                    <div class="addr-line"><i class="fa-solid fa-map-pin"></i><span>{{ ficha.resumen.ultima_direccion }}</span></div>
+                    {% if ficha.resumen.maps_url %}<div style="margin-top:8px;"><a class="maps-link" href="{{ ficha.resumen.maps_url }}" target="_blank" rel="noopener"><i class="fa-solid fa-map-location-dot"></i> Ver última ubicación en el mapa</a></div>{% endif %}
+                {% else %}
+                    <p style="color:var(--text-soft); font-size:.88rem;">Este cliente no ha registrado direcciones de domicilio.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title"><i class="fa-solid fa-clock-rotate-left"></i> Historial de pedidos <span style="margin-left:auto; font-family:'Inter'; font-size:.8rem; color:var(--text-soft); font-weight:600;">{{ ficha.pedidos|length }}</span></div>
+            {% for p in ficha.pedidos %}
+            <div class="hist-order">
+                <div class="hist-top">
+                    <span class="chip {% if p.tipo == 'delivery' %}delivery{% else %}pickup{% endif %}">
+                        {% if p.tipo == 'delivery' %}<i class="fa-solid fa-motorcycle"></i>{% else %}<i class="fa-solid fa-store"></i>{% endif %} {{ p.get_tipo_display }}
+                    </span>
+                    <span class="estado {{ p.estado }}">{{ p.get_estado_display }}</span>
+                    <span class="hist-when"><i class="fa-regular fa-clock"></i> {{ p.creado|date:"d/m/Y · H:i" }}</span>
+                </div>
+                {% for l in p.lineas %}
+                    <div class="hist-line"><span class="q">{{ l.texto }}</span><span>${{ l.subtotal|intcomma }}</span></div>
+                {% empty %}
+                    <div class="hist-line"><span>(sin artículos)</span></div>
+                {% endfor %}
+                <div class="hist-total"><span>Subtotal</span><span>${{ p.subtotal|intcomma }}</span></div>
+                {% if p.notas %}<div class="hist-notes"><i class="fa-solid fa-note-sticky"></i> {{ p.notas }}</div>{% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

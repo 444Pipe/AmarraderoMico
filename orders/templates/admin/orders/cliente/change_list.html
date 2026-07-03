@@ -1,0 +1,57 @@
+{% extends "admin/base_site.html" %}
+{% load humanize %}
+
+{% block content %}
+<div id="content-main">
+    <p style="margin-bottom:14px; color:#555;">
+        <strong>{{ total_clientes }}</strong> cliente{{ total_clientes|pluralize }} ·
+        <strong>${{ total_gastado|intcomma }}</strong> facturado (sin cancelados).
+        Agrupados por teléfono. Solo lectura.
+    </p>
+
+    <form method="get" style="margin-bottom:16px;">
+        <input type="search" name="q" value="{{ q }}" placeholder="Buscar por nombre o teléfono…"
+               style="padding:7px 12px; min-width:280px; border:1px solid #ccc; border-radius:6px;">
+        <input type="submit" value="Buscar" class="button" style="padding:7px 14px;">
+        {% if q %}<a href="?" style="margin-left:8px;">Limpiar</a>{% endif %}
+    </form>
+
+    {% if clientes %}
+    <div class="results">
+        <table id="result_list" style="width:100%;">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Teléfono</th>
+                    <th style="text-align:right;">Pedidos</th>
+                    <th style="text-align:right;">Gastado</th>
+                    <th style="text-align:right;">Ticket prom.</th>
+                    <th>Último</th>
+                    <th>Domi/Recoge</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in clientes %}
+                <tr class="{% cycle 'row1' 'row2' %}">
+                    <td><strong>{{ c.nombre }}</strong></td>
+                    <td>{{ c.telefono }}</td>
+                    <td style="text-align:right;">{{ c.pedidos }}{% if c.cancelados %} <span style="color:#b83227;" title="cancelados">(+{{ c.cancelados }}✕)</span>{% endif %}</td>
+                    <td style="text-align:right;">${{ c.gastado|intcomma }}</td>
+                    <td style="text-align:right;">${{ c.ticket|intcomma }}</td>
+                    <td>{{ c.ultimo|date:"d/m/Y" }}</td>
+                    <td>{{ c.delivery }} / {{ c.pickup }}</td>
+                    <td style="white-space:nowrap;">
+                        <a class="button" href="{{ c.pedidos_url }}">Ver pedidos</a>
+                        <a href="{% url 'cliente_detalle' c.key %}" target="_blank">Ficha ↗</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>No hay clientes{% if q %} que coincidan con “{{ q }}”{% endif %}.</p>
+    {% endif %}
+</div>
+{% endblock %}

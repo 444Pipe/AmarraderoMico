@@ -32,6 +32,11 @@ urlpatterns = [
     path('panel/pedido/<int:pk>/<str:accion>/', order_views.cambiar_estado, name='cambiar_estado'),
     path('panel/datos/', order_views.pedidos_json, name='pedidos_json'),
 
+    # Clientes y estadísticas (requieren login)
+    path('panel/clientes/', order_views.clientes, name='clientes'),
+    path('panel/cliente/<str:telefono>/', order_views.cliente_detalle, name='cliente_detalle'),
+    path('panel/estadisticas/', order_views.estadisticas, name='estadisticas'),
+
     # Login / logout del panel
     path('panel/login/', auth_views.LoginView.as_view(template_name='orders/login.html'), name='login'),
     path('panel/logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),

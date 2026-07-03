@@ -1,0 +1,208 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Panel · El Amarradero del Mico{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg: #FAF6F0; --cream: #F5E6D3; --sand: #E8D4A8;
+            --brown-dark: #2D1810; --brown: #4A2C1F; --brown-mid: #8B4513;
+            --rust: #B8541F; --orange: #D2691E; --gold: #C9A961; --gold-bright: #E6B85C;
+            --green: #3E5641; --green-bright: #4f7a54; --red: #B83227; --wa: #25D366;
+            --text: #2D1810; --text-soft: #5C4538; --white: #fff;
+            --shadow: 0 10px 30px rgba(45, 24, 16, .10);
+            --shadow-lg: 0 18px 50px rgba(45, 24, 16, .18);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg); color: var(--text);
+            -webkit-font-smoothing: antialiased; min-height: 100vh;
+        }
+        a { color: inherit; }
+        .serif { font-family: 'Playfair Display', serif; }
+
+        /* ---------- HEADER + NAV ---------- */
+        header {
+            background: linear-gradient(135deg, var(--brown-dark), var(--brown) 60%, var(--brown-mid));
+            color: var(--white); padding: 16px 22px;
+            position: sticky; top: 0; z-index: 50;
+            box-shadow: 0 6px 24px rgba(45, 24, 16, .35);
+        }
+        .header-row { max-width: 1240px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand .logo {
+            width: 42px; height: 42px; border-radius: 12px;
+            background: linear-gradient(135deg, var(--rust), var(--orange));
+            display: grid; place-items: center; font-size: 1.2rem; color: var(--white);
+            box-shadow: 0 4px 14px rgba(184, 84, 31, .5);
+        }
+        .brand h1 { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; line-height: 1.1; }
+        .brand p { font-size: .72rem; color: var(--gold-bright); letter-spacing: .5px; text-transform: uppercase; }
+
+        .panel-nav { display: flex; gap: 6px; background: rgba(0,0,0,.18); padding: 5px; border-radius: 999px; order: 3; }
+        .panel-nav a {
+            display: inline-flex; align-items: center; gap: 7px; text-decoration: none;
+            color: rgba(255,255,255,.82); font-size: .84rem; font-weight: 600;
+            padding: 8px 16px; border-radius: 999px; transition: all .2s; white-space: nowrap;
+        }
+        .panel-nav a:hover { background: rgba(255,255,255,.12); color: #fff; }
+        .panel-nav a.active { background: linear-gradient(135deg, var(--rust), var(--orange)); color: #fff; box-shadow: 0 5px 14px rgba(184,84,31,.4); }
+
+        .header-user { display: flex; align-items: center; gap: 10px; font-size: .85rem; flex-wrap: wrap; }
+        .header-user .who { display: flex; align-items: center; gap: 7px; opacity: .92; }
+        .header-user .who i { color: var(--gold-bright); }
+        .logout-form { margin: 0; }
+        .btn-home, .btn-logout {
+            color: var(--white); text-decoration: none; border: 1.5px solid rgba(255,255,255,.28);
+            padding: 7px 13px; border-radius: 999px; font-size: .8rem; font-weight: 600;
+            transition: all .2s; display: inline-flex; align-items: center; gap: 6px;
+            cursor: pointer; background: transparent; font-family: 'Inter', sans-serif;
+        }
+        .btn-home:hover, .btn-logout:hover { background: rgba(255,255,255,.14); border-color: var(--gold-bright); }
+        .btn-logout:active, .btn-home:active { transform: scale(.96); }
+
+        /* ---------- LAYOUT ---------- */
+        main { max-width: 1240px; margin: 0 auto; padding: 24px 22px 64px; }
+        .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+        .page-head h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--brown-dark); }
+        .page-head .sub { color: var(--text-soft); font-size: .9rem; margin-top: 3px; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--rust); font-weight: 600; text-decoration: none; font-size: .9rem; margin-bottom: 14px; }
+        .back-link:hover { text-decoration: underline; }
+
+        /* ---------- KPI CARDS ---------- */
+        .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+        .kpi {
+            background: var(--white); border-radius: 16px; padding: 16px 18px;
+            box-shadow: var(--shadow); border-left: 5px solid var(--gold);
+            display: flex; align-items: center; gap: 14px;
+        }
+        .kpi.accent-rust { border-left-color: var(--rust); }
+        .kpi.accent-green { border-left-color: var(--green); }
+        .kpi.accent-gold { border-left-color: var(--gold-bright); }
+        .kpi.accent-brown { border-left-color: var(--brown-mid); }
+        .kpi .ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 1.2rem; flex-shrink: 0; background: var(--cream); color: var(--brown-mid); }
+        .kpi.accent-rust .ic { background: #FCEEDD; color: var(--rust); }
+        .kpi.accent-green .ic { background: #E5EEE6; color: var(--green); }
+        .kpi .num { font-family: 'Playfair Display', serif; font-size: 1.55rem; font-weight: 700; line-height: 1; }
+        .kpi .lbl { font-size: .74rem; color: var(--text-soft); text-transform: uppercase; letter-spacing: .5px; margin-top: 3px; }
+
+        /* ---------- CARDS ---------- */
+        .card { background: var(--white); border-radius: 18px; box-shadow: var(--shadow); padding: 20px 22px; }
+        .card + .card { margin-top: 18px; }
+        .card-title { font-family: 'Playfair Display', serif; font-size: 1.12rem; color: var(--brown); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        .card-title i { color: var(--rust); }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+        /* ---------- BARS ---------- */
+        .bar-row { display: grid; grid-template-columns: minmax(90px, 1.4fr) 3fr auto; align-items: center; gap: 12px; margin: 9px 0; font-size: .88rem; }
+        .bar-row .bar-name { color: var(--text); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .bar-track { background: var(--cream); border-radius: 999px; height: 14px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--orange), var(--rust)); min-width: 3px; transition: width .5s ease; }
+        .bar-fill.green { background: linear-gradient(90deg, var(--green-bright), var(--green)); }
+        .bar-val { font-weight: 700; color: var(--brown-dark); white-space: nowrap; font-size: .85rem; }
+        .bar-val small { color: var(--text-soft); font-weight: 500; }
+
+        /* Columnas verticales (horas pico) */
+        .cols { display: flex; align-items: flex-end; gap: 4px; height: 150px; padding-top: 8px; overflow-x: auto; }
+        .col { flex: 1; min-width: 16px; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+        .col .col-bar { width: 100%; max-width: 22px; border-radius: 6px 6px 0 0; background: linear-gradient(180deg, var(--orange), var(--rust)); min-height: 3px; position: relative; transition: height .5s ease; }
+        .col.peak .col-bar { background: linear-gradient(180deg, var(--gold-bright), var(--gold)); box-shadow: 0 0 0 2px rgba(201,169,97,.4); }
+        .col .col-lbl { font-size: .62rem; color: var(--text-soft); }
+        .col .col-cnt { font-size: .62rem; color: var(--brown-dark); font-weight: 700; }
+
+        /* ---------- TABLES ---------- */
+        .tbl { width: 100%; border-collapse: collapse; font-size: .88rem; }
+        .tbl th { text-align: left; color: var(--text-soft); font-size: .72rem; text-transform: uppercase; letter-spacing: .5px; padding: 8px 10px; border-bottom: 2px solid var(--cream); }
+        .tbl td { padding: 11px 10px; border-bottom: 1px solid #f2e9dc; }
+        .tbl tr:last-child td { border-bottom: none; }
+        .tbl .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+        /* ---------- BADGES / CHIPS ---------- */
+        .chip { display: inline-flex; align-items: center; gap: 5px; font-size: .72rem; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--cream); color: var(--brown-mid); }
+        .chip.delivery { background: #FCEEDD; color: var(--rust); }
+        .chip.pickup { background: #E5EEE6; color: var(--green); }
+        .estado { font-size: .66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; padding: 3px 9px; border-radius: 999px; }
+        .estado.nuevo { background: #FCEEDD; color: var(--rust); }
+        .estado.aceptado { background: #E5EEE6; color: var(--green); }
+        .estado.despachado { background: #efe9e1; color: #7a6a57; }
+        .estado.cancelado { background: #f7e3e0; color: var(--red); }
+
+        .btn-wa {
+            display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
+            background: linear-gradient(135deg, #1ebe5a, var(--wa)); color: #fff; font-weight: 600;
+            padding: 6px 12px; border-radius: 9px; font-size: .8rem;
+        }
+        .btn-wa:hover { filter: brightness(1.05); }
+
+        /* ---------- SEARCH ---------- */
+        .search { position: relative; }
+        .search i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-soft); }
+        .search input {
+            border: 1.5px solid var(--sand); background: var(--white); border-radius: 999px;
+            padding: 10px 16px 10px 40px; font-family: 'Inter', sans-serif; font-size: .9rem;
+            min-width: 240px; color: var(--text); outline: none;
+        }
+        .search input:focus { border-color: var(--gold-bright); box-shadow: 0 0 0 3px rgba(230,184,92,.2); }
+
+        /* ---------- EMPTY ---------- */
+        .empty { background: var(--white); border-radius: 18px; padding: 56px 24px; text-align: center; box-shadow: var(--shadow); }
+        .empty .big { font-size: 2.6rem; color: var(--sand); margin-bottom: 12px; }
+        .empty h3 { font-family: 'Playfair Display', serif; color: var(--brown); font-size: 1.2rem; margin-bottom: 6px; }
+        .empty p { color: var(--text-soft); font-size: .9rem; }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 900px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 720px) {
+            .header-row { justify-content: center; }
+            .panel-nav { order: 2; width: 100%; justify-content: space-between; }
+            .panel-nav a { flex: 1; justify-content: center; padding: 8px 6px; }
+            .panel-nav a span { display: none; }
+            .header-user .who span { display: none; }
+            .btn-home span { display: none; }
+            main { padding: 18px 14px 52px; }
+            .bar-row { grid-template-columns: minmax(70px, 1.3fr) 2.4fr auto; gap: 8px; font-size: .82rem; }
+        }
+        {% block extra_style %}{% endblock %}
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-row">
+            <div class="brand">
+                <div class="logo"><i class="fa-solid fa-drumstick-bite"></i></div>
+                <div>
+                    <h1>{% block brand_title %}Panel{% endblock %}</h1>
+                    <p>El Amarradero del Mico</p>
+                </div>
+            </div>
+            <nav class="panel-nav">
+                <a href="{% url 'dashboard' %}" class="{% if seccion == 'pedidos' %}active{% endif %}"><i class="fa-solid fa-bell"></i> <span>Pedidos</span></a>
+                <a href="{% url 'clientes' %}" class="{% if seccion == 'clientes' %}active{% endif %}"><i class="fa-solid fa-users"></i> <span>Clientes</span></a>
+                <a href="{% url 'estadisticas' %}" class="{% if seccion == 'estadisticas' %}active{% endif %}"><i class="fa-solid fa-chart-simple"></i> <span>Estadísticas</span></a>
+            </nav>
+            <div class="header-user">
+                <span class="who"><i class="fa-solid fa-circle-user"></i> <span>{{ request.user.username }}</span></span>
+                <a class="btn-home" href="{% url 'home' %}"><i class="fa-solid fa-house"></i> <span>Web</span></a>
+                <form method="post" action="{% url 'logout' %}" class="logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i></button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

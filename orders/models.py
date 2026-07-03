@@ -75,10 +75,13 @@ class Pedido(models.Model):
         return f'#{self.pk} · {self.nombre} · {self.get_estado_display()}'
 
     # --- Utilidades de presentación ---
-    @property
-    def telefono_e164(self):
-        """Número solo dígitos, con indicativo de Colombia (57) si hace falta."""
-        digitos = re.sub(r'\D', '', self.telefono or '')
+    @staticmethod
+    def normalizar_telefono(telefono):
+        """Número solo dígitos con indicativo de Colombia (57) si hace falta.
+
+        Se usa como *clave de cliente*: agrupa pedidos del mismo teléfono aunque
+        estén escritos con distinto formato ('320 858 3991' == '3208583991')."""
+        digitos = re.sub(r'\D', '', telefono or '')
         if not digitos:
             return ''
         if digitos.startswith('57'):
@@ -86,6 +89,10 @@ class Pedido(models.Model):
         if len(digitos) == 10:  # celular colombiano sin indicativo
             return '57' + digitos
         return digitos
+
+    @property
+    def telefono_e164(self):
+        return self.normalizar_telefono(self.telefono)
 
     @property
     def whatsapp_url(self):
@@ -116,3 +123,15 @@ class Pedido(models.Model):
     @property
     def es_activo(self):
         return self.estado in (self.ESTADO_NUEVO, self.ESTADO_ACEPTADO)
+
+
+class Cliente(Pedido):
+    """Vista de 'cliente' para el admin de Django.
+
+    No es una tabla nueva: es un proxy sobre Pedido. El admin de Cliente muestra
+    los pedidos agrupados por teléfono (ver ClienteAdmin en admin.py)."""
+
+    class Meta:
+        proxy = True
+        verbose_name = 'cliente'
+        verbose_name_plural = 'clientes'
