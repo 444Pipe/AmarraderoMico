@@ -2833,25 +2833,33 @@ a { text-decoration: none; color: inherit; }
     display: grid;
     grid-template-columns: 1fr 1fr;
     background: var(--color-cream);
-    min-height: 600px;
+    /* Alto atado al viewport: llena la pantalla sin forzar scroll de más.
+       El desborde se maneja limpio (imagen recortada por object-fit,
+       texto con scroll interno solo si no cupiera). */
+    min-height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
 }
 .exp-img {
-    overflow: hidden;
     position: relative;
+    overflow: hidden;
+    min-height: 0;
 }
 .exp-img img {
+    display: block;
     width: 100%;
     height: 100%;
-    min-height: 600px;
-    object-fit: cover;
+    object-fit: cover;   /* mantiene el aspect-ratio; nunca empuja el contenido */
     transition: transform 1s;
 }
 .exp-img:hover img { transform: scale(1.05); }
 .exp-text {
-    padding: 100px 80px;
+    padding: clamp(36px, 6vh, 90px) clamp(24px, 5vw, 80px);
     display: flex;
     flex-direction: column;
     justify-content: center;
+    min-height: 0;
+    overflow-y: auto;    /* si el contenido no cabe en el viewport, scroll interno limpio */
 }
 .exp-text h2 {
     font-size: clamp(2rem, 3vw, 2.8rem);
@@ -3364,9 +3372,10 @@ a { text-decoration: none; color: inherit; }
     .historia-container { grid-template-columns: 1fr; gap: 50px; max-width: 750px; }
     .historia-img img { height: 480px; }
 
-    .experiencia { grid-template-columns: 1fr; }
-    .exp-img img { min-height: 380px; max-height: 480px; }
-    .exp-text { padding: 70px 40px; }
+    /* En una columna (apilado) el alto vuelve a ser natural: sin el tope de 100vh */
+    .experiencia { grid-template-columns: 1fr; min-height: 0; max-height: none; overflow: visible; }
+    .exp-img img { height: auto; min-height: 380px; max-height: 480px; }
+    .exp-text { padding: 70px 40px; overflow-y: visible; }
 
     .carta { padding: 90px 28px; }
     .carta-header { margin-bottom: 50px; }
