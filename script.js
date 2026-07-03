@@ -79,32 +79,178 @@ const DELIVERY_CONFIG = {
     branchName: 'Sede Vanguardia',
     // El costo de domicilio se coordina con la sede segun distancia
     // (no se cobra fijo en linea, solo se muestra el subtotal de productos)
-    // Menu de muestra. Reemplazar/ampliar con el menu real.
-    categories: [
-        {
-            name: 'Platos Fuertes',
-            items: [
-                { id: 'mamona', name: 'Mamona al Palo', desc: 'Porción de ternero asado al palo (300g).', price: 42000, img: 'statics/img/comida.jpg' },
-                { id: 'bandeja', name: 'Bandeja Llanera', desc: 'Carne, longaniza, yuca, plátano y arepa.', price: 38000, img: 'statics/img/comida2.jpg' },
-                { id: 'carne-perra', name: 'Carne a la Perra', desc: 'Asada y enterrada al estilo tradicional.', price: 40000, img: 'statics/img/comida3.jpg' },
-            ]
-        },
-        {
-            name: 'Para Compartir',
-            items: [
-                { id: 'picada', name: 'Picada del Mico (2 personas)', desc: 'Variedad de carnes, longaniza, yuca, plátano y arepa.', price: 75000, img: 'statics/img/comida6.jpg' },
-                { id: 'hayacas', name: 'Hayacas Llaneras (unidad)', desc: 'Tradicional masa envuelta en hoja de plátano.', price: 12000, img: 'statics/img/comida5.jpg' },
-            ]
-        },
-        {
-            name: 'Bebidas',
-            items: [
-                { id: 'limonada', name: 'Limonada de panela', desc: 'Jarra (1 litro).', price: 9000, img: 'statics/img/DDD.jpg' },
-                { id: 'jugo', name: 'Jugo natural en agua', desc: 'Mora, lulo, mango o maracuyá.', price: 7000, img: 'statics/img/dos.jpg' },
-            ]
-        },
-    ]
 };
+
+// Carta oficial de El Amarradero del Mico (menú 2026, Sede Vanguardia).
+// Fuente única: alimenta tanto la sección "Menú" de la landing como el menú
+// del domicilio. Cada categoría tiene un `icon` (emoji) que se usa como avatar
+// del plato en el carrito, ya que la carta no maneja foto por plato.
+const MENU_DATA = [
+    {
+        id: 'desayunos', name: 'Desayunos', icon: '🍳',
+        items: [
+            { id: 'caldo-hueso', name: 'Caldo de Hueso', price: 15000 },
+            { id: 'caldo-picado', name: 'Caldo de Picado', price: 20000 },
+            { id: 'caldo-pez', name: 'Caldo de Pez', price: 24000 },
+            { id: 'huevos-arroz', name: 'Huevos con Arroz', price: 15000 },
+            { id: 'huevos-gusto', name: 'Huevos al Gusto', desc: 'Pericos, revueltos o fritos.', price: 11000 },
+            { id: 'huevos-rancheros', name: 'Huevos Rancheros', price: 15000 },
+            { id: 'hayaca', name: 'Hayaca', price: 19000 },
+            { id: 'omelette', name: 'Omelette', price: 16000 },
+            { id: 'calentao-paisa', name: 'Calentao Paisa', price: 26000 },
+            { id: 'higado-plancha', name: 'Hígado a la Plancha', price: 23000 },
+            { id: 'carne-bisteck', name: 'Carne en Bisteck', price: 25000 },
+            { id: 'bisteck-caballo', name: 'Bisteck a Caballo', price: 28000 },
+            { id: 'carne-plancha-des', name: 'Carne a la Plancha', price: 23000 },
+        ]
+    },
+    {
+        id: 'sopitas', name: 'Sopitas', icon: '🍲',
+        items: [
+            { id: 'sancocho-res', name: 'Sancocho de Res Especial', desc: 'Preparado en leña, acompañado de arroz y aguacate.', price: 20000 },
+            { id: 'mondongo', name: 'Mondongo', desc: 'Acompañado de arroz y banano.', price: 25000 },
+            { id: 'sancocho-gallina', name: 'Sancocho de Gallina', desc: 'Preparado en leña, con arroz de menudencias y aguacate.', price: 40000 },
+        ]
+    },
+    {
+        id: 'pa-empezar', name: "Pa' Empezar", icon: '🫓',
+        items: [
+            { id: 'chicharrones', name: 'Chicharrones Carnudos', price: 25000 },
+            { id: 'arepa-casa', name: 'Arepa de la Casa', price: 5000 },
+            { id: 'rellena', name: 'Rellena', price: 15000 },
+            { id: 'patacones-hogao', name: 'Patacones con Hogao', price: 14000 },
+            { id: 'chunchullitas', name: 'Chunchullitas', price: 25000 },
+            { id: 'empanaditas-mamona', name: 'Empanaditas de Mamona', price: 19000 },
+            { id: 'chorizo-santarrosano', name: 'Chorizo Santarrosano', price: 12000 },
+            { id: 'platano-queso', name: 'Plátano con Queso y Bocadillo', price: 12000 },
+        ]
+    },
+    {
+        id: 'lo-tipico', name: 'Lo Típico', icon: '🔥',
+        items: [
+            { id: 'plato-mamona', name: 'Plato de Mamona', price: 38000 },
+            { id: 'carne-cerdo', name: 'Carne de Cerdo', price: 38000 },
+            { id: 'carne-mixta', name: 'Carne Mixta', price: 38000 },
+            { id: 'chuleta-res', name: 'Chuleta de Res', price: 45000 },
+            { id: 'costilla-cerdo-tulio', name: 'Costilla de Cerdo — Tulio', price: 55000 },
+            { id: 'palo-costilla-mixto', name: 'Palo de Costilla Mixto', price: 50000 },
+            { id: 'costilla-res', name: 'Costilla de Res', price: 65000 },
+        ]
+    },
+    {
+        id: 'pa-compartir', name: "Pa' Compartir", icon: '👥',
+        items: [
+            { id: 'picada-3', name: 'Picada del Mico (3 pax aprox)', desc: 'Cortes de res y cerdo con papa, yuca, plátano, papa criolla, morcilla, arepa dulce de la casa y buen ají.', price: 90000 },
+            { id: 'picada-4', name: 'Picada del Mico (4 pax aprox)', desc: 'Cortes de res y cerdo con papa, yuca, plátano, papa criolla, morcilla, arepa dulce de la casa y buen ají.', price: 110000 },
+        ]
+    },
+    {
+        id: 'otras-opciones', name: 'Otras Opciones', icon: '🍽️',
+        items: [
+            { id: 'hamburguesa-mamona', name: 'Hamburguesa de Mamona', price: 32000 },
+            { id: 'arroz-vegetariano', name: 'Arroz Vegetariano', price: 32000 },
+            { id: 'sudado-cola', name: 'Sudado de Cola', price: 40000 },
+            { id: 'arroz-mico', name: 'Arroz del Mico', price: 40000 },
+            { id: 'lengua-salsa', name: 'Lengua en Salsa', price: 42000 },
+            { id: 'costillas-bbq', name: 'Costillas BBQ', price: 35000 },
+            { id: 'salchipapa', name: 'Salchipapa', price: 20000 },
+        ]
+    },
+    {
+        id: 'pescados', name: 'Pescados', icon: '🐟',
+        items: [
+            { id: 'mojarra', name: 'Mojarra Frita o en Salsa', price: 50000 },
+            { id: 'trucha-ajillo', name: 'Trucha al Ajillo', price: 50000 },
+            { id: 'bagre', name: 'Bagre Frito o en Salsa', price: 50000 },
+            { id: 'amarillo-monsenor', name: 'Amarillo a la Monseñor', price: 60000 },
+            { id: 'cachama', name: 'Cachama de Río', desc: 'Frita o en salsa.', price: 55000 },
+            { id: 'salmon-parrilla', name: 'Salmón a la Parrilla', price: 55000 },
+            { id: 'salmon-camaron', name: 'Salmón con Camarón', price: 65000 },
+            { id: 'cazuela-mariscos', name: 'Cazuela de Mariscos', price: 60000 },
+        ]
+    },
+    {
+        id: 'parrilla', name: 'Parrilla', icon: '🥩',
+        items: [
+            { id: 'sobrebarriga', name: 'Sobrebarriga a la Parrilla', price: 45000 },
+            { id: 'pechuga-plancha', name: 'Pechuga a la Plancha', price: 40000 },
+            { id: 'pechuga-champinones', name: 'Pechuga en Salsa de Champiñones', price: 50000 },
+            { id: 'pechuga-hawaiana', name: 'Pechuga Hawaiana', price: 48000 },
+            { id: 'lomo-cerdo', name: 'Lomo de Cerdo a la Parrilla', price: 40000 },
+            { id: 'punta-anca', name: 'Punta de Anca', price: 55000 },
+            { id: 'churrasco', name: 'Churrasco', price: 48000 },
+            { id: 'baby-beef', name: 'Baby Beef', price: 52000 },
+        ]
+    },
+    {
+        id: 'porciones', name: 'Porciones', icon: '🍟',
+        items: [
+            { id: 'papa-criolla', name: 'Papa Criolla', price: 10000 },
+            { id: 'papa-salada', name: 'Papa Salada', price: 5000 },
+            { id: 'papa-francesa', name: 'Papa a la Francesa', price: 6000 },
+            { id: 'yuca', name: 'Yuca', price: 5000 },
+            { id: 'guacamole', name: 'Guacamole', price: 6000 },
+            { id: 'platano-maduro', name: 'Plátano Maduro', price: 5000 },
+        ]
+    },
+    {
+        id: 'postres', name: 'Postres', icon: '🍮',
+        items: [
+            { id: 'merengon', name: 'Merengón', price: 14000 },
+            { id: 'postre-casa', name: 'Postre de la Casa', price: 12000 },
+            { id: 'arroz-leche', name: 'Arroz con Leche', price: 10000 },
+            { id: 'paletas-amarelo', name: 'Paletas de Amarelo', price: 8000 },
+            { id: 'alfajores', name: 'Alfajores (caja x8 und)', price: 20000 },
+        ]
+    },
+    {
+        id: 'bebidas', name: 'Bebidas', icon: '🥤',
+        items: [
+            { id: 'sodas', name: 'Sodas', desc: 'Arándanos, berry o té limón.', price: 13000 },
+            { id: 'jarra-panela', name: 'Jarra de Panela y Limón', price: 15000 },
+            { id: 'jarra-citrica', name: 'Jarra de Cítrica', price: 26000 },
+            { id: 'citrica-personal', name: 'Cítrica Personal', price: 9000 },
+            { id: 'jugos-naturales', name: 'Jugos Naturales', desc: 'Maracuyá, mora, mango o guanábana.', price: 9000 },
+            { id: 'jugo-naranja', name: 'Jugo de Naranja', price: 7000 },
+            { id: 'limonada-coco', name: 'Limonada de Coco', price: 14000 },
+            { id: 'gatorade', name: 'Gatorade', price: 6000 },
+            { id: 'agua-botella', name: 'Agua en Botella', price: 5000 },
+            { id: 'gaseosa', name: 'Gaseosa', price: 5000 },
+            { id: 'gaseosa-15', name: 'Gaseosa (1.5 Lt)', price: 10000 },
+            { id: 'jugos-hit', name: 'Jugos Hit', price: 5000 },
+            { id: 'agua-h2o', name: 'Agua H2O', price: 5000 },
+        ]
+    },
+    {
+        id: 'bebidas-calientes', name: 'Bebidas Calientes', icon: '☕',
+        items: [
+            { id: 'tinto', name: 'Tinto', price: 4000 },
+            { id: 'americano', name: 'Americano', price: 4000 },
+            { id: 'capuchino', name: 'Capuchino', price: 5000 },
+            { id: 'chocolate', name: 'Chocolate', price: 5000 },
+        ]
+    },
+    {
+        id: 'cervezas-licores', name: 'Cervezas & Licores', icon: '🍺',
+        items: [
+            { id: 'cerveza-corona', name: 'Cerveza Corona', price: 10000 },
+            { id: 'cerveza-coronita', name: 'Cerveza Coronita', price: 6000 },
+            { id: 'cerveza-llanera', name: 'Cerveza Llanera', price: 11000 },
+            { id: 'cerveza-aguila', name: 'Cerveza Águila / Poker / Light', price: 6000 },
+            { id: 'club-colombia', name: 'Club Colombia', price: 9000 },
+            { id: 'cerveza-stella', name: 'Cerveza Stella Artois', price: 6000 },
+            { id: 'aguardiente-botella', name: 'Aguardiente (Botella)', price: 120000 },
+            { id: 'aguardiente-media', name: 'Aguardiente (Media)', price: 70000 },
+        ]
+    },
+];
+
+// Índice plano id -> item (con el icono y la categoría de su grupo incrustados),
+// para búsquedas O(1) desde el carrito y el checkout.
+const MENU_INDEX = new Map();
+MENU_DATA.forEach(cat => cat.items.forEach(item => {
+    MENU_INDEX.set(item.id, { ...item, icon: cat.icon, category: cat.name });
+}));
 
 const cart = new Map(); // id -> { item, qty }
 let pickedLocation = null; // { lat, lng } seleccionado en el mapa
@@ -174,15 +320,23 @@ function closeCartMobile() {
 
 function renderMenu() {
     if (!dom.menu) return;
-    dom.menu.innerHTML = DELIVERY_CONFIG.categories.map(cat => `
-        <div class="menu-category">
-            <h3>${cat.name}</h3>
+    const catNav = `
+        <div class="menu-catnav" id="menuCatNav">
+            ${MENU_DATA.map(cat => `
+                <button type="button" class="menu-chip" data-cat="${cat.id}">
+                    <span class="menu-chip-icon" aria-hidden="true">${cat.icon}</span> ${cat.name}
+                </button>
+            `).join('')}
+        </div>`;
+    const categories = MENU_DATA.map(cat => `
+        <div class="menu-category" id="dcat-${cat.id}">
+            <h3><span class="menu-cat-emoji" aria-hidden="true">${cat.icon}</span> ${cat.name}</h3>
             ${cat.items.map(item => `
                 <div class="menu-item" data-item-id="${item.id}">
-                    <img src="${item.img}" alt="${item.name}" loading="lazy">
+                    ${itemThumb(item, 'menu-item-thumb')}
                     <div class="menu-item-info">
                         <h4>${item.name}</h4>
-                        <p>${item.desc}</p>
+                        ${item.desc ? `<p>${item.desc}</p>` : ''}
                         <span class="menu-item-price">${formatCOP(item.price)}</span>
                     </div>
                     <div class="menu-item-add" data-add-slot="${item.id}"></div>
@@ -190,7 +344,32 @@ function renderMenu() {
             `).join('')}
         </div>
     `).join('');
+    dom.menu.innerHTML = catNav + categories;
     refreshAddButtons();
+}
+
+// Menú público de la landing (sección "Menú"): la misma carta en formato lista
+// elegante estilo carta impresa, solo lectura (sin botón de agregar).
+function renderFullMenu() {
+    const host = document.getElementById('fullMenu');
+    if (!host) return;
+    host.innerHTML = MENU_DATA.map(cat => `
+        <div class="fmenu-cat">
+            <h3 class="fmenu-cat-title"><span class="fmenu-cat-emoji" aria-hidden="true">${cat.icon}</span> ${cat.name}</h3>
+            <ul class="fmenu-list">
+                ${cat.items.map(item => `
+                    <li class="fmenu-dish">
+                        <div class="fmenu-dish-row">
+                            <span class="fmenu-dish-name">${item.name}</span>
+                            <span class="fmenu-dish-dots" aria-hidden="true"></span>
+                            <span class="fmenu-dish-price">${formatCOP(item.price)}</span>
+                        </div>
+                        ${item.desc ? `<p class="fmenu-dish-desc">${item.desc}</p>` : ''}
+                    </li>
+                `).join('')}
+            </ul>
+        </div>
+    `).join('');
 }
 
 function refreshAddButtons() {
@@ -212,11 +391,16 @@ function refreshAddButtons() {
 }
 
 function getItemById(id) {
-    for (const cat of DELIVERY_CONFIG.categories) {
-        const found = cat.items.find(i => i.id === id);
-        if (found) return found;
+    return MENU_INDEX.get(id) || null;
+}
+
+// Avatar del plato: la carta no tiene foto por plato, así que usamos el emoji
+// de su categoría. Si en el futuro un plato trae `img`, se muestra la foto.
+function itemThumb(item, cls) {
+    if (item.img) {
+        return `<img src="${item.img}" alt="${item.name}" class="${cls}" loading="lazy">`;
     }
-    return null;
+    return `<span class="${cls} thumb-icon" aria-hidden="true">${item.icon || '🍽️'}</span>`;
 }
 
 function changeQty(id, delta) {
@@ -250,7 +434,7 @@ function renderCart() {
         dom.totals.hidden = false;
         dom.items.innerHTML = [...cart.values()].map(({ item, qty }) => `
             <div class="cart-item">
-                <img src="${item.img}" alt="${item.name}" class="cart-item-img" loading="lazy">
+                ${itemThumb(item, 'cart-item-img')}
                 <div class="cart-item-body">
                     <div class="cart-item-name">${item.name}</div>
                     <div class="cart-item-price">${formatCOP(item.price)} <span>c/u</span></div>
@@ -597,7 +781,7 @@ function showMenuView() {
 function renderCheckoutSummary() {
     const itemLines = [...cart.values()].map(({ item, qty }) => `
         <div class="summary-item">
-            <img src="${item.img}" alt="${item.name}" class="summary-thumb" loading="lazy">
+            ${itemThumb(item, 'summary-thumb')}
             <div class="summary-item-info">
                 <div class="summary-item-name">${item.name}</div>
                 <div class="summary-item-meta">${qty} × ${formatCOP(item.price)}</div>
@@ -743,6 +927,17 @@ if (dom.fab) {
         if (dec) changeQty(dec.getAttribute('data-dec'), -1);
     });
 
+    // Navegacion por categorias: al tocar un chip, desplaza el menu (no la pagina)
+    // hasta la categoria correspondiente, dejandola justo debajo de la barra fija.
+    dom.menu.addEventListener('click', (e) => {
+        const chip = e.target.closest('[data-cat]');
+        if (!chip) return;
+        const target = document.getElementById('dcat-' + chip.getAttribute('data-cat'));
+        if (target) {
+            dom.menu.scrollTo({ top: Math.max(0, target.offsetTop - 70), behavior: 'smooth' });
+        }
+    });
+
     dom.checkoutBtn.addEventListener('click', showCheckoutView);
     dom.checkoutBack.addEventListener('click', showMenuView);
 
@@ -816,6 +1011,13 @@ if (dom.fab) {
         if (e.key === 'Escape' && dom.modal.classList.contains('open')) closeDelivery();
     });
 }
+
+// Carta publica de la landing (seccion "Menu") + botones que abren el domicilio.
+// Fuera del guard del FAB para que la seccion se pinte siempre.
+renderFullMenu();
+document.querySelectorAll('[data-open-delivery]').forEach(btn =>
+    btn.addEventListener('click', openDelivery)
+);
 
 // ============= SCROLL PROGRESS BAR =============
 const scrollProgress = document.getElementById('scrollProgress');
