@@ -502,6 +502,17 @@ function setupMenuFilter(cfg) {
             });
             catEl.classList.toggle('filtered-out', !catVisible);
         });
+        // En modo acordeón: al buscar/filtrar, abre las categorías con resultados
+        // para que se vean; al limpiar el filtro, vuelve a colapsarlas.
+        if (cfg.accordion) {
+            const filtering = q !== '' || antojo !== ANTOJOS[0].key;
+            listRoot.querySelectorAll(cfg.catSel).forEach(catEl => {
+                const abrir = filtering && !catEl.classList.contains('filtered-out');
+                catEl.classList.toggle('is-open', abrir);
+                const accBtn = catEl.querySelector('[data-acc-toggle]');
+                if (accBtn) accBtn.setAttribute('aria-expanded', abrir ? 'true' : 'false');
+            });
+        }
         noResults.hidden = anyVisible;
         clearBtn.hidden = !query;
     };
@@ -562,29 +573,52 @@ function renderFullMenu() {
     if (!host) return;
     host.innerHTML = orderedCategories().map(cat => `
         <div class="fmenu-cat" data-cat="${cat.id}">
-            <h3 class="fmenu-cat-title"><i class="fa-solid ${cat.icon} fmenu-cat-emoji" aria-hidden="true"></i> ${cat.name}</h3>
-            <ul class="fmenu-list">
-                ${cat.items.map(item => {
-                    const pop = POPULAR.has(item.id);
-                    return `
-                    <li class="fmenu-dish${pop ? ' is-popular' : ''}" data-item-id="${item.id}" data-cat="${cat.id}" data-price="${item.price}" data-popular="${pop ? '1' : '0'}" data-search="${normalizeText(item.name + ' ' + cat.name)}">
-                        <div class="fmenu-dish-row">
-                            <i class="fa-solid ${iconFor(item, cat)} fmenu-dish-icon" aria-hidden="true"></i>
-                            <span class="fmenu-dish-name">${item.name}${pop ? ' <span class="fmenu-pop" title="De los más pedidos"><i class="fa-solid fa-fire" aria-hidden="true"></i></span>' : ''}</span>
-                            <span class="fmenu-dish-dots" aria-hidden="true"></span>
-                            <span class="fmenu-dish-price">${formatCOP(item.price)}</span>
-                        </div>
-                    </li>`;
-                }).join('')}
-            </ul>
+            <button type="button" class="fmenu-cat-title" data-acc-toggle aria-expanded="false">
+                <i class="fa-solid ${cat.icon} fmenu-cat-emoji" aria-hidden="true"></i>
+                <span class="fmenu-cat-name">${cat.name}</span>
+                <span class="fmenu-cat-count">${cat.items.length}</span>
+                <i class="fa-solid fa-chevron-down fmenu-chevron" aria-hidden="true"></i>
+            </button>
+            <div class="fmenu-panel">
+              <div class="fmenu-panel-inner">
+                <ul class="fmenu-list">
+                    ${cat.items.map(item => {
+                        const pop = POPULAR.has(item.id);
+                        return `
+                        <li class="fmenu-dish${pop ? ' is-popular' : ''}" data-item-id="${item.id}" data-cat="${cat.id}" data-price="${item.price}" data-popular="${pop ? '1' : '0'}" data-search="${normalizeText(item.name + ' ' + cat.name)}">
+                            <div class="fmenu-dish-row">
+                                <i class="fa-solid ${iconFor(item, cat)} fmenu-dish-icon" aria-hidden="true"></i>
+                                <span class="fmenu-dish-name">${item.name}${pop ? ' <span class="fmenu-pop" title="De los más pedidos"><i class="fa-solid fa-fire" aria-hidden="true"></i></span>' : ''}</span>
+                                <span class="fmenu-dish-dots" aria-hidden="true"></span>
+                                <span class="fmenu-dish-price">${formatCOP(item.price)}</span>
+                            </div>
+                        </li>`;
+                    }).join('')}
+                </ul>
+              </div>
+            </div>
         </div>
     `).join('');
+
+    // Acordeón: al tocar el título se despliega/colapsa la categoría.
+    if (!host.dataset.accBound) {
+        host.dataset.accBound = '1';
+        host.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-acc-toggle]');
+            if (!btn || !host.contains(btn)) return;
+            const cat = btn.closest('.fmenu-cat');
+            const open = cat.classList.toggle('is-open');
+            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+    }
+
     setupMenuFilter({
         listRootId: 'fullMenu',
         barId: 'landingFilter',
         barClass: 'in-landing',
         catSel: '.fmenu-cat',
         itemSel: '.fmenu-dish',
+        accordion: true,
         mount: (bar, noResults, listRoot) => {
             listRoot.parentNode.insertBefore(bar, listRoot);
             listRoot.parentNode.insertBefore(noResults, listRoot.nextSibling);
