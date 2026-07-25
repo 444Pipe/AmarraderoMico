@@ -616,81 +616,15 @@ function renderMenu() {
     refreshAddButtons();
 }
 
-// Menú público de la landing (sección "Menú"): la carta completa en formato
-// "tablero" — vitrina de "más pedidos" arriba + acordeón en grid de 2 columnas.
-// Solo lectura (sin botón de agregar).
+// Sección "Menú" de la landing: ya no pinta la carta completa. La estrategia es
+// antojar con la vitrina de "más pedidos" e invitar a abrir la carta dentro del
+// flujo de pedido (modal de domicilios), donde además se puede agregar al carrito.
 function renderFullMenu() {
-    const host = document.getElementById('fullMenu');
-    if (!host) return;
-    const cats = orderedCategories();
-    host.innerHTML = cats.map((cat, idx) => {
-        // Abre las primeras categorías (que orderedCategories prioriza por el horario)
-        // para que siempre se vea comida sin tener que desplegar nada.
-        const open = idx < 2;
-        const desde = Math.min(...cat.items.map(i => i.price));
-        return `
-        <div class="fmenu-cat${open ? ' is-open' : ''}" data-cat="${cat.id}">
-            <button type="button" class="fmenu-cat-title" data-acc-toggle aria-expanded="${open ? 'true' : 'false'}">
-                <span class="fmenu-cat-ic"><i class="fa-solid ${cat.icon}" aria-hidden="true"></i></span>
-                <span class="fmenu-cat-meta">
-                    <span class="fmenu-cat-name">${cat.name}</span>
-                    <span class="fmenu-cat-sub">
-                        <span class="fmenu-cat-count">${cat.items.length}</span>
-                        <span class="fmenu-cat-desde">desde ${formatCOP(desde)}</span>
-                    </span>
-                </span>
-                <i class="fa-solid fa-chevron-down fmenu-chevron" aria-hidden="true"></i>
-            </button>
-            <div class="fmenu-panel">
-              <div class="fmenu-panel-inner">
-                <ul class="fmenu-list">
-                    ${cat.items.map(item => {
-                        const pop = POPULAR.has(item.id);
-                        return `
-                        <li class="fmenu-dish${pop ? ' is-popular' : ''}" data-item-id="${item.id}" data-cat="${cat.id}" data-price="${item.price}" data-popular="${pop ? '1' : '0'}" data-search="${normalizeText(item.name + ' ' + cat.name)}">
-                            <div class="fmenu-dish-row">
-                                <span class="fmenu-dish-name">${item.name}${pop ? ' <i class="fa-solid fa-fire fmenu-pop" aria-hidden="true"></i>' : ''}</span>
-                                <span class="fmenu-dish-dots" aria-hidden="true"></span>
-                                <span class="fmenu-dish-price">${formatCOP(item.price)}</span>
-                            </div>
-                        </li>`;
-                    }).join('')}
-                </ul>
-              </div>
-            </div>
-        </div>`;
-    }).join('');
-
-    // Vitrina "Los más pedidos": se pinta como hermano ANTES del grid (y antes de
-    // insertar la barra de filtros), quedando el orden: cabecera → vitrina → filtros → grid.
+    const invite = document.getElementById('menuInvite');
+    if (!invite) return;
     const oldStrip = document.getElementById('fullMenuPopular');
     if (oldStrip) oldStrip.remove();
-    host.insertAdjacentHTML('beforebegin', popularStripHTML());
-
-    // Acordeón: al tocar el título se despliega/colapsa la categoría.
-    if (!host.dataset.accBound) {
-        host.dataset.accBound = '1';
-        host.addEventListener('click', (e) => {
-            const btn = e.target.closest('[data-acc-toggle]');
-            if (!btn || !host.contains(btn)) return;
-            const cat = btn.closest('.fmenu-cat');
-            const open = cat.classList.toggle('is-open');
-            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        });
-    }
-
-    setupMenuFilter({
-        listRootId: 'fullMenu',
-        barId: 'landingFilter',
-        barClass: 'in-landing',
-        catSel: '.fmenu-cat',
-        itemSel: '.fmenu-dish',
-        accordion: true,
-        mount: (bar, noResults, listRoot) => {
-            listRoot.parentNode.insertBefore(bar, listRoot);
-            listRoot.parentNode.insertBefore(noResults, listRoot.nextSibling);
-        },
-    });
+    invite.insertAdjacentHTML('beforebegin', popularStripHTML());
 }
 
 // HTML de la vitrina "Los más pedidos del Mico": tarjetas horizontales con los

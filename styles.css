@@ -3488,6 +3488,86 @@ body.nav-open { overflow: hidden; }
 .staff-access i { font-size: 0.68rem; }
 .staff-access:hover { color: var(--color-gold-bright); }
 
+/* ============= MENU INVITE (la carta vive en el flujo de pedido) ============= */
+.menu-invite { max-width: 760px; margin: 6px auto 0; }
+.menu-invite-card {
+    position: relative;
+    text-align: center;
+    background: var(--color-white);
+    border: 1px solid rgba(201, 169, 97, 0.4);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-soft);
+    padding: 42px 34px 36px;
+    overflow: hidden;
+}
+.menu-invite-card::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-gold), var(--color-rust), var(--color-gold));
+}
+.menu-invite-ic {
+    display: grid;
+    place-items: center;
+    width: 62px;
+    height: 62px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-brown-dark), var(--color-brown));
+    color: var(--color-gold-bright);
+    font-size: 1.5rem;
+    box-shadow: 0 10px 24px rgba(45, 24, 16, 0.25);
+}
+.menu-invite-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+    color: var(--color-brown-dark);
+    margin-bottom: 12px;
+}
+.menu-invite-card p {
+    color: var(--color-text-soft);
+    font-size: 1rem;
+    max-width: 520px;
+    margin: 0 auto 22px;
+}
+.menu-invite-card p strong { color: var(--color-rust); }
+.menu-invite-perks {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 14px;
+    margin: 0 0 26px;
+    padding: 0;
+}
+.menu-invite-perks li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--color-cream);
+    border: 1px solid rgba(201, 169, 97, 0.35);
+    border-radius: 30px;
+    padding: 8px 16px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--color-brown-dark);
+}
+.menu-invite-perks li i { color: var(--color-rust); }
+.menu-invite-perks li .fa-whatsapp { color: #25D366; }
+.menu-invite-cta { font-size: 1rem; padding: 16px 34px; }
+.menu-invite-card .menu-invite-alt {
+    margin: 16px auto 0;
+    font-size: 0.82rem;
+}
+.menu-invite-alt i { color: var(--color-brown-mid); margin-right: 4px; }
+
+@media (max-width: 600px) {
+    .menu-invite-card { padding: 32px 20px 28px; }
+    .menu-invite-cta { width: 100%; justify-content: center; }
+    .menu-invite-perks li { font-size: 0.76rem; padding: 7px 13px; }
+}
+
 /* ============= LEGAL MODAL (Términos y Privacidad) ============= */
 .legal-modal {
     position: fixed;

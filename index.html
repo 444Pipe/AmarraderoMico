@@ -16,7 +16,7 @@
     <link rel="dns-prefetch" href="https://unpkg.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;900&family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="styles.css?v=20260724d">
+    <link rel="stylesheet" href="styles.css?v=20260724f">
 </head>
 <body class="loading">
 
@@ -522,15 +522,27 @@
     <!-- ============= MENU / CARTA COMPLETA ============= -->
     <section class="menu-full" id="menu">
         <div class="menu-full-header">
-            <span class="section-tag">La Carta Completa</span>
+            <span class="section-tag">Antójate</span>
             <h2>Nuestro Menú</h2>
-            <p>Del desayuno llanero a la mamona al palo: toda nuestra carta, con precios. Pide a domicilio o recoge tu pedido en la Sede Principal (Vanguardia).</p>
-            <button type="button" class="btn btn-primary menu-full-cta" data-open-delivery>
-                <i class="fa-solid fa-motorcycle"></i> Pedir a domicilio
-            </button>
+            <p>Estos son los platos que más piden nuestros clientes. La carta completa, con precios, te espera al armar tu pedido.</p>
         </div>
-        <div class="menu-full-body" id="fullMenu">
-            <!-- Generado por JS desde MENU_DATA (misma fuente que el domicilio) -->
+        <!-- La vitrina "Los más pedidos" la inserta el JS justo antes de esta invitación.
+             La carta completa vive en el flujo de pedido (modal de domicilios). -->
+        <div class="menu-invite" id="menuInvite">
+            <div class="menu-invite-card">
+                <span class="menu-invite-ic"><i class="fa-solid fa-book-open"></i></span>
+                <h3>La carta completa te espera en tu pedido</h3>
+                <p>Más de <strong>90 platos</strong>, del desayuno llanero a la mamona al palo, todos con su precio. Ábrela, antójate y arma tu pedido en un par de toques.</p>
+                <ul class="menu-invite-perks">
+                    <li><i class="fa-solid fa-motorcycle"></i> Domicilios desde la Sede Vanguardia</li>
+                    <li><i class="fa-solid fa-money-bills"></i> Pagas en efectivo al recibir</li>
+                    <li><i class="fa-brands fa-whatsapp"></i> Confirmas por WhatsApp</li>
+                </ul>
+                <button type="button" class="btn btn-primary menu-invite-cta" data-open-delivery>
+                    <i class="fa-solid fa-utensils"></i> Ver la carta y hacer mi pedido
+                </button>
+                <p class="menu-invite-alt"><i class="fa-solid fa-store"></i> ¿Prefieres recogerlo? Dentro del pedido eliges "Recoger en sede".</p>
+            </div>
         </div>
         <p class="menu-full-note">
             <i class="fa-solid fa-circle-info"></i>
@@ -769,6 +781,6 @@
         </div>
     </footer>
 
-    <script defer src="script.js?v=20260724e"></script>
+    <script defer src="script.js?v=20260724f"></script>
 </body>
 </html>
