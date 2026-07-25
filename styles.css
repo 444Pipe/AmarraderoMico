@@ -3229,6 +3229,24 @@ body.nav-open { overflow: hidden; }
     color: var(--color-rust);
 }
 .sede-hora i { color: var(--color-brown); }
+/* Distintivo: única sede con servicio a domicilio */
+.sede-domicilios {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-start;
+    margin-bottom: 14px;
+    padding: 6px 14px;
+    background: rgba(230, 184, 92, 0.16);
+    border: 1px solid rgba(201, 169, 97, 0.45);
+    border-radius: 30px;
+    color: var(--color-brown-dark);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+.sede-domicilios i { color: var(--color-rust); }
+
 .sede-info {
     color: var(--color-text-soft);
     font-size: 0.95rem;
