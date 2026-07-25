@@ -367,8 +367,9 @@ MENU_DATA.forEach(cat => cat.items.forEach(item => {
 const normalizeText = (s) => (s || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
 
 // Platos estrella (los más pedidos): llevan sello 🔥 y son filtrables por antojo.
+// Los familiares (Picadas del Mico, pa' compartir) van de primeros en la vitrina.
 const POPULAR = new Set([
-    'plato-mamona', 'chicharrones', 'picada-3', 'mojarra',
+    'picada-3', 'picada-4', 'plato-mamona', 'chicharrones', 'mojarra',
     'sancocho-gallina', 'punta-anca', 'carne-cerdo', 'costilla-cerdo-tulio',
 ]);
 
