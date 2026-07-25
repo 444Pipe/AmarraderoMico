@@ -16,7 +16,7 @@
     <link rel="dns-prefetch" href="https://unpkg.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;900&family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="styles.css?v=20260724a">
+    <link rel="stylesheet" href="styles.css?v=20260724c">
 </head>
 <body class="loading">
 
@@ -80,8 +80,8 @@
                     </div>
                     <div class="cart-totals" id="cartTotals" hidden>
                         <div class="cart-row"><span>Subtotal</span><strong id="cartSubtotal">$0</strong></div>
-                        <div class="cart-row"><span>Domicilio</span><strong id="cartDelivery">$5.000</strong></div>
-                        <div class="cart-row cart-total"><span>Total</span><strong id="cartTotal">$0</strong></div>
+                        <div class="cart-row"><span>Domicilio</span><strong id="cartDelivery">Se cuadra aparte</strong></div>
+                        <div class="cart-row cart-total"><span>Total productos</span><strong id="cartTotal">$0</strong></div>
                         <button class="btn btn-primary cart-checkout" id="cartCheckout">
                             <i class="fa-solid fa-arrow-right"></i> Continuar al pedido
                         </button>
@@ -119,6 +119,11 @@
                             </button>
                         </div>
                         <p class="map-coords" id="mapCoords" hidden></p>
+                        <p class="map-privacy">
+                            <i class="fa-solid fa-lock"></i>
+                            Tu ubicación es opcional y solo se usa para la entrega de este pedido.
+                            <a href="#" class="legal-link" data-open-legal="legal-ubicacion">Más información</a>
+                        </p>
 
                         <div class="checkout-row address-row">
                             <div class="row-icon"><i class="fa-solid fa-location-dot"></i></div>
@@ -183,6 +188,7 @@
                                 </div>
                                 <span class="payment-badge"><i class="fa-solid fa-check"></i></span>
                             </label>
+                            <!-- Pago con Wompi deshabilitado temporalmente. Para reactivarlo, descomentar este bloque.
                             <label class="payment-option">
                                 <input type="radio" name="metodo_pago" value="pse">
                                 <div class="payment-icon pse"><i class="fa-solid fa-building-columns"></i></div>
@@ -192,7 +198,12 @@
                                 </div>
                                 <span class="payment-badge"><i class="fa-solid fa-check"></i></span>
                             </label>
+                            -->
                         </div>
+                        <p class="payment-note">
+                            <i class="fa-solid fa-circle-info"></i>
+                            Por ahora recibimos <strong>pago en efectivo</strong> al momento de la entrega. Pronto habilitaremos pagos en línea.
+                        </p>
                         <div class="payment-extra" id="paymentExtra">
                             <label class="row-label-sm">¿Con cuánto vas a pagar? (opcional)</label>
                             <input type="text" name="paga_con" placeholder="Ej: $100.000 — para alistar el cambio">
@@ -207,7 +218,7 @@
                     <div class="checkout-summary">
                         <h4>Resumen del pedido</h4>
                         <div id="checkoutSummary"></div>
-                        <div class="cart-row cart-total"><span>Total a pagar</span><strong id="checkoutTotal">$0</strong></div>
+                        <div class="cart-row cart-total"><span>Total productos</span><strong id="checkoutTotal">$0</strong></div>
                     </div>
 
                     <div class="confirm-bar">
@@ -221,6 +232,7 @@
                             <span class="confirm-spinner" hidden><i class="fa-solid fa-circle-notch fa-spin"></i></span>
                         </button>
                         <p class="confirm-note"><i class="fa-solid fa-shield-halved"></i> Pago 100% seguro · Datos protegidos</p>
+                        <p class="confirm-legal">Al confirmar aceptas los <a href="#" class="legal-link" data-open-legal>Términos del servicio</a> y el <a href="#" class="legal-link" data-open-legal="legal-datos">tratamiento de tus datos</a>.</p>
                     </div>
                 </form>
             </div>
@@ -240,6 +252,93 @@
                 <button type="button" class="btn-again" id="successAgain">
                     <i class="fa-solid fa-rotate-left"></i> Hacer otro pedido
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============= TERMINOS Y CONDICIONES / PRIVACIDAD ============= -->
+    <div class="legal-modal" id="legalModal" aria-hidden="true" role="dialog" aria-labelledby="legalTitle">
+        <div class="legal-backdrop" data-close-legal></div>
+        <div class="legal-panel">
+            <header class="legal-header">
+                <h2 id="legalTitle"><i class="fa-solid fa-file-contract"></i> Términos, Condiciones y Privacidad</h2>
+                <button class="legal-close" data-close-legal aria-label="Cerrar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </header>
+            <div class="legal-body" id="legalBody">
+
+                <p class="legal-intro">Estos términos aplican al servicio de <strong>pedidos a domicilio y para recoger</strong> realizados a través de este sitio web de <strong>El Amarradero del Mico</strong> (familia Falla Ballestero), Villavicencio, Meta, Colombia. Al confirmar un pedido aceptas estas condiciones.</p>
+
+                <section class="legal-section">
+                    <h3><i class="fa-solid fa-motorcycle"></i> 1. El servicio a domicilio</h3>
+                    <ul>
+                        <li>Los pedidos hechos en este sitio se gestionan desde nuestra <strong>Sede Principal (Vanguardia)</strong> y se confirman por <strong>WhatsApp</strong>.</li>
+                        <li>El restaurante <strong>te gestiona el domiciliario</strong> para llevar tu pedido; el servicio de transporte es independiente del valor de los productos.</li>
+                        <li>La cobertura es Villavicencio y sus alrededores, según la distancia a la sede. Horario: lunes a domingo, 6:00 a.m. a 6:00 p.m.</li>
+                        <li>El pedido se entiende <strong>aceptado únicamente cuando la sede lo confirma por WhatsApp</strong>. Hasta entonces no existe obligación de entrega.</li>
+                        <li>La disponibilidad de los platos puede variar según la sede y la hora del día.</li>
+                    </ul>
+                </section>
+
+                <section class="legal-section">
+                    <h3><i class="fa-solid fa-hand-holding-dollar"></i> 2. Precios y costo del domicilio</h3>
+                    <ul>
+                        <li>Los precios están en pesos colombianos (COP) y pueden cambiar sin previo aviso.</li>
+                        <li>El total mostrado en línea y lo que pagas al restaurante corresponde <strong>únicamente a los productos</strong>.</li>
+                        <li>El <strong>valor del domicilio es aparte</strong> y no está incluido en ese total: lo <strong>cuadras directamente con el domiciliario cuando te lleve el pedido</strong>, según la distancia del punto de entrega. Nosotros gestionamos el domiciliario, pero ese valor se paga por aparte a él.</li>
+                        <li>Si tienes dudas sobre el valor aproximado del domicilio para tu zona, puedes preguntarlo por WhatsApp a la sede antes de que despachemos tu pedido.</li>
+                    </ul>
+                </section>
+
+                <section class="legal-section">
+                    <h3><i class="fa-solid fa-credit-card"></i> 3. Pagos</h3>
+                    <ul>
+                        <li>Por el momento el único método de pago disponible es el <strong>pago en efectivo contra entrega</strong>: pagas los productos al domiciliario al recibir tu pedido (o en la sede si eliges recoger).</li>
+                        <li>El campo "¿con cuánto vas a pagar?" es opcional y solo se usa para alistar tu cambio.</li>
+                        <li>El valor del domicilio se paga <strong>por aparte al domiciliario en el momento de la entrega</strong>; es independiente de lo que pagas por los productos.</li>
+                        <li>Los pagos electrónicos (PSE, tarjeta, Nequi) están <strong>temporalmente deshabilitados</strong>; cuando se habiliten, se procesarán en una plataforma de pagos segura y el restaurante no recibirá ni almacenará datos bancarios.</li>
+                    </ul>
+                </section>
+
+                <section class="legal-section">
+                    <h3><i class="fa-solid fa-box"></i> 4. Entrega, cambios y cancelaciones</h3>
+                    <ul>
+                        <li>Es tu responsabilidad indicar una <strong>dirección y teléfono correctos</strong>. Si el domiciliario no logra ubicarte, la sede intentará contactarte por teléfono o WhatsApp.</li>
+                        <li>Los tiempos de entrega son estimados y pueden variar por clima, tráfico o demanda. Los pedidos para recoger suelen estar listos en 25 a 35 minutos.</li>
+                        <li>Para cambios o cancelaciones escribe cuanto antes al WhatsApp de la sede. Si el pedido ya está en preparación o fue despachado, puede no ser posible cancelarlo.</li>
+                        <li>Si recibes un producto equivocado o en mal estado, repórtalo de inmediato por WhatsApp para darte solución.</li>
+                    </ul>
+                </section>
+
+                <section class="legal-section" id="legal-datos">
+                    <h3><i class="fa-solid fa-shield-halved"></i> 5. Tratamiento de datos personales</h3>
+                    <p>Conforme a la <strong>Ley 1581 de 2012</strong> y el Decreto 1377 de 2013 (Colombia), El Amarradero del Mico actúa como responsable del tratamiento de los datos que suministras al hacer tu pedido:</p>
+                    <ul>
+                        <li><strong>Datos que recogemos:</strong> nombre, teléfono, dirección de entrega, notas del pedido, ubicación aproximada (solo si decides compartirla), detalle del pedido y método de pago elegido.</li>
+                        <li><strong>Para qué los usamos:</strong> gestionar, preparar, cobrar y entregar tu pedido; contactarte sobre su estado; y llevar un historial de pedidos que nos permita atenderte mejor.</li>
+                        <li><strong>No vendemos tus datos.</strong> Solo se comparten con autoridades cuando la ley lo exija (y con la pasarela de pagos segura si en el futuro eliges un pago electrónico).</li>
+                        <li><strong>Conservación:</strong> guardamos los datos el tiempo necesario para estas finalidades y las obligaciones legales del restaurante.</li>
+                        <li><strong>Tus derechos:</strong> puedes conocer, actualizar, rectificar o suprimir tus datos, y revocar tu autorización, escribiendo a <a href="mailto:contacto@amarraderodelmico.com">contacto@amarraderodelmico.com</a> o al WhatsApp <a href="https://wa.me/573159265910" target="_blank" rel="noopener">315 926 5910</a>.</li>
+                    </ul>
+                </section>
+
+                <section class="legal-section" id="legal-ubicacion">
+                    <h3><i class="fa-solid fa-location-dot"></i> 6. Uso de tu ubicación (GPS)</h3>
+                    <ul>
+                        <li>Compartir tu ubicación es <strong>totalmente opcional</strong>: solo ocurre si aceptas el permiso que pide tu navegador, y siempre puedes escribir la dirección manualmente.</li>
+                        <li>La ubicación se usa <strong>únicamente</strong> para fijar el punto de entrega en el mapa y coordinar el valor del domicilio. <strong>No te rastreamos</strong> en segundo plano ni después de cerrar la página.</li>
+                        <li>Para convertir tus coordenadas en una dirección legible usamos el servicio de mapas <strong>OpenStreetMap (Nominatim)</strong>; tus coordenadas se envían a ese servicio solo con ese fin.</li>
+                        <li>Las coordenadas del punto de entrega se guardan junto con el pedido para que el domiciliario pueda ubicarte.</li>
+                    </ul>
+                </section>
+
+                <section class="legal-section">
+                    <h3><i class="fa-solid fa-circle-check"></i> 7. Aceptación y contacto</h3>
+                    <p>Al confirmar un pedido en este sitio declaras que leíste y aceptas estos términos y el tratamiento de tus datos aquí descrito. Para cualquier duda, reclamo o solicitud sobre tus datos: <a href="mailto:contacto@amarraderodelmico.com">contacto@amarraderodelmico.com</a> · WhatsApp <a href="https://wa.me/573159265910" target="_blank" rel="noopener">315 926 5910</a>.</p>
+                    <p class="legal-updated">Última actualización: julio de 2026 · El Amarradero del Mico — Villavicencio, Meta, Colombia.</p>
+                </section>
+
             </div>
         </div>
     </div>
@@ -659,6 +758,9 @@
         </div>
         <div class="footer-bottom">
             <p>© 2026 El Amarradero del Mico — Familia Falla Ballestero. Todos los derechos reservados.</p>
+            <a href="#" class="footer-legal" data-open-legal>
+                <i class="fa-solid fa-file-contract"></i> Términos y privacidad
+            </a>
             <!-- Acceso discreto al panel interno (solo personal) -->
             <a href="/panel/" class="staff-access" title="Acceso del personal">
                 <i class="fa-solid fa-lock"></i> Personal
@@ -666,6 +768,6 @@
         </div>
     </footer>
 
-    <script defer src="script.js?v=20260724a"></script>
+    <script defer src="script.js?v=20260724d"></script>
 </body>
 </html>

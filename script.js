@@ -797,7 +797,7 @@ function renderCart() {
             </div>
         `).join('');
         dom.subtotal.textContent = formatCOP(subtotal);
-        dom.delivery.textContent = orderType === 'pickup' ? 'Gratis (recoger)' : 'Según ubicación';
+        dom.delivery.textContent = orderType === 'pickup' ? 'Gratis (recoger)' : 'Se cuadra con el domiciliario';
         dom.delivery.parentElement.querySelector('span').textContent = orderType === 'pickup' ? 'Recoger en sede' : 'Domicilio';
         dom.total.textContent = formatCOP(total);
     }
@@ -1216,10 +1216,10 @@ function renderCheckoutSummary() {
     const total = subtotal;
     const feeLine = orderType === 'pickup'
         ? `<div class="summary-line"><span><i class="fa-solid fa-store"></i> Recoger en sede</span><strong style="color: var(--color-green);">Gratis</strong></div>`
-        : `<div class="summary-line"><span><i class="fa-solid fa-motorcycle"></i> Costo de domicilio</span><strong class="fee-coord">Según ubicación</strong></div>`;
+        : `<div class="summary-line"><span><i class="fa-solid fa-motorcycle"></i> Costo de domicilio</span><strong class="fee-coord">Se cuadra con el domiciliario</strong></div>`;
     const totalNote = orderType === 'pickup'
         ? '<p class="total-note">Precio final. No hay costo de domicilio.</p>'
-        : '<p class="total-note"><i class="fa-solid fa-circle-info"></i> El costo del domicilio se confirma con la sede según tu ubicación.</p>';
+        : '<p class="total-note"><i class="fa-solid fa-circle-info"></i> El total corresponde solo a los productos. Nosotros te gestionamos el domiciliario y el valor del domicilio lo cuadras con él, por aparte, cuando te lleve el pedido.</p>';
     dom.checkoutSummary.innerHTML = `
         <div class="summary-items">${itemLines}</div>
         <div class="summary-totals">
@@ -1285,7 +1285,7 @@ function buildWhatsappMessage(data) {
         '',
         feeLine,
         `${totalLabel} ${formatCOP(total)}`,
-        isPickup ? null : '_(el costo del domicilio se suma al total según distancia)_',
+        isPickup ? null : '_(el total es solo de los productos; el valor del domicilio se cuadra por aparte con el domiciliario en la entrega)_',
         '',
         ...customerInfo,
         data.notas ? `📝 ${data.notas}` : null,
@@ -1503,9 +1503,11 @@ if (dom.fab) {
         dom.successAgain.addEventListener('click', resetOrderFlow);
     }
 
-    // ESC cierra modal
+    // ESC cierra modal (salvo que el modal legal esté abierto encima)
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && dom.modal.classList.contains('open')) closeDelivery();
+        if (e.key !== 'Escape') return;
+        if (document.querySelector('.legal-modal.open')) return;
+        if (dom.modal.classList.contains('open')) closeDelivery();
     });
 }
 
@@ -1515,6 +1517,53 @@ renderFullMenu();
 document.querySelectorAll('[data-open-delivery]').forEach(btn =>
     btn.addEventListener('click', openDelivery)
 );
+
+// ============= MODAL LEGAL (Términos, Condiciones y Privacidad) =============
+// Se abre desde el footer, el checkout y la nota de privacidad del mapa.
+// Puede abrirse ENCIMA del modal de domicilios, por eso guarda y restaura
+// el overflow previo del body en vez de limpiarlo siempre.
+const legalModal = document.getElementById('legalModal');
+const legalBody = document.getElementById('legalBody');
+let legalPrevOverflow = '';
+
+function openLegal(sectionId) {
+    if (!legalModal) return;
+    legalPrevOverflow = document.body.style.overflow;
+    legalModal.classList.add('open');
+    legalModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    if (legalBody) legalBody.scrollTop = 0;
+    if (sectionId) {
+        const target = document.getElementById(sectionId);
+        if (target) {
+            requestAnimationFrame(() => {
+                target.scrollIntoView({ block: 'start' });
+                target.classList.remove('highlight');
+                void target.offsetWidth; // reinicia la animación de resaltado
+                target.classList.add('highlight');
+            });
+        }
+    }
+}
+function closeLegal() {
+    if (!legalModal) return;
+    legalModal.classList.remove('open');
+    legalModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = legalPrevOverflow;
+}
+
+document.querySelectorAll('[data-open-legal]').forEach(el => {
+    el.addEventListener('click', (e) => {
+        e.preventDefault();
+        openLegal(el.getAttribute('data-open-legal') || null);
+    });
+});
+document.querySelectorAll('[data-close-legal]').forEach(el =>
+    el.addEventListener('click', closeLegal)
+);
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && legalModal && legalModal.classList.contains('open')) closeLegal();
+});
 
 // ============= SCROLL PROGRESS BAR =============
 const scrollProgress = document.getElementById('scrollProgress');
