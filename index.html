@@ -16,7 +16,7 @@
     <link rel="dns-prefetch" href="https://unpkg.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;900&family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="styles.css?v=20260702i">
+    <link rel="stylesheet" href="styles.css?v=20260724a">
 </head>
 <body class="loading">
 
@@ -257,20 +257,41 @@
 
     <!-- ============= NAVBAR ============= -->
     <header class="navbar" id="navbar">
+        <div class="nav-backdrop" id="navBackdrop"></div>
         <div class="nav-container">
             <a href="#inicio" class="nav-logo">
                 <img src="statics/logodelmico.png" alt="El Amarradero del Mico">
             </a>
-            <nav class="nav-menu" id="navMenu">
-                <a href="#inicio">Inicio</a>
-                <a href="#historia">Historia</a>
-                <a href="#carta">Lo Típico</a>
-                <a href="#menu">Menú</a>
-                <a href="#sedes">Sedes</a>
-                <a href="#noticias">Noticias</a>
-                <a href="#contacto">Contacto</a>
+            <nav class="nav-menu" id="navMenu" aria-label="Menú principal">
+                <div class="nav-menu-head">
+                    <img src="statics/logodelmico.png" alt="">
+                    <div class="nav-menu-title">
+                        <strong>El Amarradero del Mico</strong>
+                        <span>Sabor llanero · Desde 1998</span>
+                    </div>
+                    <button type="button" class="nav-menu-close" id="navClose" aria-label="Cerrar menú">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="nav-links">
+                    <a href="#inicio"><i class="fa-solid fa-house"></i><span>Inicio</span></a>
+                    <a href="#historia"><i class="fa-solid fa-book-open"></i><span>Historia</span></a>
+                    <a href="#carta"><i class="fa-solid fa-fire"></i><span>Lo Típico</span></a>
+                    <a href="#menu"><i class="fa-solid fa-utensils"></i><span>Menú</span></a>
+                    <a href="#sedes"><i class="fa-solid fa-location-dot"></i><span>Sedes</span></a>
+                    <a href="#noticias"><i class="fa-solid fa-newspaper"></i><span>Noticias</span></a>
+                    <a href="#contacto"><i class="fa-solid fa-phone"></i><span>Contacto</span></a>
+                </div>
+                <div class="nav-menu-cta">
+                    <button type="button" class="btn btn-primary nav-cta-delivery" data-open-delivery>
+                        <i class="fa-solid fa-motorcycle"></i> Pedir a domicilio
+                    </button>
+                    <a class="nav-cta-wa" href="https://wa.me/573159265910" target="_blank" rel="noopener">
+                        <i class="fa-brands fa-whatsapp"></i> Escríbenos por WhatsApp
+                    </a>
+                </div>
             </nav>
-            <button class="nav-toggle" id="navToggle" aria-label="Menú">
+            <button class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="navMenu">
                 <span></span><span></span><span></span>
             </button>
         </div>
@@ -645,6 +666,6 @@
         </div>
     </footer>
 
-    <script defer src="script.js?v=20260702i"></script>
+    <script defer src="script.js?v=20260724a"></script>
 </body>
 </html>

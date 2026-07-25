@@ -59,18 +59,31 @@ window.addEventListener('scroll', () => {
     if (!navTicking) { requestAnimationFrame(updateNavbar); navTicking = true; }
 }, { passive: true });
 
-// Mobile menu toggle
+// Mobile menu (drawer lateral con backdrop y bloqueo de scroll)
 const navToggle = document.getElementById('navToggle');
 const navMenu = document.getElementById('navMenu');
-navToggle.addEventListener('click', () => {
-    navMenu.classList.toggle('active');
+const navBackdrop = document.getElementById('navBackdrop');
+const navClose = document.getElementById('navClose');
+
+const setNavOpen = (open) => {
+    navMenu.classList.toggle('active', open);
+    navToggle.classList.toggle('active', open);
+    navBackdrop.classList.toggle('active', open);
+    document.body.classList.toggle('nav-open', open);
+    navToggle.setAttribute('aria-expanded', open);
+    navToggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+};
+
+navToggle.addEventListener('click', () => setNavOpen(!navMenu.classList.contains('active')));
+navClose.addEventListener('click', () => setNavOpen(false));
+navBackdrop.addEventListener('click', () => setNavOpen(false));
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && navMenu.classList.contains('active')) setNavOpen(false);
 });
 
-// Close mobile menu on link click
-document.querySelectorAll('.nav-menu a').forEach(link => {
-    link.addEventListener('click', () => {
-        navMenu.classList.remove('active');
-    });
+// Cerrar el menú al tocar un enlace o el CTA de domicilio
+document.querySelectorAll('.nav-menu a, .nav-menu [data-open-delivery]').forEach(el => {
+    el.addEventListener('click', () => setNavOpen(false));
 });
 
 // ============= SISTEMA DE DOMICILIOS =============
