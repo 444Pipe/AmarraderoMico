@@ -4030,12 +4030,14 @@ body.nav-open { overflow: hidden; }
 
     .carta-header { margin-bottom: 40px; }
     .carta-header p { font-size: 0.95rem; }
-    .carta-grid { grid-template-columns: 1fr; grid-auto-rows: 260px; gap: 14px; }
+    /* Tarjetas de "Lo Típico" en filas de 2 en móvil */
+    .carta-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 205px; gap: 12px; }
     .dish-large, .dish-wide { grid-column: span 1; grid-row: span 1; }
-    .dish-info { padding: 18px; transform: translateY(0); }
-    .dish-info h3 { font-size: 1.25rem; }
-    .dish-large .dish-info h3 { font-size: 1.5rem; }
-    .dish-info p { font-size: 0.85rem; }
+    .dish-info { padding: 14px 12px 12px; transform: translateY(0); }
+    .dish-info h3 { font-size: 1.02rem; margin-bottom: 4px; line-height: 1.25; }
+    .dish-large .dish-info h3 { font-size: 1.02rem; }
+    .dish-info p { display: none; }
+    .dish-tag { font-size: 0.58rem; padding: 3px 10px; letter-spacing: 1px; }
 
     .sedes-header { margin-bottom: 40px; }
     .sedes-header p { font-size: 1rem; }
@@ -4087,6 +4089,9 @@ body.nav-open { overflow: hidden; }
     .strip-stars { font-size: 0.95rem !important; }
 
     .historia, .carta, .sedes, .cta, .noticias { padding: 56px 16px; }
+    .carta-grid { grid-auto-rows: 170px; gap: 10px; }
+    .dish-info h3 { font-size: 0.92rem; }
+    .dish-large .dish-info h3 { font-size: 0.92rem; }
     .news-img { height: 180px; }
     .news-body { padding: 18px 18px 22px; }
     .news-body h3 { font-size: 1.05rem; }
