@@ -2362,6 +2362,8 @@ body.nav-open { overflow: hidden; }
     object-fit: cover;
     object-position: center;
     z-index: 1;
+    /* Es fondo decorativo: sin hover no aparecen los controles del navegador. */
+    pointer-events: none;
 }
 .hero-overlay {
     position: absolute;
