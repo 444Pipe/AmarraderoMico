@@ -121,33 +121,6 @@
         .back-site:hover { background: rgba(60,33,20,.75); border-color: var(--gold-bright); transform: translateY(-1px); }
         .back-site:active { transform: scale(.97); }
 
-        /* ===== Frase llanera protagonista (desktop) ===== */
-        .hero-line {
-            text-align: center; width: min(94vw, 760px); pointer-events: none;
-        }
-        .hero-line .place {
-            display: inline-flex; align-items: center; gap: 9px;
-            font-size: .68rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
-            color: var(--gold-bright); margin-bottom: 10px;
-        }
-        .hero-line .place::before, .hero-line .place::after {
-            content: ''; width: 26px; height: 1.5px; background: var(--gold-bright); opacity: .8;
-        }
-        .hero-line h2 {
-            font-family: 'Playfair Display', serif; font-weight: 900;
-            font-size: clamp(1.4rem, 2.9vw, 2.3rem); line-height: 1.12; color: #fff;
-            text-shadow: 0 3px 22px rgba(0,0,0,.7); text-wrap: balance;
-        }
-        .hero-line h2 em { color: var(--gold-bright); font-style: italic; }
-        .hero-tags { display: flex; gap: 9px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
-        .hero-tags span {
-            font-size: .72rem; font-weight: 600; letter-spacing: .3px;
-            padding: 7px 14px; border-radius: 999px; color: #fbeedd;
-            background: rgba(30,16,10,.42); border: 1px solid rgba(230,184,92,.40);
-            -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
-        }
-        .hero-tags i { color: var(--gold-bright); margin-right: 7px; }
-
         /* ===== Formulario tipo vidrio esmerilado ===== */
         .card {
             position: relative; z-index: 2; width: 100%; max-width: 412px;
@@ -272,18 +245,7 @@
         }
         .foot i { color: var(--gold-bright); opacity: .9; font-size: .8rem; }
 
-        /* Pantallas bajas: la frase estorba más de lo que aporta, el formulario manda */
-        @media (max-height: 720px) {
-            .hero-line .hero-tags { display: none; }
-            .stage { gap: 16px; }
-        }
-        @media (max-height: 680px) {
-            .hero-line { display: none; }
-        }
-
-        /* Tablet y móvil: se deja solo el formulario, con la marca en la barra */
         @media (max-width: 760px) {
-            .hero-line { display: none; }
             .topbar { padding: 16px 16px; }
             .stage { padding: 4px 18px 34px; }
             .card { margin-top: 34px; }
@@ -331,17 +293,6 @@
     </header>
 
     <div class="stage">
-    <!-- Frase llanera protagonista (solo desktop) -->
-    <div class="hero-line">
-        <span class="place">Villavicencio · Meta</span>
-        <h2>Sabor de los <em>Llanos</em>, directo a tu mesa</h2>
-        <div class="hero-tags">
-            <span><i class="fa-solid fa-fire"></i>A la llanera</span>
-            <span><i class="fa-solid fa-motorcycle"></i>Domicilios</span>
-            <span><i class="fa-solid fa-leaf"></i>Tradición</span>
-        </div>
-    </div>
-
     <form class="card" method="post">
         {% csrf_token %}
 
