@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2D1810">
     <title>{% block title %}Panel · El Amarradero del Mico{% endblock %}</title>
+    <link rel="icon" href="/statics/logodelmico.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -18,87 +20,158 @@
             --text: #2D1810; --text-soft: #5C4538; --white: #fff;
             --shadow: 0 10px 30px rgba(45, 24, 16, .10);
             --shadow-lg: 0 18px 50px rgba(45, 24, 16, .18);
+            --tabbar-h: 0px;   /* en móvil pasa a la altura de la barra inferior */
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Inter', -apple-system, sans-serif;
             background: var(--bg); color: var(--text);
             -webkit-font-smoothing: antialiased; min-height: 100vh;
+            padding-bottom: var(--tabbar-h);
         }
         a { color: inherit; }
         .serif { font-family: 'Playfair Display', serif; }
+        .sr-only {
+            position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden;
+            clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+        }
 
-        /* ---------- HEADER + NAV ---------- */
-        header {
+        /* ============================================================
+           BARRA SUPERIOR · marca + navegación + sesión
+           ============================================================ */
+        .topbar {
             background: linear-gradient(135deg, var(--brown-dark), var(--brown) 60%, var(--brown-mid));
-            color: var(--white); padding: 16px 22px;
+            color: var(--white); padding: 14px 22px;
             position: sticky; top: 0; z-index: 50;
             box-shadow: 0 6px 24px rgba(45, 24, 16, .35);
         }
-        .header-row { max-width: 1240px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
-        .brand { display: flex; align-items: center; gap: 12px; }
-        .brand-logo {
-            height: 50px; width: auto; flex-shrink: 0;
-            filter: drop-shadow(0 3px 10px rgba(0, 0, 0, .5));
+        .topbar-row {
+            max-width: 1240px; margin: 0 auto;
+            display: flex; align-items: center; justify-content: space-between; gap: 16px;
         }
-        .brand h1 { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; line-height: 1.1; }
-        .brand p { font-size: .72rem; color: var(--gold-bright); letter-spacing: .5px; text-transform: uppercase; }
 
-        .panel-nav { display: flex; gap: 6px; background: rgba(0,0,0,.18); padding: 5px; border-radius: 999px; }
+        /* ---- Marca (lleva a Pedidos) ---- */
+        .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; min-width: 0; }
+        .brand-logo { height: 46px; width: auto; flex-shrink: 0; filter: drop-shadow(0 3px 10px rgba(0, 0, 0, .5)); }
+        .brand-txt { min-width: 0; }
+        .brand-txt b {
+            display: block; font-family: 'Playfair Display', serif; font-size: 1.1rem;
+            font-weight: 700; line-height: 1.15;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .brand-txt small {
+            display: block; font-size: .68rem; color: var(--gold-bright);
+            letter-spacing: 1.2px; text-transform: uppercase; margin-top: 1px;
+        }
+
+        /* ---- Navegación entre secciones ---- */
+        .panel-nav { display: flex; gap: 6px; background: rgba(0,0,0,.20); padding: 5px; border-radius: 999px; }
         .panel-nav a {
-            display: inline-flex; align-items: center; gap: 7px; text-decoration: none;
-            color: rgba(255,255,255,.82); font-size: .84rem; font-weight: 600;
-            padding: 8px 16px; border-radius: 999px; transition: all .2s; white-space: nowrap;
+            position: relative; display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+            color: rgba(255,255,255,.80); font-size: .86rem; font-weight: 600;
+            padding: 9px 18px; border-radius: 999px; transition: background .2s, color .2s; white-space: nowrap;
         }
         .panel-nav a:hover { background: rgba(255,255,255,.12); color: #fff; }
-        .panel-nav a.active { background: linear-gradient(135deg, var(--rust), var(--orange)); color: #fff; box-shadow: 0 5px 14px rgba(184,84,31,.4); }
-
-        .header-user { display: flex; align-items: center; gap: 10px; font-size: .85rem; flex-wrap: wrap; }
-        .header-user .who { display: flex; align-items: center; gap: 7px; opacity: .92; }
-        .header-user .who i { color: var(--gold-bright); }
-        .logout-form { margin: 0; }
-        .btn-home, .btn-logout {
-            color: var(--white); text-decoration: none; border: 1.5px solid rgba(255,255,255,.28);
-            padding: 7px 13px; border-radius: 999px; font-size: .8rem; font-weight: 600;
-            transition: all .2s; display: inline-flex; align-items: center; gap: 6px;
-            cursor: pointer; background: transparent; font-family: 'Inter', sans-serif;
+        .panel-nav a.active {
+            background: linear-gradient(135deg, var(--rust), var(--orange)); color: #fff;
+            box-shadow: 0 5px 14px rgba(184,84,31,.45);
         }
-        .btn-home:hover, .btn-logout:hover { background: rgba(255,255,255,.14); border-color: var(--gold-bright); }
-        .btn-logout:active, .btn-home:active { transform: scale(.96); }
+        /* Insignia con los pedidos nuevos sin atender */
+        .nav-badge {
+            min-width: 19px; height: 19px; padding: 0 5px; border-radius: 999px;
+            background: var(--gold-bright); color: var(--brown-dark);
+            font-size: .68rem; font-weight: 800; line-height: 19px; text-align: center;
+        }
+        .panel-nav a.active .nav-badge { background: #fff; color: var(--rust); }
 
-        /* ---------- LAYOUT ---------- */
+        /* ---- Sesión ---- */
+        .topbar-user { display: flex; align-items: center; gap: 8px; }
+        .topbar-user form { margin: 0; }
+        .topbar-user .who {
+            display: inline-flex; align-items: center; gap: 7px; font-size: .84rem;
+            font-weight: 600; opacity: .92; max-width: 160px;
+        }
+        .topbar-user .who i { color: var(--gold-bright); }
+        .topbar-user .who span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .btn-top {
+            display: inline-flex; align-items: center; gap: 7px; cursor: pointer;
+            color: var(--white); text-decoration: none; background: transparent;
+            border: 1.5px solid rgba(255,255,255,.28); border-radius: 999px;
+            padding: 8px 14px; font-family: 'Inter', sans-serif; font-size: .8rem; font-weight: 600;
+            transition: background .2s, border-color .2s;
+        }
+        .btn-top:hover { background: rgba(255,255,255,.14); border-color: var(--gold-bright); }
+        .btn-top:active { transform: scale(.96); }
+        .btn-top-out:hover { background: rgba(184,50,39,.35); border-color: #e59d94; }
+
+        /* ============================================================
+           LAYOUT
+           ============================================================ */
         main { max-width: 1240px; margin: 0 auto; padding: 24px 22px 64px; }
-        .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
-        .page-head h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--brown-dark); }
-        .page-head .sub { color: var(--text-soft); font-size: .9rem; margin-top: 3px; }
-        .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--rust); font-weight: 600; text-decoration: none; font-size: .9rem; margin-bottom: 14px; }
+        .page-head {
+            display: flex; align-items: flex-end; justify-content: space-between;
+            gap: 14px; flex-wrap: wrap; margin-bottom: 20px;
+        }
+        .page-head h2 { font-family: 'Playfair Display', serif; font-size: 1.55rem; color: var(--brown-dark); line-height: 1.15; }
+        .page-head .sub { color: var(--text-soft); font-size: .9rem; margin-top: 4px; }
+        .back-link {
+            display: inline-flex; align-items: center; gap: 8px; color: var(--rust);
+            font-weight: 600; text-decoration: none; font-size: .9rem; margin-bottom: 14px;
+        }
         .back-link:hover { text-decoration: underline; }
+        .section-title {
+            font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--brown);
+            margin: 32px 0 14px; display: flex; align-items: center; gap: 10px;
+        }
+        .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--sand), transparent); }
 
         /* ---------- KPI CARDS ---------- */
-        .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+        .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 24px; }
         .kpi {
             background: var(--white); border-radius: 16px; padding: 16px 18px;
             box-shadow: var(--shadow); border-left: 5px solid var(--gold);
-            display: flex; align-items: center; gap: 14px;
+            display: flex; align-items: center; gap: 14px; position: relative; overflow: hidden;
         }
         .kpi.accent-rust { border-left-color: var(--rust); }
         .kpi.accent-green { border-left-color: var(--green); }
         .kpi.accent-gold { border-left-color: var(--gold-bright); }
         .kpi.accent-brown { border-left-color: var(--brown-mid); }
-        .kpi .ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 1.2rem; flex-shrink: 0; background: var(--cream); color: var(--brown-mid); }
+        .kpi .ic { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; font-size: 1.2rem; flex-shrink: 0; background: var(--cream); color: var(--brown-mid); }
         .kpi.accent-rust .ic { background: #FCEEDD; color: var(--rust); }
         .kpi.accent-green .ic { background: #E5EEE6; color: var(--green); }
-        .kpi .num { font-family: 'Playfair Display', serif; font-size: 1.55rem; font-weight: 700; line-height: 1; }
-        .kpi .lbl { font-size: .74rem; color: var(--text-soft); text-transform: uppercase; letter-spacing: .5px; margin-top: 3px; }
+        .kpi.accent-gold .ic { background: #FBF1DA; color: #a8862f; }
+        .kpi .num { font-family: 'Playfair Display', serif; font-size: 1.7rem; font-weight: 700; line-height: 1; }
+        .kpi .lbl { font-size: .74rem; color: var(--text-soft); text-transform: uppercase; letter-spacing: .5px; margin-top: 4px; }
 
         /* ---------- CARDS ---------- */
         .card { background: var(--white); border-radius: 18px; box-shadow: var(--shadow); padding: 20px 22px; }
         .card + .card { margin-top: 18px; }
         .card-title { font-family: 'Playfair Display', serif; font-size: 1.12rem; color: var(--brown); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
         .card-title i { color: var(--rust); }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
 
-        /* ---------- BARS ---------- */
+        /* ---------- BOTONES ---------- */
+        .btn {
+            border: none; border-radius: 11px; padding: 11px 16px; font-family: 'Inter', sans-serif;
+            font-size: .88rem; font-weight: 600; cursor: pointer; text-decoration: none;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            transition: filter .18s, transform .18s, background .18s;
+        }
+        .btn:hover { filter: brightness(1.05); transform: translateY(-1px); }
+        .btn:active { transform: scale(.97); }
+        .btn-block { width: 100%; }
+        .btn-accept { background: linear-gradient(135deg, var(--green), var(--green-bright)); color: #fff; box-shadow: 0 6px 16px rgba(62,86,65,.32); }
+        .btn-dispatch { background: linear-gradient(135deg, var(--rust), var(--orange)); color: #fff; box-shadow: 0 6px 16px rgba(184,84,31,.32); }
+        .btn-cancel { background: var(--white); color: var(--red); border: 1.5px solid #e7c4bf; }
+        .btn-cancel:hover { background: #fceae7; filter: none; }
+        .btn-wa {
+            display: inline-flex; align-items: center; justify-content: center; gap: 7px; text-decoration: none;
+            background: linear-gradient(135deg, #1ebe5a, var(--wa)); color: #fff; font-weight: 600;
+            padding: 8px 14px; border-radius: 10px; font-size: .82rem; border: none; cursor: pointer;
+        }
+        .btn-wa:hover { filter: brightness(1.05); }
+
+        /* ---------- BARRAS HORIZONTALES ---------- */
         .bar-row { display: grid; grid-template-columns: minmax(90px, 1.4fr) 3fr auto; align-items: center; gap: 12px; margin: 9px 0; font-size: .88rem; }
         .bar-row .bar-name { color: var(--text); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .bar-track { background: var(--cream); border-radius: 999px; height: 14px; overflow: hidden; }
@@ -107,7 +180,7 @@
         .bar-val { font-weight: 700; color: var(--brown-dark); white-space: nowrap; font-size: .85rem; }
         .bar-val small { color: var(--text-soft); font-weight: 500; }
 
-        /* Columnas verticales (horas pico) */
+        /* ---------- COLUMNAS VERTICALES (horas pico / ventas) ---------- */
         .cols { display: flex; align-items: flex-end; gap: 4px; height: 150px; padding-top: 8px; overflow-x: auto; }
         .col { flex: 1; min-width: 16px; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
         .col .col-bar { width: 100%; max-width: 22px; border-radius: 6px 6px 0 0; background: linear-gradient(180deg, var(--orange), var(--rust)); min-height: 3px; position: relative; transition: height .5s ease; }
@@ -115,83 +188,116 @@
         .col .col-lbl { font-size: .62rem; color: var(--text-soft); }
         .col .col-cnt { font-size: .62rem; color: var(--brown-dark); font-weight: 700; }
 
-        /* ---------- TABLES ---------- */
-        .tbl { width: 100%; border-collapse: collapse; font-size: .88rem; }
-        .tbl th { text-align: left; color: var(--text-soft); font-size: .72rem; text-transform: uppercase; letter-spacing: .5px; padding: 8px 10px; border-bottom: 2px solid var(--cream); }
-        .tbl td { padding: 11px 10px; border-bottom: 1px solid #f2e9dc; }
-        .tbl tr:last-child td { border-bottom: none; }
-        .tbl .num { text-align: right; font-variant-numeric: tabular-nums; }
-
-        /* ---------- BADGES / CHIPS ---------- */
-        .chip { display: inline-flex; align-items: center; gap: 5px; font-size: .72rem; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--cream); color: var(--brown-mid); }
+        /* ---------- ETIQUETAS DE ESTADO ---------- */
+        .chip { display: inline-flex; align-items: center; gap: 5px; font-size: .72rem; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--cream); color: var(--brown-mid); }
         .chip.delivery { background: #FCEEDD; color: var(--rust); }
         .chip.pickup { background: #E5EEE6; color: var(--green); }
-        .estado { font-size: .66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; padding: 3px 9px; border-radius: 999px; }
+        .estado { font-size: .66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; padding: 4px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
         .estado.nuevo { background: #FCEEDD; color: var(--rust); }
         .estado.aceptado { background: #E5EEE6; color: var(--green); }
         .estado.despachado { background: #efe9e1; color: #7a6a57; }
         .estado.cancelado { background: #f7e3e0; color: var(--red); }
 
-        .btn-wa {
-            display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
-            background: linear-gradient(135deg, #1ebe5a, var(--wa)); color: #fff; font-weight: 600;
-            padding: 6px 12px; border-radius: 9px; font-size: .8rem;
-        }
-        .btn-wa:hover { filter: brightness(1.05); }
-
-        /* ---------- SEARCH ---------- */
+        /* ---------- BUSCADOR ---------- */
         .search { position: relative; }
         .search i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-soft); }
         .search input {
             border: 1.5px solid var(--sand); background: var(--white); border-radius: 999px;
-            padding: 10px 16px 10px 40px; font-family: 'Inter', sans-serif; font-size: .9rem;
-            min-width: 240px; color: var(--text); outline: none;
+            padding: 11px 16px 11px 40px; font-family: 'Inter', sans-serif; font-size: .9rem;
+            min-width: 250px; color: var(--text); outline: none;
         }
         .search input:focus { border-color: var(--gold-bright); box-shadow: 0 0 0 3px rgba(230,184,92,.2); }
 
-        /* ---------- EMPTY ---------- */
-        .empty { background: var(--white); border-radius: 18px; padding: 56px 24px; text-align: center; box-shadow: var(--shadow); }
-        .empty .big { font-size: 2.6rem; color: var(--sand); margin-bottom: 12px; }
-        .empty h3 { font-family: 'Playfair Display', serif; color: var(--brown); font-size: 1.2rem; margin-bottom: 6px; }
-        .empty p { color: var(--text-soft); font-size: .9rem; }
+        /* ---------- ESTADO VACÍO ---------- */
+        .empty { background: var(--white); border-radius: 18px; padding: 64px 24px; text-align: center; box-shadow: var(--shadow); }
+        .empty .big { font-size: 2.8rem; color: var(--sand); margin-bottom: 12px; }
+        .empty h3 { font-family: 'Playfair Display', serif; color: var(--brown); font-size: 1.3rem; margin-bottom: 6px; }
+        .empty p { color: var(--text-soft); font-size: .92rem; }
 
-        /* ---------- RESPONSIVE ---------- */
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 980px) {
+            .topbar-user .who { display: none; }
+            .btn-top span { display: none; }
+            .btn-top { padding: 9px 12px; }
+        }
         @media (max-width: 900px) {
             .grid-2 { grid-template-columns: 1fr; }
         }
-        @media (max-width: 720px) {
-            .panel-nav { order: 2; width: 100%; justify-content: space-between; }
-            .panel-nav a { flex: 1; justify-content: center; padding: 8px 6px; }
-            .panel-nav a span { display: none; }
-            .header-user .who span { display: none; }
-            .btn-home span { display: none; }
-            main { padding: 18px 14px 52px; }
+
+        /* En móvil la navegación baja a una barra de pestañas fija, siempre visible
+           y con las etiquetas a la vista (más fácil de entender que solo iconos). */
+        @media (max-width: 760px) {
+            :root { --tabbar-h: 76px; }
+            .topbar { padding: 11px 14px; }
+            .brand-logo { height: 40px; }
+            .brand-txt b { font-size: .95rem; }
+            .brand-txt small { font-size: .6rem; letter-spacing: 1px; }
+
+            .panel-nav {
+                position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+                background: var(--white); border-top: 1px solid var(--cream); border-radius: 0;
+                padding: 7px 8px calc(7px + env(safe-area-inset-bottom, 0px));
+                box-shadow: 0 -8px 26px rgba(45, 24, 16, .16); gap: 4px;
+            }
+            .panel-nav a {
+                flex: 1; flex-direction: column; gap: 4px; justify-content: center;
+                color: var(--text-soft); font-size: .68rem; font-weight: 700;
+                padding: 8px 4px; border-radius: 13px;
+            }
+            .panel-nav a i { font-size: 1.1rem; }
+            .panel-nav a:hover { background: var(--bg); color: var(--brown); }
+            .panel-nav a.active { box-shadow: none; }
+            .nav-badge { position: absolute; top: 3px; right: 50%; margin-right: -22px; }
+
+            main { padding: 18px 14px 40px; }
+            .page-head h2 { font-size: 1.35rem; }
             .bar-row { grid-template-columns: minmax(70px, 1.3fr) 2.4fr auto; gap: 8px; font-size: .82rem; }
+            .search input { min-width: 0; width: 100%; }
+            .page-head .search { width: 100%; }
+            .empty { padding: 46px 20px; }
+        }
+        @media (max-width: 420px) {
+            .brand-txt small { display: none; }
         }
         {% block extra_style %}{% endblock %}
     </style>
 </head>
 <body>
-    <header>
-        <div class="header-row">
-            <div class="brand">
+    <header class="topbar">
+        <div class="topbar-row">
+            <a class="brand" href="{% url 'dashboard' %}">
                 <img class="brand-logo" src="/statics/logodelmico.png" alt="El Amarradero del Mico">
-                <div>
-                    <h1>{% block brand_title %}Panel{% endblock %}</h1>
-                    <p>El Amarradero del Mico</p>
-                </div>
-            </div>
-            <nav class="panel-nav">
-                <a href="{% url 'dashboard' %}" class="{% if seccion == 'pedidos' %}active{% endif %}"><i class="fa-solid fa-bell"></i> <span>Pedidos</span></a>
-                <a href="{% url 'clientes' %}" class="{% if seccion == 'clientes' %}active{% endif %}"><i class="fa-solid fa-users"></i> <span>Clientes</span></a>
-                <a href="{% url 'estadisticas' %}" class="{% if seccion == 'estadisticas' %}active{% endif %}"><i class="fa-solid fa-chart-simple"></i> <span>Estadísticas</span></a>
+                <span class="brand-txt">
+                    <b>El Amarradero del Mico</b>
+                    <small>Panel de administración</small>
+                </span>
+            </a>
+
+            <nav class="panel-nav" aria-label="Secciones del panel">
+                <a href="{% url 'dashboard' %}" {% if seccion == 'pedidos' %}class="active" aria-current="page"{% endif %}>
+                    <i class="fa-solid fa-motorcycle"></i> <span>Pedidos</span>
+                    {% if nav_nuevos %}<b class="nav-badge">{{ nav_nuevos }}</b>{% endif %}
+                </a>
+                <a href="{% url 'clientes' %}" {% if seccion == 'clientes' %}class="active" aria-current="page"{% endif %}>
+                    <i class="fa-solid fa-users"></i> <span>Clientes</span>
+                </a>
+                <a href="{% url 'estadisticas' %}" {% if seccion == 'estadisticas' %}class="active" aria-current="page"{% endif %}>
+                    <i class="fa-solid fa-chart-simple"></i> <span>Estadísticas</span>
+                </a>
             </nav>
-            <div class="header-user">
+
+            <div class="topbar-user">
                 <span class="who"><i class="fa-solid fa-circle-user"></i> <span>{{ request.user.username }}</span></span>
-                <a class="btn-home" href="{% url 'home' %}"><i class="fa-solid fa-house"></i> <span>Página principal</span></a>
-                <form method="post" action="{% url 'logout' %}" class="logout-form">
+                <a class="btn-top" href="{% url 'home' %}" title="Ver el sitio web">
+                    <i class="fa-solid fa-house"></i> <span>Ver sitio</span>
+                </a>
+                <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <button type="submit" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</button>
+                    <button type="submit" class="btn-top btn-top-out" title="Cerrar sesión">
+                        <i class="fa-solid fa-right-from-bracket"></i> <span>Salir</span>
+                    </button>
                 </form>
             </div>
         </div>

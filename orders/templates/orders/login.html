@@ -15,13 +15,32 @@
             --red: #B83227; --green: #3C7A34;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { height: 100%; }
+        html, body { min-height: 100%; }
+        /* La página es una columna: barra superior arriba y el resto centrado.
+           Nada va superpuesto, así que la frase, el logo y el formulario no
+           pueden pisarse por más angosta o baja que sea la pantalla. */
         body {
-            min-height: 100vh; display: flex; align-items: center; justify-content: center;
-            font-family: 'Inter', -apple-system, sans-serif; padding: 22px;
-            position: relative; overflow: hidden; color: #fff;
+            min-height: 100vh; min-height: 100dvh;
+            display: flex; flex-direction: column;
+            font-family: 'Inter', -apple-system, sans-serif;
+            position: relative; overflow-x: hidden; color: #fff;
             background: var(--brown-dark);
             -webkit-font-smoothing: antialiased;
+        }
+        .topbar {
+            position: relative; z-index: 3; width: 100%; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 14px; padding: 20px 22px;
+        }
+        .stage {
+            position: relative; z-index: 2; flex: 1; width: 100%;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; gap: 26px; padding: 6px 22px 42px;
+        }
+        /* Si la pantalla es muy baja, el contenido se desborda hacia abajo (y se
+           puede hacer scroll) en vez de recortarse por arriba. */
+        @supports (justify-content: safe center) {
+            .stage { justify-content: safe center; }
         }
 
         /* ===== Fondo inmersivo: una sola foto con Ken-Burns muy lento ===== */
@@ -59,10 +78,9 @@
         .overlay::before { width: 460px; height: 460px; background: var(--orange); opacity: .32; top: -170px; right: -130px; }
         .overlay::after  { width: 380px; height: 380px; background: var(--gold-bright); opacity: .24; bottom: -160px; left: -120px; }
 
-        /* ===== Badge de marca · esquina superior izquierda ===== */
+        /* ===== Badge de marca · izquierda de la barra superior ===== */
         .brand-mark {
-            position: fixed; top: 22px; left: 22px; z-index: 3;
-            display: flex; align-items: center; gap: 11px;
+            display: flex; align-items: center; gap: 11px; min-width: 0;
             padding: 7px 14px 7px 8px; border-radius: 999px;
             background: rgba(30,16,10,.55);
             -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
@@ -85,10 +103,27 @@
             letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold-bright);
         }
 
+        /* ===== Volver al sitio web · derecha de la barra superior =====
+           Mismo gesto que el botón "Ver sitio" del panel, para que la salida
+           hacia la página pública esté siempre en el mismo lugar. */
+        .back-site {
+            flex-shrink: 0;
+            display: inline-flex; align-items: center; gap: 9px; text-decoration: none;
+            padding: 10px 17px; border-radius: 999px;
+            color: #fff; font-size: .84rem; font-weight: 600;
+            background: rgba(30,16,10,.55);
+            -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+            border: 1px solid rgba(230,184,92,.30);
+            box-shadow: 0 8px 24px rgba(10,5,2,.4);
+            transition: background .2s, border-color .2s, transform .2s;
+        }
+        .back-site i { color: var(--gold-bright); }
+        .back-site:hover { background: rgba(60,33,20,.75); border-color: var(--gold-bright); transform: translateY(-1px); }
+        .back-site:active { transform: scale(.97); }
+
         /* ===== Frase llanera protagonista (desktop) ===== */
         .hero-line {
-            position: fixed; left: 50%; top: 30px; transform: translateX(-50%);
-            z-index: 3; text-align: center; width: min(92vw, 640px); pointer-events: none;
+            text-align: center; width: min(94vw, 760px); pointer-events: none;
         }
         .hero-line .place {
             display: inline-flex; align-items: center; gap: 9px;
@@ -100,8 +135,8 @@
         }
         .hero-line h2 {
             font-family: 'Playfair Display', serif; font-weight: 900;
-            font-size: clamp(1.5rem, 3.4vw, 2.5rem); line-height: 1.06; color: #fff;
-            text-shadow: 0 3px 22px rgba(0,0,0,.7);
+            font-size: clamp(1.4rem, 2.9vw, 2.3rem); line-height: 1.12; color: #fff;
+            text-shadow: 0 3px 22px rgba(0,0,0,.7); text-wrap: balance;
         }
         .hero-line h2 em { color: var(--gold-bright); font-style: italic; }
         .hero-tags { display: flex; gap: 9px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
@@ -116,6 +151,7 @@
         /* ===== Formulario tipo vidrio esmerilado ===== */
         .card {
             position: relative; z-index: 2; width: 100%; max-width: 412px;
+            /* El margen superior reserva el espacio del logo, que sobresale 60px. */
             padding: 72px 36px 34px; margin-top: 60px; border-radius: 26px;
             /* Fallback sólido café (legible aunque no haya blur) */
             background: linear-gradient(165deg, rgba(58,33,22,.92), rgba(28,15,9,.94));
@@ -236,18 +272,34 @@
         }
         .foot i { color: var(--gold-bright); opacity: .9; font-size: .8rem; }
 
-        /* Tablet/desktop pequeño: la frase hero podría chocar con el badge de marca */
+        /* Pantallas bajas: la frase estorba más de lo que aporta, el formulario manda */
+        @media (max-height: 720px) {
+            .hero-line .hero-tags { display: none; }
+            .stage { gap: 16px; }
+        }
+        @media (max-height: 680px) {
+            .hero-line { display: none; }
+        }
+
+        /* Tablet y móvil: se deja solo el formulario, con la marca en la barra */
         @media (max-width: 760px) {
-            .hero-line, .hero-tags { display: none; }
+            .hero-line { display: none; }
+            .topbar { padding: 16px 16px; }
+            .stage { padding: 4px 18px 34px; }
             .card { margin-top: 34px; }
+        }
+        @media (max-width: 560px) {
+            .back-site span { display: none; }
+            .back-site { padding: 11px 14px; gap: 0; }
         }
         @media (max-width: 480px) {
             .brand-mark span { display: none; }
             .brand-mark b { font-size: .82rem; }
         }
         @media (max-width: 420px) {
-            body { padding: 16px; }
-            .brand-mark { top: 14px; left: 14px; padding: 6px 12px 6px 6px; }
+            .topbar { padding: 14px; }
+            .stage { padding: 4px 16px 30px; }
+            .brand-mark { padding: 6px 12px 6px 6px; }
             .brand-mark .chip { width: 32px; height: 32px; flex-basis: 32px; }
             .card { padding: 64px 24px 30px; margin-top: 30px; border-radius: 22px; }
             .badge { width: 130px; height: 108px; top: -52px; }
@@ -263,15 +315,22 @@
     <div class="bg"></div>
     <div class="overlay"></div>
 
-    <!-- Badge de marca · contexto inmediato -->
-    <div class="brand-mark">
-        <span class="chip"><img src="/statics/logodelmico.png" alt="El Amarradero del Mico"></span>
-        <div>
-            <b>El Amarradero del Mico</b>
-            <span>Comida Llanera</span>
+    <!-- Barra superior: marca a la izquierda, salida al sitio a la derecha -->
+    <header class="topbar">
+        <div class="brand-mark">
+            <span class="chip"><img src="/statics/logodelmico.png" alt="El Amarradero del Mico"></span>
+            <div>
+                <b>El Amarradero del Mico</b>
+                <span>Comida Llanera</span>
+            </div>
         </div>
-    </div>
 
+        <a class="back-site" href="{% url 'home' %}" title="Volver al sitio web" aria-label="Volver al sitio web">
+            <i class="fa-solid fa-arrow-left"></i> <span>Volver al sitio web</span>
+        </a>
+    </header>
+
+    <div class="stage">
     <!-- Frase llanera protagonista (solo desktop) -->
     <div class="hero-line">
         <span class="place">Villavicencio · Meta</span>
@@ -310,5 +369,6 @@
 
         <p class="foot"><i class="fa-solid fa-shield-halved"></i> Acceso exclusivo del personal</p>
     </form>
+    </div>
 </body>
 </html>

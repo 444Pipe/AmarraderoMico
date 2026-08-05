@@ -255,6 +255,7 @@ def dashboard(request):
     )[:30]
     nuevos_count = activos.filter(estado=Pedido.ESTADO_NUEVO).count()
     return TemplateResponse(request, 'orders/dashboard.html', {
+        'seccion': 'pedidos',
         'activos': activos,
         'historial': historial,
         'nuevos_count': nuevos_count,
