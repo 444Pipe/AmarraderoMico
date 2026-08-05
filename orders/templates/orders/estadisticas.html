@@ -13,13 +13,7 @@
     .hero-stat .qty b { font-family: 'Playfair Display', serif; font-size: 2.2rem; display: block; }
     .hero-stat .qty span { font-size: .74rem; color: rgba(255,255,255,.7); text-transform: uppercase; letter-spacing: 1px; }
 
-    .split-bar { height: 26px; border-radius: 999px; overflow: hidden; display: flex; background: var(--cream); font-size: .74rem; font-weight: 700; }
-    .split-bar .seg { display: flex; align-items: center; justify-content: center; color: #fff; gap: 6px; min-width: fit-content; padding: 0 10px; white-space: nowrap; }
-    .split-bar .seg.dom { background: linear-gradient(90deg, var(--orange), var(--rust)); }
-    .split-bar .seg.rec { background: linear-gradient(90deg, var(--green-bright), var(--green)); }
-    .split-legend { display: flex; gap: 16px; margin-top: 10px; font-size: .82rem; color: var(--text-soft); }
-    .split-legend b { color: var(--brown-dark); }
-    .dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
+    /* .split-bar, .split-legend y .dot viven en panel_base (los usa también Pagos) */
     .peak-note { font-size: .86rem; color: var(--text-soft); margin-top: 14px; }
     .peak-note b { color: var(--rust); }
 {% endblock %}
@@ -71,8 +65,8 @@
             <div class="card-title"><i class="fa-solid fa-motorcycle"></i> Domicilio vs. recoger</div>
             {% if stats.n_pedidos %}
             <div class="split-bar">
-                {% if stats.pct_delivery %}<div class="seg dom" style="width: {{ stats.pct_delivery }}%;">{{ stats.pct_delivery }}%</div>{% endif %}
-                {% if stats.pct_pickup %}<div class="seg rec" style="width: {{ stats.pct_pickup }}%;">{{ stats.pct_pickup }}%</div>{% endif %}
+                {% if stats.pct_delivery %}<div class="seg seg-rust" style="width: {{ stats.pct_delivery }}%;">{{ stats.pct_delivery }}%</div>{% endif %}
+                {% if stats.pct_pickup %}<div class="seg seg-green" style="width: {{ stats.pct_pickup }}%;">{{ stats.pct_pickup }}%</div>{% endif %}
             </div>
             <div class="split-legend">
                 <span><span class="dot" style="background:var(--rust);"></span> Domicilio: <b>{{ stats.n_delivery }}</b></span>

@@ -216,6 +216,16 @@
         .bar-val { font-weight: 700; color: var(--brown-dark); white-space: nowrap; font-size: .85rem; }
         .bar-val small { color: var(--text-soft); font-weight: 500; }
 
+        /* ---------- BARRA DE REPARTO (dos porciones) ---------- */
+        .split-bar { height: 26px; border-radius: 999px; overflow: hidden; display: flex; background: var(--cream); font-size: .74rem; font-weight: 700; }
+        .split-bar .seg { display: flex; align-items: center; justify-content: center; color: #fff; gap: 6px; min-width: fit-content; padding: 0 10px; white-space: nowrap; }
+        .split-bar .seg-rust { background: linear-gradient(90deg, var(--orange), var(--rust)); }
+        .split-bar .seg-green { background: linear-gradient(90deg, var(--green-bright), var(--green)); }
+        .split-bar .seg-blue { background: linear-gradient(90deg, #4a7fb5, #2F5D8F); }
+        .split-legend { display: flex; gap: 16px; margin-top: 10px; font-size: .82rem; color: var(--text-soft); flex-wrap: wrap; }
+        .split-legend b { color: var(--brown-dark); }
+        .dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
+
         /* ---------- COLUMNAS VERTICALES (horas pico / ventas) ---------- */
         .cols { display: flex; align-items: flex-end; gap: 4px; height: 150px; padding-top: 8px; overflow-x: auto; }
         .col { flex: 1; min-width: 16px; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
@@ -326,6 +336,9 @@
             </a>
             <a href="{% url 'clientes' %}" {% if seccion == 'clientes' %}class="active" aria-current="page"{% endif %}>
                 <i class="fa-solid fa-users"></i> <span>Clientes</span>
+            </a>
+            <a href="{% url 'pagos' %}" {% if seccion == 'pagos' %}class="active" aria-current="page"{% endif %}>
+                <i class="fa-solid fa-money-bill-transfer"></i> <span>Pagos</span>
             </a>
             <a href="{% url 'estadisticas' %}" {% if seccion == 'estadisticas' %}class="active" aria-current="page"{% endif %}>
                 <i class="fa-solid fa-chart-simple"></i> <span>Estadísticas</span>

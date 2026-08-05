@@ -4,6 +4,7 @@ import re
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
@@ -318,6 +319,33 @@ def cliente_detalle(request, telefono):
     return TemplateResponse(request, 'orders/cliente_detalle.html', {
         'seccion': 'clientes',
         'ficha': ficha,
+    })
+
+
+# ---------------- Historial de pagos ----------------
+
+@login_required
+def pagos(request):
+    """Historial de pagos: cuántos pedidos se pagan en efectivo y cuántos por
+    transferencia. El resumen es siempre sobre todo el histórico; el filtro
+    ?metodo= solo recorta el listado de abajo.
+
+    Los cancelados quedan fuera del historial: nadie los pagó, y así los
+    contadores de los filtros cuadran con las filas que se ven."""
+    todos = list(Pedido.objects.all())
+    pagados = [p for p in todos if p.estado != Pedido.ESTADO_CANCELADO]
+
+    metodo = request.GET.get('metodo') or ''
+    if metodo not in (Pedido.PAGO_EFECTIVO, Pedido.PAGO_PSE):
+        metodo = ''
+    listado = [p for p in pagados if p.metodo_pago == metodo] if metodo else pagados
+
+    pagina = Paginator(listado, 40).get_page(request.GET.get('pagina'))
+    return TemplateResponse(request, 'orders/pagos.html', {
+        'seccion': 'pagos',
+        'resumen': analytics.resumen_pagos(todos),
+        'pagina': pagina,
+        'metodo': metodo,
     })
 
 

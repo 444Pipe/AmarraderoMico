@@ -35,6 +35,7 @@ urlpatterns = [
     # Clientes y estadísticas (requieren login)
     path('panel/clientes/', order_views.clientes, name='clientes'),
     path('panel/cliente/<str:telefono>/', order_views.cliente_detalle, name='cliente_detalle'),
+    path('panel/pagos/', order_views.pagos, name='pagos'),
     path('panel/estadisticas/', order_views.estadisticas, name='estadisticas'),
 
     # Login / logout del panel
