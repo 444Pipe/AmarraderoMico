@@ -20,94 +20,130 @@
             --text: #2D1810; --text-soft: #5C4538; --white: #fff;
             --shadow: 0 10px 30px rgba(45, 24, 16, .10);
             --shadow-lg: 0 18px 50px rgba(45, 24, 16, .18);
-            --tabbar-h: 0px;   /* en móvil pasa a la altura de la barra inferior */
+            /* Barra lateral fija en escritorio; en móvil se vuelve cajón y estas
+               dos medidas pasan a 0 / altura de la barra superior. */
+            --side-w: 250px;
+            --main-shift: 250px;
+            --topbar-h: 0px;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Inter', -apple-system, sans-serif;
             background: var(--bg); color: var(--text);
             -webkit-font-smoothing: antialiased; min-height: 100vh;
-            padding-bottom: var(--tabbar-h);
+            padding-left: var(--main-shift); padding-top: var(--topbar-h);
         }
         a { color: inherit; }
         .serif { font-family: 'Playfair Display', serif; }
-        .sr-only {
-            position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden;
-            clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
-        }
 
         /* ============================================================
-           BARRA SUPERIOR · marca + navegación + sesión
+           BARRA LATERAL · marca + secciones + sesión
            ============================================================ */
-        .topbar {
-            background: linear-gradient(135deg, var(--brown-dark), var(--brown) 60%, var(--brown-mid));
-            color: var(--white); padding: 14px 22px;
-            position: sticky; top: 0; z-index: 50;
-            box-shadow: 0 6px 24px rgba(45, 24, 16, .35);
-        }
-        .topbar-row {
-            max-width: 1240px; margin: 0 auto;
-            display: flex; align-items: center; justify-content: space-between; gap: 16px;
+        .sidebar {
+            position: fixed; top: 0; left: 0; bottom: 0; z-index: 80;
+            width: var(--side-w); display: flex; flex-direction: column;
+            background: linear-gradient(170deg, var(--brown-dark), var(--brown) 55%, #3B2217);
+            color: var(--white); overflow-y: auto;
+            box-shadow: 4px 0 26px rgba(45, 24, 16, .26);
         }
 
-        /* ---- Marca (lleva a Pedidos) ---- */
-        .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; min-width: 0; }
-        .brand-logo { height: 46px; width: auto; flex-shrink: 0; filter: drop-shadow(0 3px 10px rgba(0, 0, 0, .5)); }
-        .brand-txt { min-width: 0; }
-        .brand-txt b {
-            display: block; font-family: 'Playfair Display', serif; font-size: 1.1rem;
-            font-weight: 700; line-height: 1.15;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        .side-brand {
+            display: flex; align-items: center; gap: 12px; text-decoration: none;
+            padding: 20px 18px; border-bottom: 1px solid rgba(230,184,92,.18); flex-shrink: 0;
         }
-        .brand-txt small {
-            display: block; font-size: .68rem; color: var(--gold-bright);
-            letter-spacing: 1.2px; text-transform: uppercase; margin-top: 1px;
+        .side-brand img { height: 46px; width: auto; flex-shrink: 0; filter: drop-shadow(0 3px 10px rgba(0,0,0,.5)); }
+        .side-brand b { display: block; font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; line-height: 1.15; }
+        .side-brand small {
+            display: block; margin-top: 3px; font-size: .58rem; font-weight: 600;
+            letter-spacing: 1.4px; text-transform: uppercase; color: var(--gold-bright);
         }
 
-        /* ---- Navegación entre secciones ---- */
-        .panel-nav { display: flex; gap: 6px; background: rgba(0,0,0,.20); padding: 5px; border-radius: 999px; }
+        .panel-nav { display: flex; flex-direction: column; gap: 4px; padding: 14px 12px; }
+        .panel-nav .nav-tit {
+            font-size: .62rem; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase;
+            color: rgba(255,255,255,.40); padding: 4px 14px 8px;
+        }
         .panel-nav a {
-            position: relative; display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
-            color: rgba(255,255,255,.80); font-size: .86rem; font-weight: 600;
-            padding: 9px 18px; border-radius: 999px; transition: background .2s, color .2s; white-space: nowrap;
+            display: flex; align-items: center; gap: 12px; text-decoration: none;
+            padding: 12px 14px; border-radius: 12px;
+            color: rgba(255,255,255,.80); font-size: .92rem; font-weight: 600;
+            transition: background .2s, color .2s;
         }
-        .panel-nav a:hover { background: rgba(255,255,255,.12); color: #fff; }
+        .panel-nav a i { width: 20px; text-align: center; font-size: 1rem; }
+        .panel-nav a:hover { background: rgba(255,255,255,.10); color: #fff; }
         .panel-nav a.active {
             background: linear-gradient(135deg, var(--rust), var(--orange)); color: #fff;
-            box-shadow: 0 5px 14px rgba(184,84,31,.45);
+            box-shadow: 0 6px 18px rgba(184,84,31,.42);
         }
         /* Insignia con los pedidos nuevos sin atender */
         .nav-badge {
-            min-width: 19px; height: 19px; padding: 0 5px; border-radius: 999px;
+            margin-left: auto; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px;
             background: var(--gold-bright); color: var(--brown-dark);
-            font-size: .68rem; font-weight: 800; line-height: 19px; text-align: center;
+            font-size: .7rem; font-weight: 800; line-height: 22px; text-align: center;
         }
         .panel-nav a.active .nav-badge { background: #fff; color: var(--rust); }
 
-        /* ---- Sesión ---- */
-        .topbar-user { display: flex; align-items: center; gap: 8px; }
-        .topbar-user form { margin: 0; }
-        .topbar-user .who {
-            display: inline-flex; align-items: center; gap: 7px; font-size: .84rem;
-            font-weight: 600; opacity: .92; max-width: 160px;
+        .side-foot {
+            margin-top: auto; padding: 14px 12px 18px; flex-shrink: 0;
+            border-top: 1px solid rgba(230,184,92,.18);
+            display: flex; flex-direction: column; gap: 8px;
         }
-        .topbar-user .who i { color: var(--gold-bright); }
-        .topbar-user .who span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .btn-top {
-            display: inline-flex; align-items: center; gap: 7px; cursor: pointer;
-            color: var(--white); text-decoration: none; background: transparent;
-            border: 1.5px solid rgba(255,255,255,.28); border-radius: 999px;
-            padding: 8px 14px; font-family: 'Inter', sans-serif; font-size: .8rem; font-weight: 600;
+        .side-foot form { margin: 0; }
+        .side-foot .who {
+            display: flex; align-items: center; gap: 11px; padding: 6px 14px 10px;
+            font-size: .86rem; font-weight: 600; color: rgba(255,255,255,.92);
+        }
+        .side-foot .who i { color: var(--gold-bright); font-size: 1rem; }
+        .side-foot .who span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .btn-side {
+            display: flex; align-items: center; gap: 11px; width: 100%; cursor: pointer;
+            padding: 11px 14px; border-radius: 11px; text-decoration: none;
+            border: 1.5px solid rgba(255,255,255,.20); background: transparent; color: var(--white);
+            font-family: 'Inter', sans-serif; font-size: .86rem; font-weight: 600;
             transition: background .2s, border-color .2s;
         }
-        .btn-top:hover { background: rgba(255,255,255,.14); border-color: var(--gold-bright); }
-        .btn-top:active { transform: scale(.96); }
-        .btn-top-out:hover { background: rgba(184,50,39,.35); border-color: #e59d94; }
+        .btn-side i { width: 18px; text-align: center; }
+        .btn-side:hover { background: rgba(255,255,255,.12); border-color: var(--gold-bright); }
+        .btn-side:active { transform: scale(.97); }
+        .btn-side.out:hover { background: rgba(184,50,39,.35); border-color: #e59d94; }
+
+        /* ============================================================
+           BARRA SUPERIOR + CAJÓN (solo móvil)
+           ============================================================ */
+        .topbar {
+            display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 60;
+            height: var(--topbar-h); align-items: center; gap: 12px; padding: 0 14px;
+            background: linear-gradient(135deg, var(--brown-dark), var(--brown) 70%, var(--brown-mid));
+            color: var(--white); box-shadow: 0 4px 18px rgba(45, 24, 16, .35);
+        }
+        .menu-btn {
+            position: relative; flex-shrink: 0; width: 42px; height: 42px; border-radius: 12px;
+            display: grid; place-items: center; cursor: pointer; font-size: 1.05rem;
+            border: 1.5px solid rgba(255,255,255,.22); background: rgba(0,0,0,.16); color: var(--white);
+        }
+        .menu-btn:active { transform: scale(.94); }
+        .menu-btn .dot {
+            position: absolute; top: -5px; right: -5px; min-width: 19px; height: 19px; padding: 0 5px;
+            border-radius: 999px; background: var(--gold-bright); color: var(--brown-dark);
+            font-size: .64rem; font-weight: 800; line-height: 19px;
+            box-shadow: 0 0 0 2px var(--brown);
+        }
+        .tb-brand { display: flex; align-items: center; gap: 10px; min-width: 0; text-decoration: none; }
+        .tb-brand img { height: 34px; width: auto; flex-shrink: 0; }
+        .tb-brand b {
+            font-family: 'Playfair Display', serif; font-size: .95rem; font-weight: 700;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        .backdrop {
+            position: fixed; inset: 0; z-index: 70; background: rgba(20, 10, 6, .58);
+            opacity: 0; pointer-events: none; transition: opacity .25s;
+        }
 
         /* ============================================================
            LAYOUT
            ============================================================ */
-        main { max-width: 1240px; margin: 0 auto; padding: 24px 22px 64px; }
+        main { max-width: 1240px; margin: 0 auto; padding: 26px 26px 64px; }
         .page-head {
             display: flex; align-items: flex-end; justify-content: space-between;
             gap: 14px; flex-wrap: wrap; margin-bottom: 20px;
@@ -217,95 +253,125 @@
         /* ============================================================
            RESPONSIVE
            ============================================================ */
-        @media (max-width: 980px) {
-            .topbar-user .who { display: none; }
-            .btn-top span { display: none; }
-            .btn-top { padding: 9px 12px; }
+        @media (max-width: 1120px) {
+            :root { --side-w: 216px; --main-shift: 216px; }
+            .panel-nav a { font-size: .88rem; padding: 11px 12px; }
+            main { padding: 24px 20px 60px; }
         }
         @media (max-width: 900px) {
             .grid-2 { grid-template-columns: 1fr; }
         }
 
-        /* En móvil la navegación baja a una barra de pestañas fija, siempre visible
-           y con las etiquetas a la vista (más fácil de entender que solo iconos). */
-        @media (max-width: 760px) {
-            :root { --tabbar-h: 76px; }
-            .topbar { padding: 11px 14px; }
-            .brand-logo { height: 40px; }
-            .brand-txt b { font-size: .95rem; }
-            .brand-txt small { font-size: .6rem; letter-spacing: 1px; }
-
-            .panel-nav {
-                position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
-                background: var(--white); border-top: 1px solid var(--cream); border-radius: 0;
-                padding: 7px 8px calc(7px + env(safe-area-inset-bottom, 0px));
-                box-shadow: 0 -8px 26px rgba(45, 24, 16, .16); gap: 4px;
+        /* Móvil: la barra lateral se convierte en cajón desplegable */
+        @media (max-width: 860px) {
+            :root { --main-shift: 0px; --topbar-h: 62px; }
+            .topbar { display: flex; }
+            .sidebar {
+                width: min(84vw, 300px); transform: translateX(-102%);
+                /* visibility evita que el cajón cerrado capture el tabulador */
+                visibility: hidden;
+                transition: transform .3s cubic-bezier(.3, .8, .3, 1), visibility 0s .3s;
             }
-            .panel-nav a {
-                flex: 1; flex-direction: column; gap: 4px; justify-content: center;
-                color: var(--text-soft); font-size: .68rem; font-weight: 700;
-                padding: 8px 4px; border-radius: 13px;
+            body.nav-open .sidebar {
+                transform: none; visibility: visible;
+                transition: transform .3s cubic-bezier(.3, .8, .3, 1), visibility 0s;
             }
-            .panel-nav a i { font-size: 1.1rem; }
-            .panel-nav a:hover { background: var(--bg); color: var(--brown); }
-            .panel-nav a.active { box-shadow: none; }
-            .nav-badge { position: absolute; top: 3px; right: 50%; margin-right: -22px; }
+            body.nav-open .backdrop { opacity: 1; pointer-events: auto; }
+            body.nav-open { overflow: hidden; }
+            .panel-nav { padding: 16px 12px; }
+            .panel-nav a { font-size: .95rem; padding: 13px 14px; }
 
-            main { padding: 18px 14px 40px; }
+            main { padding: 18px 14px 44px; }
             .page-head h2 { font-size: 1.35rem; }
             .bar-row { grid-template-columns: minmax(70px, 1.3fr) 2.4fr auto; gap: 8px; font-size: .82rem; }
             .search input { min-width: 0; width: 100%; }
             .page-head .search { width: 100%; }
             .empty { padding: 46px 20px; }
         }
-        @media (max-width: 420px) {
-            .brand-txt small { display: none; }
+        @media (prefers-reduced-motion: reduce) {
+            .sidebar { transition: none; }
         }
         {% block extra_style %}{% endblock %}
     </style>
 </head>
 <body>
+    <!-- Barra superior (solo móvil): abre y cierra el cajón -->
     <header class="topbar">
-        <div class="topbar-row">
-            <a class="brand" href="{% url 'dashboard' %}">
-                <img class="brand-logo" src="/statics/logodelmico.png" alt="El Amarradero del Mico">
-                <span class="brand-txt">
-                    <b>El Amarradero del Mico</b>
-                    <small>Panel de administración</small>
-                </span>
-            </a>
-
-            <nav class="panel-nav" aria-label="Secciones del panel">
-                <a href="{% url 'dashboard' %}" {% if seccion == 'pedidos' %}class="active" aria-current="page"{% endif %}>
-                    <i class="fa-solid fa-motorcycle"></i> <span>Pedidos</span>
-                    {% if nav_nuevos %}<b class="nav-badge">{{ nav_nuevos }}</b>{% endif %}
-                </a>
-                <a href="{% url 'clientes' %}" {% if seccion == 'clientes' %}class="active" aria-current="page"{% endif %}>
-                    <i class="fa-solid fa-users"></i> <span>Clientes</span>
-                </a>
-                <a href="{% url 'estadisticas' %}" {% if seccion == 'estadisticas' %}class="active" aria-current="page"{% endif %}>
-                    <i class="fa-solid fa-chart-simple"></i> <span>Estadísticas</span>
-                </a>
-            </nav>
-
-            <div class="topbar-user">
-                <span class="who"><i class="fa-solid fa-circle-user"></i> <span>{{ request.user.username }}</span></span>
-                <a class="btn-top" href="{% url 'home' %}" title="Ver el sitio web">
-                    <i class="fa-solid fa-house"></i> <span>Ver sitio</span>
-                </a>
-                <form method="post" action="{% url 'logout' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn-top btn-top-out" title="Cerrar sesión">
-                        <i class="fa-solid fa-right-from-bracket"></i> <span>Salir</span>
-                    </button>
-                </form>
-            </div>
-        </div>
+        <button type="button" class="menu-btn" id="menuBtn" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir el menú">
+            <i class="fa-solid fa-bars" id="menuIcon"></i>
+            {% if nav_nuevos %}<span class="dot">{{ nav_nuevos }}</span>{% endif %}
+        </button>
+        <a class="tb-brand" href="{% url 'dashboard' %}">
+            <img src="/statics/logodelmico.png" alt="">
+            <b>El Amarradero del Mico</b>
+        </a>
     </header>
+
+    <div class="backdrop" id="navBackdrop"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <a class="side-brand" href="{% url 'dashboard' %}">
+            <img src="/statics/logodelmico.png" alt="El Amarradero del Mico">
+            <span>
+                <b>El Amarradero del Mico</b>
+                <small>Panel de administración</small>
+            </span>
+        </a>
+
+        <nav class="panel-nav" aria-label="Secciones del panel">
+            <span class="nav-tit">Gestión</span>
+            <a href="{% url 'dashboard' %}" {% if seccion == 'pedidos' %}class="active" aria-current="page"{% endif %}>
+                <i class="fa-solid fa-motorcycle"></i> <span>Pedidos</span>
+                {% if nav_nuevos %}<b class="nav-badge">{{ nav_nuevos }}</b>{% endif %}
+            </a>
+            <a href="{% url 'clientes' %}" {% if seccion == 'clientes' %}class="active" aria-current="page"{% endif %}>
+                <i class="fa-solid fa-users"></i> <span>Clientes</span>
+            </a>
+            <a href="{% url 'estadisticas' %}" {% if seccion == 'estadisticas' %}class="active" aria-current="page"{% endif %}>
+                <i class="fa-solid fa-chart-simple"></i> <span>Estadísticas</span>
+            </a>
+        </nav>
+
+        <div class="side-foot">
+            <span class="who"><i class="fa-solid fa-circle-user"></i> <span>{{ request.user.username }}</span></span>
+            <a class="btn-side" href="{% url 'home' %}">
+                <i class="fa-solid fa-house"></i> Ver el sitio web
+            </a>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-side out">
+                    <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+                </button>
+            </form>
+        </div>
+    </aside>
 
     <main>
         {% block content %}{% endblock %}
     </main>
+
+    <script>
+        // Cajón del menú en móvil: botón, fondo oscuro y tecla Escape.
+        (function () {
+            var body = document.body;
+            var btn = document.getElementById('menuBtn');
+            var backdrop = document.getElementById('navBackdrop');
+            var icon = document.getElementById('menuIcon');
+            if (!btn) return;
+
+            function set(abierto) {
+                body.classList.toggle('nav-open', abierto);
+                btn.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+                btn.setAttribute('aria-label', abierto ? 'Cerrar el menú' : 'Abrir el menú');
+                icon.className = abierto ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+            }
+            btn.addEventListener('click', function () { set(!body.classList.contains('nav-open')); });
+            backdrop.addEventListener('click', function () { set(false); });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') set(false);
+            });
+        })();
+    </script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -104,8 +104,10 @@
     .hist-mini .plata { font-weight: 700; color: var(--brown-dark); white-space: nowrap; }
 
     /* ---------- Aviso de pedido nuevo ---------- */
+    /* Se centra sobre el contenido, descontando la barra lateral. */
     .toast {
-        position: fixed; bottom: calc(24px + var(--tabbar-h)); left: 50%; transform: translateX(-50%) translateY(180%);
+        position: fixed; bottom: 24px; left: calc(50% + var(--main-shift) / 2);
+        transform: translateX(-50%) translateY(180%);
         background: linear-gradient(135deg, var(--rust), var(--orange)); color: #fff;
         padding: 15px 24px; border-radius: 14px; box-shadow: 0 14px 40px rgba(184,84,31,.5);
         font-weight: 600; display: flex; align-items: center; gap: 12px; z-index: 200;
