@@ -1,0 +1,175 @@
+{% extends 'orders/panel_base.html' %}
+{% load humanize %}
+{% block title %}Pagos · El Amarradero del Mico{% endblock %}
+
+{% block extra_style %}
+    .chip.efectivo { background: #E5EEE6; color: var(--green); }
+    .chip.transferencia { background: #E7EDF6; color: #2F5D8F; }
+
+    /* ---------- Filtros del historial ---------- */
+    .filtros {
+        display: inline-flex; gap: 6px; margin-bottom: 18px;
+        background: var(--white); padding: 6px; border-radius: 999px; box-shadow: var(--shadow);
+    }
+    .filtros a {
+        display: inline-flex; align-items: center; gap: 7px; text-decoration: none; white-space: nowrap;
+        padding: 9px 18px; border-radius: 999px; font-size: .85rem; font-weight: 600;
+        color: var(--text-soft); transition: background .2s, color .2s;
+    }
+    .filtros a:hover { background: var(--bg); color: var(--brown); }
+    .filtros a.active { background: linear-gradient(135deg, var(--rust), var(--orange)); color: var(--white); box-shadow: 0 6px 16px rgba(184,84,31,.35); }
+    .filtros .pill { background: var(--cream); color: var(--brown); border-radius: 999px; padding: 1px 8px; font-size: .72rem; }
+    .filtros a.active .pill { background: rgba(255,255,255,.25); color: var(--white); }
+
+    /* ---------- Filas del historial ---------- */
+    .pagos-lista { display: flex; flex-direction: column; gap: 10px; }
+    .pago-row {
+        display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+        background: var(--white); border-radius: 14px; box-shadow: var(--shadow); padding: 13px 16px;
+    }
+    .pago-ic { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; font-size: 1.05rem; flex-shrink: 0; }
+    .pago-ic.efectivo { background: #E5EEE6; color: var(--green); }
+    .pago-ic.transferencia { background: #E7EDF6; color: #2F5D8F; }
+    .pago-quien { flex: 1 1 190px; min-width: 0; }
+    .pago-quien b { display: block; font-weight: 600; color: var(--brown-dark); font-size: .95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pago-quien small { color: var(--text-soft); font-size: .78rem; }
+    .pago-etiquetas { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .pago-monto { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.08rem; color: var(--brown-dark); white-space: nowrap; margin-left: auto; }
+
+    .nota { color: var(--text-soft); font-size: .86rem; margin-top: 14px; display: flex; align-items: center; gap: 8px; }
+    .nota i { color: var(--gold); }
+
+    /* ---------- Paginación ---------- */
+    .pager { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 22px; font-size: .86rem; color: var(--text-soft); }
+    .pager a {
+        display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+        background: var(--white); border-radius: 999px; box-shadow: var(--shadow);
+        padding: 9px 17px; color: var(--rust); font-weight: 600;
+    }
+    .pager a:hover { background: #FDF3E9; }
+
+    @media (max-width: 860px) {
+        .filtros { width: 100%; }
+        .filtros a { flex: 1; justify-content: center; padding: 10px 6px; font-size: .8rem; }
+        .pago-monto { margin-left: 0; }
+    }
+{% endblock %}
+
+{% block content %}
+    <div class="page-head">
+        <div>
+            <h2>Historial de pagos</h2>
+            <p class="sub">Cuántos pedidos se pagan en efectivo y cuántos por transferencia</p>
+        </div>
+    </div>
+
+    <div class="kpis">
+        <div class="kpi accent-green">
+            <div class="ic"><i class="fa-solid fa-money-bills"></i></div>
+            <div>
+                <div class="num">{{ resumen.n_efectivo }}</div>
+                <div class="lbl">En efectivo · ${{ resumen.monto_efectivo|intcomma }}</div>
+            </div>
+        </div>
+        <div class="kpi" style="border-left-color:#2F5D8F;">
+            <div class="ic" style="background:#E7EDF6; color:#2F5D8F;"><i class="fa-solid fa-building-columns"></i></div>
+            <div>
+                <div class="num">{{ resumen.n_transferencia }}</div>
+                <div class="lbl">Por transferencia · ${{ resumen.monto_transferencia|intcomma }}</div>
+            </div>
+        </div>
+        <div class="kpi accent-gold">
+            <div class="ic"><i class="fa-solid fa-sack-dollar"></i></div>
+            <div>
+                <div class="num">${{ resumen.monto_total|intcomma }}</div>
+                <div class="lbl">Recaudado en {{ resumen.n_total }} pedido{{ resumen.n_total|pluralize }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><i class="fa-solid fa-scale-balanced"></i> Cómo pagan los clientes</div>
+        {% if resumen.n_total %}
+            <div class="split-bar">
+                {% if resumen.pct_efectivo %}<div class="seg seg-green" style="width: {{ resumen.pct_efectivo }}%;">{{ resumen.pct_efectivo }}%</div>{% endif %}
+                {% if resumen.pct_transferencia %}<div class="seg seg-blue" style="width: {{ resumen.pct_transferencia }}%;">{{ resumen.pct_transferencia }}%</div>{% endif %}
+            </div>
+            <div class="split-legend">
+                <span><span class="dot" style="background:var(--green);"></span> Efectivo: <b>{{ resumen.n_efectivo }}</b> pedido{{ resumen.n_efectivo|pluralize }}</span>
+                <span><span class="dot" style="background:#2F5D8F;"></span> Transferencia: <b>{{ resumen.n_transferencia }}</b> pedido{{ resumen.n_transferencia|pluralize }}</span>
+            </div>
+            {% if not resumen.n_transferencia %}
+                <p class="nota"><i class="fa-solid fa-circle-info"></i> Todavía no hay pagos por transferencia registrados: todos los pedidos se han pagado en efectivo.</p>
+            {% endif %}
+            {% if resumen.n_cancelados %}
+                <p class="nota"><i class="fa-solid fa-ban"></i> Los pedidos cancelados ({{ resumen.n_cancelados }}) no entran en estos totales.</p>
+            {% endif %}
+        {% else %}
+            <p style="color:var(--text-soft); font-size:.9rem;">Aún no hay pedidos pagados.</p>
+        {% endif %}
+    </div>
+
+    <h2 class="section-title"><i class="fa-solid fa-clock-rotate-left"></i> Historial</h2>
+
+    <div class="filtros">
+        <a href="{% url 'pagos' %}" {% if not metodo %}class="active"{% endif %}>
+            Todos <span class="pill">{{ resumen.n_total }}</span>
+        </a>
+        <a href="{% url 'pagos' %}?metodo=efectivo" {% if metodo == 'efectivo' %}class="active"{% endif %}>
+            <i class="fa-solid fa-money-bills"></i> Efectivo <span class="pill">{{ resumen.n_efectivo }}</span>
+        </a>
+        <a href="{% url 'pagos' %}?metodo=pse" {% if metodo == 'pse' %}class="active"{% endif %}>
+            <i class="fa-solid fa-building-columns"></i> Transferencia <span class="pill">{{ resumen.n_transferencia }}</span>
+        </a>
+    </div>
+
+    {% if pagina.object_list %}
+        <div class="pagos-lista">
+            {% for p in pagina %}
+            <div class="pago-row">
+                {% if p.metodo_pago == 'efectivo' %}
+                    <div class="pago-ic efectivo"><i class="fa-solid fa-money-bills"></i></div>
+                {% else %}
+                    <div class="pago-ic transferencia"><i class="fa-solid fa-building-columns"></i></div>
+                {% endif %}
+
+                <div class="pago-quien">
+                    <b>#{{ p.pk }} · {{ p.nombre }}</b>
+                    <small>{{ p.creado|date:"d/m/Y · H:i" }} · {{ p.get_tipo_display }}</small>
+                </div>
+
+                <div class="pago-etiquetas">
+                    {% if p.metodo_pago == 'efectivo' %}
+                        <span class="chip efectivo"><i class="fa-solid fa-money-bills"></i> Efectivo</span>
+                        {% if p.paga_con %}<span class="chip">Paga con {{ p.paga_con }}</span>{% endif %}
+                    {% else %}
+                        <span class="chip transferencia"><i class="fa-solid fa-building-columns"></i> Transferencia</span>
+                        <span class="estado {% if p.estado_pago == 'aprobado' %}aceptado{% elif p.estado_pago == 'rechazado' %}cancelado{% else %}nuevo{% endif %}">{{ p.get_estado_pago_display }}</span>
+                    {% endif %}
+                    <span class="estado {{ p.estado }}">{{ p.get_estado_display }}</span>
+                </div>
+
+                <div class="pago-monto">${{ p.subtotal|intcomma }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if pagina.paginator.num_pages > 1 %}
+        <div class="pager">
+            {% if pagina.has_previous %}
+                <a href="?{% if metodo %}metodo={{ metodo }}&amp;{% endif %}pagina={{ pagina.previous_page_number }}"><i class="fa-solid fa-arrow-left"></i> Más recientes</a>
+            {% endif %}
+            <span>Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span>
+            {% if pagina.has_next %}
+                <a href="?{% if metodo %}metodo={{ metodo }}&amp;{% endif %}pagina={{ pagina.next_page_number }}">Más antiguos <i class="fa-solid fa-arrow-right"></i></a>
+            {% endif %}
+        </div>
+        {% endif %}
+    {% else %}
+        <div class="empty">
+            <div class="big"><i class="fa-solid fa-receipt"></i></div>
+            <h3>{% if metodo %}Sin pagos con este método{% else %}Aún no hay pagos{% endif %}</h3>
+            <p>{% if metodo %}Ningún pedido se ha pagado así todavía.{% else %}Cuando entren pedidos, aquí verás cómo pagó cada uno.{% endif %}</p>
+        </div>
+    {% endif %}
+{% endblock %}

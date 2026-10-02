@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2D1810">
     <title>{% block title %}Panel · El Amarradero del Mico{% endblock %}</title>
+    <link rel="icon" href="/statics/logodelmico.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -18,87 +20,194 @@
             --text: #2D1810; --text-soft: #5C4538; --white: #fff;
             --shadow: 0 10px 30px rgba(45, 24, 16, .10);
             --shadow-lg: 0 18px 50px rgba(45, 24, 16, .18);
+            /* Barra lateral fija en escritorio; en móvil se vuelve cajón y estas
+               dos medidas pasan a 0 / altura de la barra superior. */
+            --side-w: 250px;
+            --main-shift: 250px;
+            --topbar-h: 0px;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Inter', -apple-system, sans-serif;
             background: var(--bg); color: var(--text);
             -webkit-font-smoothing: antialiased; min-height: 100vh;
+            padding-left: var(--main-shift); padding-top: var(--topbar-h);
         }
         a { color: inherit; }
         .serif { font-family: 'Playfair Display', serif; }
 
-        /* ---------- HEADER + NAV ---------- */
-        header {
-            background: linear-gradient(135deg, var(--brown-dark), var(--brown) 60%, var(--brown-mid));
-            color: var(--white); padding: 16px 22px;
-            position: sticky; top: 0; z-index: 50;
-            box-shadow: 0 6px 24px rgba(45, 24, 16, .35);
+        /* ============================================================
+           BARRA LATERAL · marca + secciones + sesión
+           ============================================================ */
+        .sidebar {
+            position: fixed; top: 0; left: 0; bottom: 0; z-index: 80;
+            width: var(--side-w); display: flex; flex-direction: column;
+            background: linear-gradient(170deg, var(--brown-dark), var(--brown) 55%, #3B2217);
+            color: var(--white); overflow-y: auto;
+            box-shadow: 4px 0 26px rgba(45, 24, 16, .26);
         }
-        .header-row { max-width: 1240px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
-        .brand { display: flex; align-items: center; gap: 12px; }
-        .brand-logo {
-            height: 50px; width: auto; flex-shrink: 0;
-            filter: drop-shadow(0 3px 10px rgba(0, 0, 0, .5));
-        }
-        .brand h1 { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; line-height: 1.1; }
-        .brand p { font-size: .72rem; color: var(--gold-bright); letter-spacing: .5px; text-transform: uppercase; }
 
-        .panel-nav { display: flex; gap: 6px; background: rgba(0,0,0,.18); padding: 5px; border-radius: 999px; }
+        .side-brand {
+            display: flex; align-items: center; gap: 12px; text-decoration: none;
+            padding: 20px 18px; border-bottom: 1px solid rgba(230,184,92,.18); flex-shrink: 0;
+        }
+        .side-brand img { height: 46px; width: auto; flex-shrink: 0; filter: drop-shadow(0 3px 10px rgba(0,0,0,.5)); }
+        .side-brand b { display: block; font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; line-height: 1.15; }
+        .side-brand small {
+            display: block; margin-top: 3px; font-size: .58rem; font-weight: 600;
+            letter-spacing: 1.4px; text-transform: uppercase; color: var(--gold-bright);
+        }
+
+        .panel-nav { display: flex; flex-direction: column; gap: 4px; padding: 14px 12px; }
+        .panel-nav .nav-tit {
+            font-size: .62rem; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase;
+            color: rgba(255,255,255,.40); padding: 4px 14px 8px;
+        }
         .panel-nav a {
-            display: inline-flex; align-items: center; gap: 7px; text-decoration: none;
-            color: rgba(255,255,255,.82); font-size: .84rem; font-weight: 600;
-            padding: 8px 16px; border-radius: 999px; transition: all .2s; white-space: nowrap;
+            display: flex; align-items: center; gap: 12px; text-decoration: none;
+            padding: 12px 14px; border-radius: 12px;
+            color: rgba(255,255,255,.80); font-size: .92rem; font-weight: 600;
+            transition: background .2s, color .2s;
         }
-        .panel-nav a:hover { background: rgba(255,255,255,.12); color: #fff; }
-        .panel-nav a.active { background: linear-gradient(135deg, var(--rust), var(--orange)); color: #fff; box-shadow: 0 5px 14px rgba(184,84,31,.4); }
-
-        .header-user { display: flex; align-items: center; gap: 10px; font-size: .85rem; flex-wrap: wrap; }
-        .header-user .who { display: flex; align-items: center; gap: 7px; opacity: .92; }
-        .header-user .who i { color: var(--gold-bright); }
-        .logout-form { margin: 0; }
-        .btn-home, .btn-logout {
-            color: var(--white); text-decoration: none; border: 1.5px solid rgba(255,255,255,.28);
-            padding: 7px 13px; border-radius: 999px; font-size: .8rem; font-weight: 600;
-            transition: all .2s; display: inline-flex; align-items: center; gap: 6px;
-            cursor: pointer; background: transparent; font-family: 'Inter', sans-serif;
+        .panel-nav a i { width: 20px; text-align: center; font-size: 1rem; }
+        .panel-nav a:hover { background: rgba(255,255,255,.10); color: #fff; }
+        .panel-nav a.active {
+            background: linear-gradient(135deg, var(--rust), var(--orange)); color: #fff;
+            box-shadow: 0 6px 18px rgba(184,84,31,.42);
         }
-        .btn-home:hover, .btn-logout:hover { background: rgba(255,255,255,.14); border-color: var(--gold-bright); }
-        .btn-logout:active, .btn-home:active { transform: scale(.96); }
+        /* Insignia con los pedidos nuevos sin atender */
+        .nav-badge {
+            margin-left: auto; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px;
+            background: var(--gold-bright); color: var(--brown-dark);
+            font-size: .7rem; font-weight: 800; line-height: 22px; text-align: center;
+        }
+        .panel-nav a.active .nav-badge { background: #fff; color: var(--rust); }
 
-        /* ---------- LAYOUT ---------- */
-        main { max-width: 1240px; margin: 0 auto; padding: 24px 22px 64px; }
-        .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
-        .page-head h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--brown-dark); }
-        .page-head .sub { color: var(--text-soft); font-size: .9rem; margin-top: 3px; }
-        .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--rust); font-weight: 600; text-decoration: none; font-size: .9rem; margin-bottom: 14px; }
+        .side-foot {
+            margin-top: auto; padding: 14px 12px 18px; flex-shrink: 0;
+            border-top: 1px solid rgba(230,184,92,.18);
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .side-foot form { margin: 0; }
+        .side-foot .who {
+            display: flex; align-items: center; gap: 11px; padding: 6px 14px 10px;
+            font-size: .86rem; font-weight: 600; color: rgba(255,255,255,.92);
+        }
+        .side-foot .who i { color: var(--gold-bright); font-size: 1rem; }
+        .side-foot .who span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .btn-side {
+            display: flex; align-items: center; gap: 11px; width: 100%; cursor: pointer;
+            padding: 11px 14px; border-radius: 11px; text-decoration: none;
+            border: 1.5px solid rgba(255,255,255,.20); background: transparent; color: var(--white);
+            font-family: 'Inter', sans-serif; font-size: .86rem; font-weight: 600;
+            transition: background .2s, border-color .2s;
+        }
+        .btn-side i { width: 18px; text-align: center; }
+        .btn-side:hover { background: rgba(255,255,255,.12); border-color: var(--gold-bright); }
+        .btn-side:active { transform: scale(.97); }
+        .btn-side.out:hover { background: rgba(184,50,39,.35); border-color: #e59d94; }
+
+        /* ============================================================
+           BARRA SUPERIOR + CAJÓN (solo móvil)
+           ============================================================ */
+        .topbar {
+            display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 60;
+            height: var(--topbar-h); align-items: center; gap: 12px; padding: 0 14px;
+            background: linear-gradient(135deg, var(--brown-dark), var(--brown) 70%, var(--brown-mid));
+            color: var(--white); box-shadow: 0 4px 18px rgba(45, 24, 16, .35);
+        }
+        .menu-btn {
+            position: relative; flex-shrink: 0; width: 42px; height: 42px; border-radius: 12px;
+            display: grid; place-items: center; cursor: pointer; font-size: 1.05rem;
+            border: 1.5px solid rgba(255,255,255,.22); background: rgba(0,0,0,.16); color: var(--white);
+        }
+        .menu-btn:active { transform: scale(.94); }
+        .menu-btn .dot {
+            position: absolute; top: -5px; right: -5px; min-width: 19px; height: 19px; padding: 0 5px;
+            border-radius: 999px; background: var(--gold-bright); color: var(--brown-dark);
+            font-size: .64rem; font-weight: 800; line-height: 19px;
+            box-shadow: 0 0 0 2px var(--brown);
+        }
+        .tb-brand { display: flex; align-items: center; gap: 10px; min-width: 0; text-decoration: none; }
+        .tb-brand img { height: 34px; width: auto; flex-shrink: 0; }
+        .tb-brand b {
+            font-family: 'Playfair Display', serif; font-size: .95rem; font-weight: 700;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        .backdrop {
+            position: fixed; inset: 0; z-index: 70; background: rgba(20, 10, 6, .58);
+            opacity: 0; pointer-events: none; transition: opacity .25s;
+        }
+
+        /* ============================================================
+           LAYOUT
+           ============================================================ */
+        main { max-width: 1240px; margin: 0 auto; padding: 26px 26px 64px; }
+        .page-head {
+            display: flex; align-items: flex-end; justify-content: space-between;
+            gap: 14px; flex-wrap: wrap; margin-bottom: 20px;
+        }
+        .page-head h2 { font-family: 'Playfair Display', serif; font-size: 1.55rem; color: var(--brown-dark); line-height: 1.15; }
+        .page-head .sub { color: var(--text-soft); font-size: .9rem; margin-top: 4px; }
+        .back-link {
+            display: inline-flex; align-items: center; gap: 8px; color: var(--rust);
+            font-weight: 600; text-decoration: none; font-size: .9rem; margin-bottom: 14px;
+        }
         .back-link:hover { text-decoration: underline; }
+        .section-title {
+            font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--brown);
+            margin: 32px 0 14px; display: flex; align-items: center; gap: 10px;
+        }
+        .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--sand), transparent); }
 
         /* ---------- KPI CARDS ---------- */
-        .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+        .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 24px; }
         .kpi {
             background: var(--white); border-radius: 16px; padding: 16px 18px;
             box-shadow: var(--shadow); border-left: 5px solid var(--gold);
-            display: flex; align-items: center; gap: 14px;
+            display: flex; align-items: center; gap: 14px; position: relative; overflow: hidden;
         }
         .kpi.accent-rust { border-left-color: var(--rust); }
         .kpi.accent-green { border-left-color: var(--green); }
         .kpi.accent-gold { border-left-color: var(--gold-bright); }
         .kpi.accent-brown { border-left-color: var(--brown-mid); }
-        .kpi .ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 1.2rem; flex-shrink: 0; background: var(--cream); color: var(--brown-mid); }
+        .kpi .ic { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; font-size: 1.2rem; flex-shrink: 0; background: var(--cream); color: var(--brown-mid); }
         .kpi.accent-rust .ic { background: #FCEEDD; color: var(--rust); }
         .kpi.accent-green .ic { background: #E5EEE6; color: var(--green); }
-        .kpi .num { font-family: 'Playfair Display', serif; font-size: 1.55rem; font-weight: 700; line-height: 1; }
-        .kpi .lbl { font-size: .74rem; color: var(--text-soft); text-transform: uppercase; letter-spacing: .5px; margin-top: 3px; }
+        .kpi.accent-gold .ic { background: #FBF1DA; color: #a8862f; }
+        .kpi .num { font-family: 'Playfair Display', serif; font-size: 1.7rem; font-weight: 700; line-height: 1; }
+        .kpi .lbl { font-size: .74rem; color: var(--text-soft); text-transform: uppercase; letter-spacing: .5px; margin-top: 4px; }
 
         /* ---------- CARDS ---------- */
         .card { background: var(--white); border-radius: 18px; box-shadow: var(--shadow); padding: 20px 22px; }
         .card + .card { margin-top: 18px; }
         .card-title { font-family: 'Playfair Display', serif; font-size: 1.12rem; color: var(--brown); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
         .card-title i { color: var(--rust); }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
 
-        /* ---------- BARS ---------- */
+        /* ---------- BOTONES ---------- */
+        .btn {
+            border: none; border-radius: 11px; padding: 11px 16px; font-family: 'Inter', sans-serif;
+            font-size: .88rem; font-weight: 600; cursor: pointer; text-decoration: none;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            transition: filter .18s, transform .18s, background .18s;
+        }
+        .btn:hover { filter: brightness(1.05); transform: translateY(-1px); }
+        .btn:active { transform: scale(.97); }
+        .btn-block { width: 100%; }
+        .btn-accept { background: linear-gradient(135deg, var(--green), var(--green-bright)); color: #fff; box-shadow: 0 6px 16px rgba(62,86,65,.32); }
+        .btn-dispatch { background: linear-gradient(135deg, var(--rust), var(--orange)); color: #fff; box-shadow: 0 6px 16px rgba(184,84,31,.32); }
+        .btn-cancel { background: var(--white); color: var(--red); border: 1.5px solid #e7c4bf; }
+        .btn-cancel:hover { background: #fceae7; filter: none; }
+        .btn-wa {
+            display: inline-flex; align-items: center; justify-content: center; gap: 7px; text-decoration: none;
+            background: linear-gradient(135deg, #1ebe5a, var(--wa)); color: #fff; font-weight: 600;
+            padding: 8px 14px; border-radius: 10px; font-size: .82rem; border: none; cursor: pointer;
+        }
+        .btn-wa:hover { filter: brightness(1.05); }
+
+        /* ---------- BARRAS HORIZONTALES ---------- */
         .bar-row { display: grid; grid-template-columns: minmax(90px, 1.4fr) 3fr auto; align-items: center; gap: 12px; margin: 9px 0; font-size: .88rem; }
         .bar-row .bar-name { color: var(--text); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .bar-track { background: var(--cream); border-radius: 999px; height: 14px; overflow: hidden; }
@@ -107,7 +216,17 @@
         .bar-val { font-weight: 700; color: var(--brown-dark); white-space: nowrap; font-size: .85rem; }
         .bar-val small { color: var(--text-soft); font-weight: 500; }
 
-        /* Columnas verticales (horas pico) */
+        /* ---------- BARRA DE REPARTO (dos porciones) ---------- */
+        .split-bar { height: 26px; border-radius: 999px; overflow: hidden; display: flex; background: var(--cream); font-size: .74rem; font-weight: 700; }
+        .split-bar .seg { display: flex; align-items: center; justify-content: center; color: #fff; gap: 6px; min-width: fit-content; padding: 0 10px; white-space: nowrap; }
+        .split-bar .seg-rust { background: linear-gradient(90deg, var(--orange), var(--rust)); }
+        .split-bar .seg-green { background: linear-gradient(90deg, var(--green-bright), var(--green)); }
+        .split-bar .seg-blue { background: linear-gradient(90deg, #4a7fb5, #2F5D8F); }
+        .split-legend { display: flex; gap: 16px; margin-top: 10px; font-size: .82rem; color: var(--text-soft); flex-wrap: wrap; }
+        .split-legend b { color: var(--brown-dark); }
+        .dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
+
+        /* ---------- COLUMNAS VERTICALES (horas pico / ventas) ---------- */
         .cols { display: flex; align-items: flex-end; gap: 4px; height: 150px; padding-top: 8px; overflow-x: auto; }
         .col { flex: 1; min-width: 16px; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
         .col .col-bar { width: 100%; max-width: 22px; border-radius: 6px 6px 0 0; background: linear-gradient(180deg, var(--orange), var(--rust)); min-height: 3px; position: relative; transition: height .5s ease; }
@@ -115,91 +234,157 @@
         .col .col-lbl { font-size: .62rem; color: var(--text-soft); }
         .col .col-cnt { font-size: .62rem; color: var(--brown-dark); font-weight: 700; }
 
-        /* ---------- TABLES ---------- */
-        .tbl { width: 100%; border-collapse: collapse; font-size: .88rem; }
-        .tbl th { text-align: left; color: var(--text-soft); font-size: .72rem; text-transform: uppercase; letter-spacing: .5px; padding: 8px 10px; border-bottom: 2px solid var(--cream); }
-        .tbl td { padding: 11px 10px; border-bottom: 1px solid #f2e9dc; }
-        .tbl tr:last-child td { border-bottom: none; }
-        .tbl .num { text-align: right; font-variant-numeric: tabular-nums; }
-
-        /* ---------- BADGES / CHIPS ---------- */
-        .chip { display: inline-flex; align-items: center; gap: 5px; font-size: .72rem; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--cream); color: var(--brown-mid); }
+        /* ---------- ETIQUETAS DE ESTADO ---------- */
+        .chip { display: inline-flex; align-items: center; gap: 5px; font-size: .72rem; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: var(--cream); color: var(--brown-mid); }
         .chip.delivery { background: #FCEEDD; color: var(--rust); }
         .chip.pickup { background: #E5EEE6; color: var(--green); }
-        .estado { font-size: .66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; padding: 3px 9px; border-radius: 999px; }
+        .estado { font-size: .66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; padding: 4px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
         .estado.nuevo { background: #FCEEDD; color: var(--rust); }
         .estado.aceptado { background: #E5EEE6; color: var(--green); }
         .estado.despachado { background: #efe9e1; color: #7a6a57; }
         .estado.cancelado { background: #f7e3e0; color: var(--red); }
 
-        .btn-wa {
-            display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
-            background: linear-gradient(135deg, #1ebe5a, var(--wa)); color: #fff; font-weight: 600;
-            padding: 6px 12px; border-radius: 9px; font-size: .8rem;
-        }
-        .btn-wa:hover { filter: brightness(1.05); }
-
-        /* ---------- SEARCH ---------- */
+        /* ---------- BUSCADOR ---------- */
         .search { position: relative; }
         .search i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-soft); }
         .search input {
             border: 1.5px solid var(--sand); background: var(--white); border-radius: 999px;
-            padding: 10px 16px 10px 40px; font-family: 'Inter', sans-serif; font-size: .9rem;
-            min-width: 240px; color: var(--text); outline: none;
+            padding: 11px 16px 11px 40px; font-family: 'Inter', sans-serif; font-size: .9rem;
+            min-width: 250px; color: var(--text); outline: none;
         }
         .search input:focus { border-color: var(--gold-bright); box-shadow: 0 0 0 3px rgba(230,184,92,.2); }
 
-        /* ---------- EMPTY ---------- */
-        .empty { background: var(--white); border-radius: 18px; padding: 56px 24px; text-align: center; box-shadow: var(--shadow); }
-        .empty .big { font-size: 2.6rem; color: var(--sand); margin-bottom: 12px; }
-        .empty h3 { font-family: 'Playfair Display', serif; color: var(--brown); font-size: 1.2rem; margin-bottom: 6px; }
-        .empty p { color: var(--text-soft); font-size: .9rem; }
+        /* ---------- ESTADO VACÍO ---------- */
+        .empty { background: var(--white); border-radius: 18px; padding: 64px 24px; text-align: center; box-shadow: var(--shadow); }
+        .empty .big { font-size: 2.8rem; color: var(--sand); margin-bottom: 12px; }
+        .empty h3 { font-family: 'Playfair Display', serif; color: var(--brown); font-size: 1.3rem; margin-bottom: 6px; }
+        .empty p { color: var(--text-soft); font-size: .92rem; }
 
-        /* ---------- RESPONSIVE ---------- */
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 1120px) {
+            :root { --side-w: 216px; --main-shift: 216px; }
+            .panel-nav a { font-size: .88rem; padding: 11px 12px; }
+            main { padding: 24px 20px 60px; }
+        }
         @media (max-width: 900px) {
             .grid-2 { grid-template-columns: 1fr; }
         }
-        @media (max-width: 720px) {
-            .panel-nav { order: 2; width: 100%; justify-content: space-between; }
-            .panel-nav a { flex: 1; justify-content: center; padding: 8px 6px; }
-            .panel-nav a span { display: none; }
-            .header-user .who span { display: none; }
-            .btn-home span { display: none; }
-            main { padding: 18px 14px 52px; }
+
+        /* Móvil: la barra lateral se convierte en cajón desplegable */
+        @media (max-width: 860px) {
+            :root { --main-shift: 0px; --topbar-h: 62px; }
+            .topbar { display: flex; }
+            .sidebar {
+                width: min(84vw, 300px); transform: translateX(-102%);
+                /* visibility evita que el cajón cerrado capture el tabulador */
+                visibility: hidden;
+                transition: transform .3s cubic-bezier(.3, .8, .3, 1), visibility 0s .3s;
+            }
+            body.nav-open .sidebar {
+                transform: none; visibility: visible;
+                transition: transform .3s cubic-bezier(.3, .8, .3, 1), visibility 0s;
+            }
+            body.nav-open .backdrop { opacity: 1; pointer-events: auto; }
+            body.nav-open { overflow: hidden; }
+            .panel-nav { padding: 16px 12px; }
+            .panel-nav a { font-size: .95rem; padding: 13px 14px; }
+
+            main { padding: 18px 14px 44px; }
+            .page-head h2 { font-size: 1.35rem; }
             .bar-row { grid-template-columns: minmax(70px, 1.3fr) 2.4fr auto; gap: 8px; font-size: .82rem; }
+            .search input { min-width: 0; width: 100%; }
+            .page-head .search { width: 100%; }
+            .empty { padding: 46px 20px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .sidebar { transition: none; }
         }
         {% block extra_style %}{% endblock %}
     </style>
 </head>
 <body>
-    <header>
-        <div class="header-row">
-            <div class="brand">
-                <img class="brand-logo" src="/statics/logodelmico.png" alt="El Amarradero del Mico">
-                <div>
-                    <h1>{% block brand_title %}Panel{% endblock %}</h1>
-                    <p>El Amarradero del Mico</p>
-                </div>
-            </div>
-            <nav class="panel-nav">
-                <a href="{% url 'dashboard' %}" class="{% if seccion == 'pedidos' %}active{% endif %}"><i class="fa-solid fa-bell"></i> <span>Pedidos</span></a>
-                <a href="{% url 'clientes' %}" class="{% if seccion == 'clientes' %}active{% endif %}"><i class="fa-solid fa-users"></i> <span>Clientes</span></a>
-                <a href="{% url 'estadisticas' %}" class="{% if seccion == 'estadisticas' %}active{% endif %}"><i class="fa-solid fa-chart-simple"></i> <span>Estadísticas</span></a>
-            </nav>
-            <div class="header-user">
-                <span class="who"><i class="fa-solid fa-circle-user"></i> <span>{{ request.user.username }}</span></span>
-                <a class="btn-home" href="{% url 'home' %}"><i class="fa-solid fa-house"></i> <span>Página principal</span></a>
-                <form method="post" action="{% url 'logout' %}" class="logout-form">
-                    {% csrf_token %}
-                    <button type="submit" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</button>
-                </form>
-            </div>
-        </div>
+    <!-- Barra superior (solo móvil): abre y cierra el cajón -->
+    <header class="topbar">
+        <button type="button" class="menu-btn" id="menuBtn" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir el menú">
+            <i class="fa-solid fa-bars" id="menuIcon"></i>
+            {% if nav_nuevos %}<span class="dot">{{ nav_nuevos }}</span>{% endif %}
+        </button>
+        <a class="tb-brand" href="{% url 'dashboard' %}">
+            <img src="/statics/logodelmico.png" alt="">
+            <b>El Amarradero del Mico</b>
+        </a>
     </header>
+
+    <div class="backdrop" id="navBackdrop"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <a class="side-brand" href="{% url 'dashboard' %}">
+            <img src="/statics/logodelmico.png" alt="El Amarradero del Mico">
+            <span>
+                <b>El Amarradero del Mico</b>
+                <small>Panel de administración</small>
+            </span>
+        </a>
+
+        <nav class="panel-nav" aria-label="Secciones del panel">
+            <span class="nav-tit">Gestión</span>
+            <a href="{% url 'dashboard' %}" {% if seccion == 'pedidos' %}class="active" aria-current="page"{% endif %}>
+                <i class="fa-solid fa-motorcycle"></i> <span>Pedidos</span>
+                {% if nav_nuevos %}<b class="nav-badge">{{ nav_nuevos }}</b>{% endif %}
+            </a>
+            <a href="{% url 'clientes' %}" {% if seccion == 'clientes' %}class="active" aria-current="page"{% endif %}>
+                <i class="fa-solid fa-users"></i> <span>Clientes</span>
+            </a>
+            <a href="{% url 'pagos' %}" {% if seccion == 'pagos' %}class="active" aria-current="page"{% endif %}>
+                <i class="fa-solid fa-money-bill-transfer"></i> <span>Pagos</span>
+            </a>
+            <a href="{% url 'estadisticas' %}" {% if seccion == 'estadisticas' %}class="active" aria-current="page"{% endif %}>
+                <i class="fa-solid fa-chart-simple"></i> <span>Estadísticas</span>
+            </a>
+        </nav>
+
+        <div class="side-foot">
+            <span class="who"><i class="fa-solid fa-circle-user"></i> <span>{{ request.user.username }}</span></span>
+            <a class="btn-side" href="{% url 'home' %}">
+                <i class="fa-solid fa-house"></i> Ver el sitio web
+            </a>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-side out">
+                    <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+                </button>
+            </form>
+        </div>
+    </aside>
 
     <main>
         {% block content %}{% endblock %}
     </main>
+
+    <script>
+        // Cajón del menú en móvil: botón, fondo oscuro y tecla Escape.
+        (function () {
+            var body = document.body;
+            var btn = document.getElementById('menuBtn');
+            var backdrop = document.getElementById('navBackdrop');
+            var icon = document.getElementById('menuIcon');
+            if (!btn) return;
+
+            function set(abierto) {
+                body.classList.toggle('nav-open', abierto);
+                btn.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+                btn.setAttribute('aria-label', abierto ? 'Cerrar el menú' : 'Abrir el menú');
+                icon.className = abierto ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+            }
+            btn.addEventListener('click', function () { set(!body.classList.contains('nav-open')); });
+            backdrop.addEventListener('click', function () { set(false); });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') set(false);
+            });
+        })();
+    </script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

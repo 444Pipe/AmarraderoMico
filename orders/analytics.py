@@ -124,6 +124,40 @@ def ficha_cliente(key):
     return {'resumen': resumen, 'pedidos': suyos, 'favoritos': favoritos}
 
 
+def resumen_pagos(pedidos=None):
+    """Reparto de los pedidos entre pago en efectivo y por transferencia.
+
+    Los cancelados no cuentan: nadie pagó por ellos. Se reportan aparte para que
+    el número de pedidos cuadre con lo que se ve en el historial.
+    """
+    if pedidos is None:
+        pedidos = Pedido.objects.all()
+    pedidos = list(pedidos)
+
+    validos = [p for p in pedidos if p.estado != Pedido.ESTADO_CANCELADO]
+    efectivo = [p for p in validos if p.metodo_pago == Pedido.PAGO_EFECTIVO]
+    transferencia = [p for p in validos if p.metodo_pago != Pedido.PAGO_EFECTIVO]
+
+    n_total = len(validos)
+    monto_efectivo = sum(p.subtotal or 0 for p in efectivo)
+    monto_transferencia = sum(p.subtotal or 0 for p in transferencia)
+    # El porcentaje de transferencia se deriva del otro para que la barra
+    # siempre sume 100 exacto (dos redondeos independientes darían 99 o 101).
+    pct_efectivo = round(len(efectivo) / n_total * 100) if n_total else 0
+
+    return {
+        'n_efectivo': len(efectivo),
+        'n_transferencia': len(transferencia),
+        'monto_efectivo': monto_efectivo,
+        'monto_transferencia': monto_transferencia,
+        'n_total': n_total,
+        'monto_total': monto_efectivo + monto_transferencia,
+        'pct_efectivo': pct_efectivo,
+        'pct_transferencia': (100 - pct_efectivo) if n_total else 0,
+        'n_cancelados': len(pedidos) - n_total,
+    }
+
+
 def estadisticas_generales(pedidos=None):
     """KPIs del negocio + plato más vendido + horas pico + ventas por día.
 

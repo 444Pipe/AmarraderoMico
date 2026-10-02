@@ -59,18 +59,31 @@ window.addEventListener('scroll', () => {
     if (!navTicking) { requestAnimationFrame(updateNavbar); navTicking = true; }
 }, { passive: true });
 
-// Mobile menu toggle
+// Mobile menu (drawer lateral con backdrop y bloqueo de scroll)
 const navToggle = document.getElementById('navToggle');
 const navMenu = document.getElementById('navMenu');
-navToggle.addEventListener('click', () => {
-    navMenu.classList.toggle('active');
+const navBackdrop = document.getElementById('navBackdrop');
+const navClose = document.getElementById('navClose');
+
+const setNavOpen = (open) => {
+    navMenu.classList.toggle('active', open);
+    navToggle.classList.toggle('active', open);
+    navBackdrop.classList.toggle('active', open);
+    document.body.classList.toggle('nav-open', open);
+    navToggle.setAttribute('aria-expanded', open);
+    navToggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+};
+
+navToggle.addEventListener('click', () => setNavOpen(!navMenu.classList.contains('active')));
+navClose.addEventListener('click', () => setNavOpen(false));
+navBackdrop.addEventListener('click', () => setNavOpen(false));
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && navMenu.classList.contains('active')) setNavOpen(false);
 });
 
-// Close mobile menu on link click
-document.querySelectorAll('.nav-menu a').forEach(link => {
-    link.addEventListener('click', () => {
-        navMenu.classList.remove('active');
-    });
+// Cerrar el menú al tocar un enlace o el CTA de domicilio
+document.querySelectorAll('.nav-menu a, .nav-menu [data-open-delivery]').forEach(el => {
+    el.addEventListener('click', () => setNavOpen(false));
 });
 
 // ============= SISTEMA DE DOMICILIOS =============
@@ -189,8 +202,9 @@ MENU_DATA.forEach(cat => cat.items.forEach(item => {
 const normalizeText = (s) => (s || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
 
 // Platos estrella (los más pedidos): llevan sello 🔥 y son filtrables por antojo.
+// Los familiares (Picadas del Mico, pa' compartir) van de primeros en la vitrina.
 const POPULAR = new Set([
-    'plato-mamona', 'chicharrones', 'picada-3', 'mojarra',
+    'picada-3', 'picada-4', 'plato-mamona', 'chicharrones', 'mojarra',
     'sancocho-gallina', 'punta-anca', 'carne-cerdo', 'costilla-cerdo-tulio',
 ]);
 
@@ -439,81 +453,15 @@ function renderMenu() {
     refreshAddButtons();
 }
 
-// Menú público de la landing (sección "Menú"): la carta completa en formato
-// "tablero" — vitrina de "más pedidos" arriba + acordeón en grid de 2 columnas.
-// Solo lectura (sin botón de agregar).
+// Sección "Menú" de la landing: ya no pinta la carta completa. La estrategia es
+// antojar con la vitrina de "más pedidos" e invitar a abrir la carta dentro del
+// flujo de pedido (modal de domicilios), donde además se puede agregar al carrito.
 function renderFullMenu() {
-    const host = document.getElementById('fullMenu');
-    if (!host) return;
-    const cats = orderedCategories();
-    host.innerHTML = cats.map((cat, idx) => {
-        // Abre las primeras categorías (que orderedCategories prioriza por el horario)
-        // para que siempre se vea comida sin tener que desplegar nada.
-        const open = idx < 2;
-        const desde = Math.min(...cat.items.map(i => i.price));
-        return `
-        <div class="fmenu-cat${open ? ' is-open' : ''}" data-cat="${cat.id}">
-            <button type="button" class="fmenu-cat-title" data-acc-toggle aria-expanded="${open ? 'true' : 'false'}">
-                <span class="fmenu-cat-ic"><i class="fa-solid ${cat.icon}" aria-hidden="true"></i></span>
-                <span class="fmenu-cat-meta">
-                    <span class="fmenu-cat-name">${cat.name}</span>
-                    <span class="fmenu-cat-sub">
-                        <span class="fmenu-cat-count">${cat.items.length}</span>
-                        <span class="fmenu-cat-desde">desde ${formatCOP(desde)}</span>
-                    </span>
-                </span>
-                <i class="fa-solid fa-chevron-down fmenu-chevron" aria-hidden="true"></i>
-            </button>
-            <div class="fmenu-panel">
-              <div class="fmenu-panel-inner">
-                <ul class="fmenu-list">
-                    ${cat.items.map(item => {
-                        const pop = POPULAR.has(item.id);
-                        return `
-                        <li class="fmenu-dish${pop ? ' is-popular' : ''}" data-item-id="${item.id}" data-cat="${cat.id}" data-price="${item.price}" data-popular="${pop ? '1' : '0'}" data-search="${normalizeText(item.name + ' ' + cat.name)}">
-                            <div class="fmenu-dish-row">
-                                <span class="fmenu-dish-name">${item.name}${pop ? ' <i class="fa-solid fa-fire fmenu-pop" aria-hidden="true"></i>' : ''}</span>
-                                <span class="fmenu-dish-dots" aria-hidden="true"></span>
-                                <span class="fmenu-dish-price">${formatCOP(item.price)}</span>
-                            </div>
-                        </li>`;
-                    }).join('')}
-                </ul>
-              </div>
-            </div>
-        </div>`;
-    }).join('');
-
-    // Vitrina "Los más pedidos": se pinta como hermano ANTES del grid (y antes de
-    // insertar la barra de filtros), quedando el orden: cabecera → vitrina → filtros → grid.
+    const invite = document.getElementById('menuInvite');
+    if (!invite) return;
     const oldStrip = document.getElementById('fullMenuPopular');
     if (oldStrip) oldStrip.remove();
-    host.insertAdjacentHTML('beforebegin', popularStripHTML());
-
-    // Acordeón: al tocar el título se despliega/colapsa la categoría.
-    if (!host.dataset.accBound) {
-        host.dataset.accBound = '1';
-        host.addEventListener('click', (e) => {
-            const btn = e.target.closest('[data-acc-toggle]');
-            if (!btn || !host.contains(btn)) return;
-            const cat = btn.closest('.fmenu-cat');
-            const open = cat.classList.toggle('is-open');
-            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        });
-    }
-
-    setupMenuFilter({
-        listRootId: 'fullMenu',
-        barId: 'landingFilter',
-        barClass: 'in-landing',
-        catSel: '.fmenu-cat',
-        itemSel: '.fmenu-dish',
-        accordion: true,
-        mount: (bar, noResults, listRoot) => {
-            listRoot.parentNode.insertBefore(bar, listRoot);
-            listRoot.parentNode.insertBefore(noResults, listRoot.nextSibling);
-        },
-    });
+    invite.insertAdjacentHTML('beforebegin', popularStripHTML());
 }
 
 // HTML de la vitrina "Los más pedidos del Mico": tarjetas horizontales con los
@@ -621,7 +569,7 @@ function renderCart() {
             </div>
         `).join('');
         dom.subtotal.textContent = formatCOP(subtotal);
-        dom.delivery.textContent = orderType === 'pickup' ? 'Gratis (recoger)' : 'Según ubicación';
+        dom.delivery.textContent = orderType === 'pickup' ? 'Gratis (recoger)' : 'Se cuadra con el domiciliario';
         dom.delivery.parentElement.querySelector('span').textContent = orderType === 'pickup' ? 'Recoger en sede' : 'Domicilio';
         dom.total.textContent = formatCOP(total);
     }
@@ -1046,10 +994,10 @@ function renderCheckoutSummary() {
     const total = subtotal;
     const feeLine = orderType === 'pickup'
         ? `<div class="summary-line"><span><i class="fa-solid fa-store"></i> Recoger en sede</span><strong style="color: var(--color-green);">Gratis</strong></div>`
-        : `<div class="summary-line"><span><i class="fa-solid fa-motorcycle"></i> Costo de domicilio</span><strong class="fee-coord">Según ubicación</strong></div>`;
+        : `<div class="summary-line"><span><i class="fa-solid fa-motorcycle"></i> Costo de domicilio</span><strong class="fee-coord">Se cuadra con el domiciliario</strong></div>`;
     const totalNote = orderType === 'pickup'
         ? '<p class="total-note">Precio final. No hay costo de domicilio.</p>'
-        : '<p class="total-note"><i class="fa-solid fa-circle-info"></i> El costo del domicilio se confirma con la sede según tu ubicación.</p>';
+        : '<p class="total-note"><i class="fa-solid fa-circle-info"></i> El total corresponde solo a los productos. Nosotros te gestionamos el domiciliario y el valor del domicilio lo cuadras con él, por aparte, cuando te lleve el pedido.</p>';
     dom.checkoutSummary.innerHTML = `
         <div class="summary-items">${itemLines}</div>
         <div class="summary-totals">
@@ -1117,7 +1065,7 @@ function buildWhatsappMessage(data) {
         '',
         feeLine,
         `${totalLabel} ${formatCOP(total)}`,
-        isPickup ? null : '_(el costo del domicilio se suma al total según distancia)_',
+        isPickup ? null : '_(el total es solo de los productos; el valor del domicilio se cuadra por aparte con el domiciliario en la entrega)_',
         '',
         ...customerInfo,
         data.notas ? `📝 ${data.notas}` : null,
@@ -1335,9 +1283,11 @@ if (dom.fab) {
         dom.successAgain.addEventListener('click', resetOrderFlow);
     }
 
-    // ESC cierra modal
+    // ESC cierra modal (salvo que el modal legal esté abierto encima)
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && dom.modal.classList.contains('open')) closeDelivery();
+        if (e.key !== 'Escape') return;
+        if (document.querySelector('.legal-modal.open')) return;
+        if (dom.modal.classList.contains('open')) closeDelivery();
     });
 }
 
@@ -1347,6 +1297,53 @@ renderFullMenu();
 document.querySelectorAll('[data-open-delivery]').forEach(btn =>
     btn.addEventListener('click', openDelivery)
 );
+
+// ============= MODAL LEGAL (Términos, Condiciones y Privacidad) =============
+// Se abre desde el footer, el checkout y la nota de privacidad del mapa.
+// Puede abrirse ENCIMA del modal de domicilios, por eso guarda y restaura
+// el overflow previo del body en vez de limpiarlo siempre.
+const legalModal = document.getElementById('legalModal');
+const legalBody = document.getElementById('legalBody');
+let legalPrevOverflow = '';
+
+function openLegal(sectionId) {
+    if (!legalModal) return;
+    legalPrevOverflow = document.body.style.overflow;
+    legalModal.classList.add('open');
+    legalModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    if (legalBody) legalBody.scrollTop = 0;
+    if (sectionId) {
+        const target = document.getElementById(sectionId);
+        if (target) {
+            requestAnimationFrame(() => {
+                target.scrollIntoView({ block: 'start' });
+                target.classList.remove('highlight');
+                void target.offsetWidth; // reinicia la animación de resaltado
+                target.classList.add('highlight');
+            });
+        }
+    }
+}
+function closeLegal() {
+    if (!legalModal) return;
+    legalModal.classList.remove('open');
+    legalModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = legalPrevOverflow;
+}
+
+document.querySelectorAll('[data-open-legal]').forEach(el => {
+    el.addEventListener('click', (e) => {
+        e.preventDefault();
+        openLegal(el.getAttribute('data-open-legal') || null);
+    });
+});
+document.querySelectorAll('[data-close-legal]').forEach(el =>
+    el.addEventListener('click', closeLegal)
+);
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && legalModal && legalModal.classList.contains('open')) closeLegal();
+});
 
 // ============= SCROLL PROGRESS BAR =============
 const scrollProgress = document.getElementById('scrollProgress');
