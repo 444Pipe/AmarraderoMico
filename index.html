@@ -5,6 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="El Amarradero del Mico - Restaurante folclórico llanero en Villavicencio. Mamona, carne a la llanera y tradición desde 1998.">
     <title>El Amarradero del Mico — Sabor Llanero desde 1998</title>
+    <link rel="canonical" href="__SITE_URL__/">
+
+    <!-- Open Graph (WhatsApp, Facebook, Instagram) -->
+    <meta property="og:type" content="restaurant">
+    <meta property="og:title" content="El Amarradero del Mico — Sabor Llanero desde 1998">
+    <meta property="og:description" content="Restaurante folclórico llanero en Villavicencio. Mamona, carne a la llanera y tradición desde 1998. Pide a domicilio.">
+    <meta property="og:url" content="__SITE_URL__/">
+    <meta property="og:image" content="__SITE_URL__/statics/img/principal2.jpg">
+    <meta property="og:locale" content="es_CO">
+    <meta property="og:site_name" content="El Amarradero del Mico">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="El Amarradero del Mico — Sabor Llanero desde 1998">
+    <meta name="twitter:description" content="Restaurante folclórico llanero en Villavicencio. Mamona, carne a la llanera y tradición desde 1998.">
+    <meta name="twitter:image" content="__SITE_URL__/statics/img/principal2.jpg">
     <link rel="icon" type="image/png" sizes="32x32" href="statics/logodelmico.png">
     <link rel="icon" type="image/png" sizes="192x192" href="statics/logodelmico.png">
     <link rel="apple-touch-icon" href="statics/logodelmico.png">
@@ -14,9 +30,38 @@
     <link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="dns-prefetch" href="https://unpkg.com">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;900&family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;900&family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="styles.css?v=20260702i">
+    <link rel="stylesheet" href="styles.css?v=20260710a">
+
+    <!-- Datos estructurados para Google (rich results de restaurante) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Restaurant",
+        "name": "El Amarradero del Mico",
+        "url": "__SITE_URL__/",
+        "image": "__SITE_URL__/statics/img/principal2.jpg",
+        "logo": "__SITE_URL__/statics/logodelmico.png",
+        "telephone": "+57 315 926 5910",
+        "servesCuisine": ["Comida llanera", "Carne a la llanera", "Mamona"],
+        "priceRange": "$$",
+        "foundingDate": "1998",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Kilómetro 1 vía aeropuerto Vanguardia",
+            "addressLocality": "Villavicencio",
+            "addressRegion": "Meta",
+            "addressCountry": "CO"
+        },
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 4.1659871,
+            "longitude": -73.6235892
+        },
+        "hasMap": "https://www.google.com/maps/place/EL+AMARRADERO+DEL+MICO/@4.1659871,-73.6235892,17z"
+    }
+    </script>
 </head>
 <body class="loading">
 
@@ -80,7 +125,7 @@
                     </div>
                     <div class="cart-totals" id="cartTotals" hidden>
                         <div class="cart-row"><span>Subtotal</span><strong id="cartSubtotal">$0</strong></div>
-                        <div class="cart-row"><span>Domicilio</span><strong id="cartDelivery">$5.000</strong></div>
+                        <div class="cart-row"><span>Domicilio</span><strong id="cartDelivery">Según ubicación</strong></div>
                         <div class="cart-row cart-total"><span>Total</span><strong id="cartTotal">$0</strong></div>
                         <button class="btn btn-primary cart-checkout" id="cartCheckout">
                             <i class="fa-solid fa-arrow-right"></i> Continuar al pedido
@@ -165,7 +210,7 @@
                             <div class="row-icon"><i class="fa-solid fa-phone"></i></div>
                             <div class="row-content">
                                 <label class="row-label">Teléfono de contacto</label>
-                                <input type="tel" name="telefono" placeholder="Ej: 320 858 3991" required>
+                                <input type="tel" name="telefono" placeholder="Ej: 320 858 3991" required inputmode="tel" pattern="[0-9+()\s-]{7,17}" title="Escribe un número de celular válido, ej: 320 858 3991">
                             </div>
                         </div>
                     </div>
@@ -324,7 +369,7 @@
     <section class="historia" id="historia">
         <div class="historia-container">
             <div class="historia-img">
-                <img src="statics/img/principal2.jpg" alt="Preparación de la mamona">
+                <img src="statics/img/principal2.jpg" alt="Preparación de la mamona" loading="lazy" decoding="async">
                 <div class="historia-badge">
                     <span>Fundado</span>
                     <strong>1998</strong>
@@ -353,7 +398,7 @@
 
         <div class="carta-grid">
             <article class="dish dish-large">
-                <img src="statics/img/comida4.jpg" alt="Carne de mamona asada al palo sobre brasa de leña">
+                <img src="statics/img/comida4.jpg" alt="Carne de mamona asada al palo sobre brasa de leña" loading="lazy" decoding="async">
                 <div class="dish-info">
                     <h3>Mamona al Palo</h3>
                     <p>Nuestro plato insignia: ternera asada al palo, lento sobre brasa de leña.</p>
@@ -361,35 +406,35 @@
                 </div>
             </article>
             <article class="dish">
-                <img src="statics/img/comida2.jpg" alt="Mojarra del río con papa criolla y patacón">
+                <img src="statics/img/comida2.jpg" alt="Mojarra del río con papa criolla y patacón" loading="lazy" decoding="async">
                 <div class="dish-info">
                     <h3>Mojarra del Río</h3>
                     <p>Fresca del río, con papa criolla y patacón.</p>
                 </div>
             </article>
             <article class="dish">
-                <img src="statics/img/comida6.jpg" alt="Chicharrón carnudo y crocante">
+                <img src="statics/img/comida6.jpg" alt="Chicharrón carnudo y crocante" loading="lazy" decoding="async">
                 <div class="dish-info">
                     <h3>Chicharrón Carnudo</h3>
                     <p>Crocante por fuera y bien carnudo por dentro.</p>
                 </div>
             </article>
             <article class="dish">
-                <img src="statics/img/comida.jpg" alt="Cortes de carne a la brasa en tabla">
+                <img src="statics/img/comida.jpg" alt="Cortes de carne a la brasa en tabla" loading="lazy" decoding="async">
                 <div class="dish-info">
                     <h3>Carnes a la Brasa</h3>
                     <p>Cortes jugosos asados sobre leña, como en la sabana.</p>
                 </div>
             </article>
             <article class="dish">
-                <img src="statics/img/comida5.jpg" alt="Bandeja de mariscos con camarón, mejillón y cangrejo">
+                <img src="statics/img/comida5.jpg" alt="Bandeja de mariscos con camarón, mejillón y cangrejo" loading="lazy" decoding="async">
                 <div class="dish-info">
                     <h3>Bandeja de Mariscos</h3>
                     <p>Camarón, mejillón y cangrejo: del mar al llano.</p>
                 </div>
             </article>
             <article class="dish">
-                <img src="statics/img/DDD.jpg" alt="Picada llanera surtida en hoja de plátano">
+                <img src="statics/img/DDD.jpg" alt="Picada llanera surtida en hoja de plátano" loading="lazy" decoding="async">
                 <div class="dish-info">
                     <h3>Picada del Mico</h3>
                     <p>Pa' compartir en familia: surtido de carnes, rellena, papa y plátano.</p>
@@ -421,7 +466,7 @@
     <!-- ============= EXPERIENCIA / BANDA ============= -->
     <section class="experiencia">
         <div class="exp-img">
-            <img src="statics/img/dos.jpg" alt="Ambiente folclórico llanero">
+            <img src="statics/img/dos.jpg" alt="Ambiente folclórico llanero" loading="lazy" decoding="async">
         </div>
         <div class="exp-text">
             <span class="section-tag">La Experiencia</span>
@@ -448,7 +493,7 @@
 
             <article class="sede-card">
                 <div class="sede-img">
-                    <img src="statics/localvanguardia.jpg" alt="Sede Vanguardia">
+                    <img src="statics/localvanguardia.jpg" alt="Sede Vanguardia" loading="lazy" decoding="async">
                     <span class="sede-badge">Sede Principal</span>
                 </div>
                 <div class="sede-body">
@@ -468,7 +513,7 @@
 
             <article class="sede-card">
                 <div class="sede-img">
-                    <img src="statics/loxal7deagosto.jpg" alt="Sede 7 de Agosto">
+                    <img src="statics/loxal7deagosto.jpg" alt="Sede 7 de Agosto" loading="lazy" decoding="async">
                     <span class="sede-badge">Nueva Sede</span>
                 </div>
                 <div class="sede-body">
@@ -488,7 +533,7 @@
 
             <article class="sede-card">
                 <div class="sede-img">
-                    <img src="statics/localpuertolopez.jpg" alt="Sede Campestre - Vía Puerto López">
+                    <img src="statics/localpuertolopez.jpg" alt="Sede Campestre - Vía Puerto López" loading="lazy" decoding="async">
                     <span class="sede-badge">Sede Campestre</span>
                 </div>
                 <div class="sede-body">
@@ -535,7 +580,7 @@
             <article class="news-card">
                 <a href="https://www.eltiempo.com/mas-contenido/a-don-julio-hay-bastante-que-aprenderle-3385910" target="_blank" rel="noopener" class="news-link">
                     <div class="news-img">
-                        <img src="statics/noticias/noticia1.jpeg" alt="Don Julio César Falla Ballestero, fundador de El Amarradero del Mico">
+                        <img src="statics/noticias/noticia1.jpeg" alt="Don Julio César Falla Ballestero, fundador de El Amarradero del Mico" loading="lazy" decoding="async">
                         <span class="news-badge"><i class="fa-solid fa-newspaper"></i></span>
                     </div>
                     <div class="news-body">
@@ -553,7 +598,7 @@
             <article class="news-card">
                 <a href="https://www.las2orillas.co/yo-naci-con-un-tenedor-y-un-cuchillo-historia-de-un-restaurante-insignia/" target="_blank" rel="noopener" class="news-link">
                     <div class="news-img">
-                        <img src="statics/noticias/NOTICIA2.jpg" alt="El Amarradero del Mico en Las2Orillas">
+                        <img src="statics/noticias/NOTICIA2.jpg" alt="El Amarradero del Mico en Las2Orillas" loading="lazy" decoding="async">
                         <span class="news-badge"><i class="fa-solid fa-newspaper"></i></span>
                     </div>
                     <div class="news-body">
@@ -571,7 +616,7 @@
             <article class="news-card">
                 <a href="https://www.pulzo.com/vivir-bien/viajes-y-turismo/cuanto-vale-comer-restaurante-amarradero-mico-villavicencio-PP4196450" target="_blank" rel="noopener" class="news-link">
                     <div class="news-img">
-                        <img src="statics/localvanguardia.jpg" alt="Local principal de El Amarradero del Mico en Vanguardia">
+                        <img src="statics/localvanguardia.jpg" alt="Local principal de El Amarradero del Mico en Vanguardia" loading="lazy" decoding="async">
                         <span class="news-badge"><i class="fa-solid fa-newspaper"></i></span>
                     </div>
                     <div class="news-body">
@@ -594,7 +639,7 @@
     <!-- ============= CTA / RESERVAS ============= -->
     <section class="cta" id="contacto">
         <div class="cta-bg">
-            <img src="statics/img/DDD.jpg" alt="">
+            <img src="statics/img/DDD.jpg" alt="" loading="lazy" decoding="async">
         </div>
         <div class="cta-content">
             <span class="section-tag light">Reservas y Eventos</span>
@@ -645,6 +690,9 @@
         </div>
     </footer>
 
-    <script defer src="script.js?v=20260702i"></script>
+    <!-- menu-data.js define window.MENU_DATA y debe cargarse ANTES de script.js
+         (ambos defer: se ejecutan en orden de aparición). -->
+    <script defer src="menu-data.js?v=20260710a"></script>
+    <script defer src="script.js?v=20260710a"></script>
 </body>
 </html>

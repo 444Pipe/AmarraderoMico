@@ -65,7 +65,7 @@ body {
 }
 
 img, video, iframe { max-width: 100%; }
-body.loading { overflow: hidden; height: 100vh; }
+body.loading { overflow: hidden; height: 100vh; height: 100dvh; }
 
 /* ============= FAB DOMICILIO ============= */
 .fab-delivery {
@@ -127,6 +127,7 @@ body.loading { overflow: hidden; height: 100vh; }
     position: absolute;
     inset: 0;
     background: rgba(20, 12, 8, 0.75);
+    -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
     animation: fadeIn 0.3s;
 }
@@ -1427,11 +1428,11 @@ body.loading { overflow: hidden; height: 100vh; }
     font-size: 0.85rem;
     color: var(--color-text-soft);
     line-height: 1.45;
-    animation: fadeIn 0.3s ease;
+    animation: fadeInDown 0.3s ease;
 }
 .rappi-style .payment-info[hidden] { display: none !important; }
 .rappi-style .payment-info i { color: var(--color-rust); font-size: 1rem; margin-top: 2px; flex-shrink: 0; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeInDown { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 .rappi-style .payment-extra { padding: 8px 20px 4px; margin-top: 4px; }
 .rappi-style .payment-extra input {
     width: 100% !important;
@@ -2107,7 +2108,6 @@ body.loading { overflow: hidden; height: 100vh; }
     opacity: 0;
     transform: translateY(50px);
     transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: opacity, transform;
 }
 .reveal.from-left { transform: translateX(-40px); }
 .reveal.from-right { transform: translateX(40px); }
@@ -2242,6 +2242,7 @@ a { text-decoration: none; color: inherit; }
 }
 .navbar.scrolled {
     background: rgba(45, 24, 16, 0.95);
+    -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
     padding: 8px 0;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
@@ -2313,6 +2314,7 @@ a { text-decoration: none; color: inherit; }
 .hero {
     position: relative;
     height: 100vh;
+    height: 100dvh;
     min-height: 700px;
     overflow: hidden;
     display: flex;
@@ -2343,7 +2345,6 @@ a { text-decoration: none; color: inherit; }
     max-width: 900px;
     padding: 0 30px;
     animation: fadeUp 1.2s ease-out;
-    will-change: transform, opacity;
 }
 .hero-tag {
     display: inline-block;
@@ -2355,6 +2356,7 @@ a { text-decoration: none; color: inherit; }
     border: 1px solid var(--color-gold-bright);
     border-radius: 30px;
     margin-bottom: 28px;
+    -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
 }
 .hero-title {
@@ -2412,6 +2414,7 @@ a { text-decoration: none; color: inherit; }
     background: transparent;
     color: var(--color-white);
     border: 2px solid rgba(255,255,255,0.4);
+    -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
 }
 .btn-ghost:hover {
@@ -2930,7 +2933,9 @@ a { text-decoration: none; color: inherit; }
        El desborde se maneja limpio (imagen recortada por object-fit,
        texto con scroll interno solo si no cupiera). */
     min-height: 100vh;
+    min-height: 100dvh;
     max-height: 100vh;
+    max-height: 100dvh;
     overflow: hidden;
 }
 .exp-img {
@@ -3506,6 +3511,7 @@ a { text-decoration: none; color: inherit; }
         position: fixed;
         top: 78px; left: 0; right: 0;
         background: rgba(45, 24, 16, 0.98);
+        -webkit-backdrop-filter: blur(15px);
         backdrop-filter: blur(15px);
         flex-direction: column;
         padding: 32px 24px;

@@ -166,6 +166,14 @@
         .meta .row { display: flex; align-items: flex-start; gap: 9px; }
         .meta .row i { color: var(--rust); width: 16px; text-align: center; margin-top: 2px; }
 
+        /* Estado del pago en línea (Wompi): la mesera debe distinguir un pedido
+           pagado de uno que solo inició el checkout y nunca pagó. */
+        .pago-chip { display: inline-flex; align-items: center; gap: 6px; font-size: .76rem;
+                     font-weight: 700; padding: 3px 10px; border-radius: 999px; }
+        .pago-chip.pendiente { background: #FFF3D6; color: #9a6b00; border: 1px solid #EDD9A3; }
+        .pago-chip.aprobado { background: #E5EEE6; color: var(--green); border: 1px solid #CFE0D1; }
+        .pago-chip.rechazado { background: #f7e3e0; color: var(--red); border: 1px solid #e7c4bf; }
+
         .items { margin: 6px 0 10px; padding: 12px 14px; background: linear-gradient(135deg, var(--bg), #fff); border: 1px solid var(--cream); border-radius: 12px; }
         .items .line { display: flex; justify-content: space-between; gap: 10px; font-size: .9rem; padding: 3px 0; color: var(--text); }
         .items .line .q { font-weight: 600; color: var(--brown); }
@@ -343,6 +351,19 @@
                         {% else %}
                             <div class="row"><i class="fa-solid fa-store"></i><span>Recoge en Sede Vanguardia</span></div>
                         {% endif %}
+                        <div class="row"><i class="fa-solid fa-money-bill-wave"></i><span>
+                            {% if p.metodo_pago == 'pse' %}
+                                {% if p.estado_pago == 'aprobado' %}
+                                    <span class="pago-chip aprobado"><i class="fa-solid fa-circle-check"></i> Pagado en línea (Wompi)</span>
+                                {% elif p.estado_pago == 'rechazado' %}
+                                    <span class="pago-chip rechazado"><i class="fa-solid fa-circle-xmark"></i> Pago en línea rechazado</span>
+                                {% else %}
+                                    <span class="pago-chip pendiente"><i class="fa-solid fa-hourglass-half"></i> Esperando pago en línea — NO pagado aún</span>
+                                {% endif %}
+                            {% else %}
+                                Efectivo{% if p.paga_con %} · paga con {{ p.paga_con }}{% endif %}
+                            {% endif %}
+                        </span></div>
                     </div>
 
                     <div class="items">
@@ -419,7 +440,7 @@
                     </div>
                     <div class="meta">
                         <div class="row"><i class="fa-solid fa-phone"></i><span>{{ p.telefono }}</span></div>
-                        <div class="row"><i class="fa-solid fa-money-bill-wave"></i><span>${{ p.subtotal|intcomma }}</span></div>
+                        <div class="row"><i class="fa-solid fa-money-bill-wave"></i><span>${{ p.subtotal|intcomma }}{% if p.metodo_pago == 'pse' %} · {% if p.estado_pago == 'aprobado' %}pagado en línea{% elif p.estado_pago == 'rechazado' %}pago rechazado{% else %}pago sin completar{% endif %}{% endif %}</span></div>
                     </div>
                     <div class="when"><i class="fa-regular fa-clock"></i> {{ p.creado|date:"d/m · H:i" }}</div>
                     {% if p.whatsapp_url %}
@@ -492,7 +513,7 @@
             try {
                 const r = await fetch("{% url 'pedidos_json' %}", { cache: 'no-store' });
                 const d = await r.json();
-                const hayNuevo = d.ultimo !== ULTIMO_ACTUAL && d.ultimo > ULTIMO_ACTUAL;
+                const hayNuevo = d.ultimo > ULTIMO_ACTUAL;
                 if (hayNuevo) {
                     chime();
                     toast.classList.add('show');

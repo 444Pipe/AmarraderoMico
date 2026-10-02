@@ -198,9 +198,29 @@ WOMPI_PUBLIC_KEY = os.environ.get('WOMPI_PUBLIC_KEY', '').strip()
 WOMPI_PRIVATE_KEY = os.environ.get('WOMPI_PRIVATE_KEY', '').strip()
 WOMPI_INTEGRITY_SECRET = os.environ.get('WOMPI_INTEGRITY_SECRET', '').strip()
 WOMPI_EVENTS_SECRET = os.environ.get('WOMPI_EVENTS_SECRET', '').strip()
-WOMPI_ENV = os.environ.get('WOMPI_ENV', 'sandbox').strip()  # 'sandbox' o 'production'
-WOMPI_CHECKOUT_URL = (
-    'https://checkout.wompi.co/p/'
-    if WOMPI_ENV == 'production'
-    else 'https://checkout.wompi.co/p/'
-)
+# La URL del checkout es la misma en sandbox y produccion: el entorno lo
+# determinan las llaves (pub_test_... vs pub_prod_...).
+WOMPI_CHECKOUT_URL = 'https://checkout.wompi.co/p/'
+
+
+# --- Logging ---
+# Todo a stdout: Railway captura la salida del proceso y la muestra en sus logs.
+# Los warnings de la app (webhook con firma/monto inválido, pedidos rechazados,
+# errores guardando) quedan visibles en producción en lugar de perderse.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {'format': '{levelname} {asctime} {name} {message}', 'style': '{'},
+    },
+    'handlers': {
+        'console': {'class': 'logging.StreamHandler', 'formatter': 'simple'},
+    },
+    'root': {'handlers': ['console'], 'level': 'INFO'},
+    'loggers': {
+        # Errores 5xx y excepciones no capturadas de las vistas
+        'django.request': {'level': 'WARNING'},
+        # Evita el ruido de un access-log por request (gunicorn ya registra lo suyo)
+        'django.server': {'level': 'WARNING'},
+    },
+}

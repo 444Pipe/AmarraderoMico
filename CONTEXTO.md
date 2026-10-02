@@ -122,6 +122,23 @@ desde el admin (ruta secreta `/gestion-mico-9q2x/`) → Usuarios, crea un usuari
 > `DATABASE_URL = ${{Postgres.DATABASE_URL}}`, `DEBUG=false` y Cloudinary activo.
 > ⚠️ No quites `DATABASE_URL`: con SQLite la base se borra en cada despliegue (se perderían los pedidos).
 
+## Backups de la base de datos
+
+Los pedidos y clientes viven en el Postgres de Railway. **No hay backup automático configurado**, así que el plan es:
+
+1. **Backups de Railway (recomendado activarlo):** en el dashboard de Railway → servicio *Postgres* → pestaña **Backups**, activar los backups programados (diarios). Es lo primero que hay que encender; según el plan puede tener costo.
+2. **Backup manual (antes de cambios grandes o migraciones):** con la [CLI de Railway](https://docs.railway.app/guides/cli) instalada y logueada:
+   ```bash
+   railway run --service Postgres bash -c 'pg_dump "$DATABASE_URL" -Fc -f amarradero-$(date +%Y%m%d).dump'
+   ```
+   O en local, copiando la `DATABASE_URL` **pública** desde Railway (la interna `postgres.railway.internal` no sirve fuera de Railway):
+   ```bash
+   pg_dump "postgresql://usuario:clave@host-publico:puerto/railway" -Fc -f amarradero-20260710.dump
+   ```
+3. **Restaurar:** `pg_restore --clean --no-owner -d "$DATABASE_URL" archivo.dump`.
+
+Guardar los dumps fuera de Railway (Drive/disco local). Regla mínima mientras no haya automatización: **un dump manual por semana** y siempre uno antes de tocar migraciones o el servicio de Postgres.
+
 ## WhatsApp de la sede
 
 `script.js` → `DELIVERY_CONFIG.whatsapp = '573159265910'` (número de la Sede Principal / Vanguardia, al que llega el pedido).

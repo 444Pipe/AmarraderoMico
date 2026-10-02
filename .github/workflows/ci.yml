@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          # 3.12 y no 3.13: psycopg2-binary 2.9.9 no publica wheels cp313
+          python-version: '3.12'
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Tests
+        run: python manage.py test orders -v 2
+        env:
+          DEBUG: 'true'
+
+      - name: Checks de deploy
+        # Corre con la config de produccion (DEBUG=false) para validar la
+        # postura de seguridad; la SECRET_KEY es de mentira, solo para el check.
+        run: python manage.py check --deploy
+        env:
+          SECRET_KEY: ci-Kx7mQ2vRt9pLw4Zc8bNy3JhFs6TgAe5XdUoWi1qYnHkPjM0rSlBvGfD
+          RAILWAY_PUBLIC_DOMAIN: ci.example.test

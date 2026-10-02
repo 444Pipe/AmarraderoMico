@@ -1,17 +1,21 @@
 import hashlib
 import json
+import logging
 import re
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
-from . import analytics
+from . import analytics, catalogo
 from .models import Pedido
+
+logger = logging.getLogger(__name__)
 
 INDEX_PATH = settings.BASE_DIR / 'index.html'
 
@@ -43,6 +47,8 @@ def home(request):
                 lambda m: f'{m.group(1)}="{_cloudinary_url(m.group(2))}"',
                 html,
             )
+        # URLs absolutas para OG/JSON-LD; en local (sin SITE_URL) quedan relativas
+        html = html.replace('__SITE_URL__', settings.SITE_URL)
         _INDEX_HTML_CACHE = html
     response = HttpResponse(_INDEX_HTML_CACHE)
     # Permite al navegador cachear el HTML por 5 min (con revalidacion)
@@ -51,15 +57,91 @@ def home(request):
 
 
 def healthz(request):
+    """Healthcheck de Railway: verifica que la BD responde, no solo que el proceso vive."""
+    from django.db import connection
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT 1')
+    except Exception:
+        logger.exception('healthz: la base de datos no responde')
+        return JsonResponse({'status': 'degraded'}, status=503)
     return JsonResponse({'status': 'ok'})
 
 
+def robots_txt(request):
+    """robots.txt: la landing es indexable; el panel, la API y el pago no aportan a SEO."""
+    lines = [
+        'User-agent: *',
+        'Allow: /',
+        'Disallow: /panel/',
+        'Disallow: /api/',
+        'Disallow: /pago/',
+    ]
+    if settings.SITE_URL:
+        lines += ['', f'Sitemap: {settings.SITE_URL}/sitemap.xml']
+    return HttpResponse('\n'.join(lines) + '\n', content_type='text/plain')
+
+
+def sitemap_xml(request):
+    """Sitemap mínimo: el sitio público es una sola página."""
+    base = settings.SITE_URL or f'https://{request.get_host()}'
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        f'  <url><loc>{base}/</loc><changefreq>monthly</changefreq></url>\n'
+        '</urlset>\n'
+    )
+    return HttpResponse(xml, content_type='application/xml')
+
+
 # ---------------- API pública: recibir pedido del formulario web ----------------
+
+# Límites anti-abuso del endpoint público (hallazgos #6 y #9 de la auditoría).
+MAX_ITEMS_PEDIDO = 60        # renglones distintos por pedido (la carta tiene 92 platos)
+MAX_QTY_POR_ITEM = 50
+MAX_NOTAS = 500
+RATE_LIMIT_PEDIDOS = 10      # pedidos por IP...
+RATE_LIMIT_VENTANA = 10 * 60  # ...cada 10 minutos
+
+
+def _client_ip(request):
+    """IP real del cliente detrás del proxy de Railway (X-Forwarded-For)."""
+    xff = request.META.get('HTTP_X_FORWARDED_FOR', '')
+    if xff:
+        return xff.split(',')[0].strip()
+    return request.META.get('REMOTE_ADDR', '')
+
+
+def _rate_limited(request):
+    """True si esta IP ya agotó su cupo de pedidos en la ventana.
+
+    Usa el cache por defecto (memoria local del proceso): con varios workers
+    cada uno lleva su propia cuenta, suficiente para frenar spam de scripts a
+    este volumen sin infraestructura extra. El cupo es holgado a propósito:
+    los celulares en Colombia comparten IP por CGNAT."""
+    ip = _client_ip(request)
+    if not ip:
+        return False
+    key = f'rl-pedidos-{ip}'
+    cache.add(key, 0, RATE_LIMIT_VENTANA)
+    try:
+        intentos = cache.incr(key)
+    except ValueError:  # la clave expiró entre add e incr
+        cache.set(key, 1, RATE_LIMIT_VENTANA)
+        intentos = 1
+    return intentos > RATE_LIMIT_PEDIDOS
+
 
 @csrf_exempt
 @require_POST
 def crear_pedido(request):
     """Recibe el pedido del formulario (fetch JSON) y lo guarda. Devuelve el id creado."""
+    if _rate_limited(request):
+        return JsonResponse(
+            {'ok': False, 'error': 'Demasiados pedidos seguidos. Espera unos minutos.'},
+            status=429,
+        )
+
     try:
         data = json.loads(request.body.decode('utf-8'))
     except (ValueError, UnicodeDecodeError):
@@ -70,28 +152,57 @@ def crear_pedido(request):
     if not nombre or not telefono:
         return JsonResponse({'ok': False, 'error': 'Faltan nombre o teléfono'}, status=400)
 
+    # Validación laxa del teléfono (#16): la mesera confirma por WhatsApp, así que
+    # basta con que parezca un número marcable (celular CO: 10 dígitos; con +57: 12).
+    telefono_digitos = re.sub(r'\D', '', telefono)
+    if not 7 <= len(telefono_digitos) <= 15:
+        return JsonResponse(
+            {'ok': False, 'error': 'El teléfono no parece válido. Revísalo e intenta de nuevo.'},
+            status=400,
+        )
+
     items = data.get('items') or []
     if not isinstance(items, list):
         items = []
+    if len(items) > MAX_ITEMS_PEDIDO:
+        return JsonResponse({'ok': False, 'error': 'Demasiados artículos en el pedido'}, status=400)
 
-    # Recalculamos el subtotal en el servidor (no confiamos en el del cliente).
+    # Precios server-side (#5): del cliente solo se usan id y qty; el nombre y el
+    # precio salen del catálogo del servidor (menu-data.js). El `price` del payload
+    # se ignora, así que falsearlo no cambia lo que se cobra.
+    try:
+        carta = catalogo.catalogo()
+    except Exception:
+        logger.exception('No se pudo cargar el catálogo (menu-data.js)')
+        return JsonResponse({'ok': False, 'error': 'Error interno con la carta'}, status=500)
+
     subtotal = 0
     limpios = []
     for it in items:
         if not isinstance(it, dict):
             continue
         try:
-            qty = max(0, int(it.get('qty', 0)))
-            price = max(0, int(it.get('price', 0)))
+            qty = int(it.get('qty', 0))
         except (TypeError, ValueError):
             continue
-        limpios.append({
-            'id': str(it.get('id', '')),
-            'name': str(it.get('name', 'Artículo'))[:120],
-            'qty': qty,
-            'price': price,
-        })
-        subtotal += qty * price
+        qty = min(max(0, qty), MAX_QTY_POR_ITEM)
+        if qty == 0:
+            continue
+        plato_id = str(it.get('id', ''))
+        plato = carta.get(plato_id)
+        if plato is None:
+            # id fuera de la carta: puede ser manipulación o una carta vieja en el
+            # cache del navegador. Se rechaza el pedido (WhatsApp queda de respaldo).
+            logger.warning('Pedido rechazado: artículo desconocido %r (ip %s)', plato_id, _client_ip(request))
+            return JsonResponse(
+                {'ok': False, 'error': 'Un artículo ya no está en la carta. Recarga la página e intenta de nuevo.'},
+                status=400,
+            )
+        limpios.append({'id': plato_id, 'name': plato['name'], 'qty': qty, 'price': plato['price']})
+        subtotal += qty * plato['price']
+
+    if not limpios:
+        return JsonResponse({'ok': False, 'error': 'El pedido no tiene artículos'}, status=400)
 
     tipo = data.get('tipo')
     if tipo not in (Pedido.TIPO_DELIVERY, Pedido.TIPO_PICKUP):
@@ -112,20 +223,24 @@ def crear_pedido(request):
         else Pedido.ESTADO_PAGO_NO_APLICA
     )
 
-    pedido = Pedido.objects.create(
-        nombre=nombre[:120],
-        telefono=telefono[:30],
-        tipo=tipo,
-        direccion=(data.get('direccion') or '').strip()[:255],
-        notas=(data.get('notas') or '').strip(),
-        lat=_coord(data.get('lat')),
-        lng=_coord(data.get('lng')),
-        items=limpios,
-        subtotal=subtotal,
-        metodo_pago=metodo_pago,
-        paga_con=(data.get('paga_con') or '').strip()[:60],
-        estado_pago=estado_pago,
-    )
+    try:
+        pedido = Pedido.objects.create(
+            nombre=nombre[:120],
+            telefono=telefono[:30],
+            tipo=tipo,
+            direccion=(data.get('direccion') or '').strip()[:255],
+            notas=(data.get('notas') or '').strip()[:MAX_NOTAS],
+            lat=_coord(data.get('lat')),
+            lng=_coord(data.get('lng')),
+            items=limpios,
+            subtotal=subtotal,
+            metodo_pago=metodo_pago,
+            paga_con=(data.get('paga_con') or '').strip()[:60],
+            estado_pago=estado_pago,
+        )
+    except Exception:
+        logger.exception('Error guardando pedido de %r', telefono[:30])
+        return JsonResponse({'ok': False, 'error': 'No se pudo guardar el pedido'}, status=500)
 
     payload = {'ok': True, 'id': pedido.pk}
 
@@ -182,6 +297,12 @@ def _build_wompi_checkout_url(pedido):
 @require_POST
 def wompi_webhook(request):
     """Webhook de Wompi: notifica cuando una transaccion cambia de estado."""
+    # Fail-closed: sin secreto de eventos no podemos verificar la firma, y este
+    # endpoint es publico. Nunca procesar un evento cuya firma no se pueda validar.
+    if not settings.WOMPI_EVENTS_SECRET:
+        logger.error('Webhook de Wompi rechazado: WOMPI_EVENTS_SECRET no esta configurado')
+        return JsonResponse({'ok': False, 'error': 'webhook no configurado'}, status=403)
+
     try:
         body = json.loads(request.body.decode('utf-8'))
     except (ValueError, UnicodeDecodeError):
@@ -193,22 +314,21 @@ def wompi_webhook(request):
     timestamp = body.get('timestamp', '')
     data = body.get('data') or {}
 
-    if settings.WOMPI_EVENTS_SECRET:
-        concat = ''
-        for prop in properties:
-            # prop puede ser "transaction.id", navegamos el data dict
-            value = data
-            for part in prop.split('.'):
-                if isinstance(value, dict):
-                    value = value.get(part)
-                else:
-                    value = None
-                    break
-            concat += str(value if value is not None else '')
-        concat += str(timestamp) + settings.WOMPI_EVENTS_SECRET
-        expected = hashlib.sha256(concat.encode('utf-8')).hexdigest()
-        if expected != signature:
-            return JsonResponse({'ok': False, 'error': 'firma invalida'}, status=403)
+    concat = ''
+    for prop in properties:
+        # prop puede ser "transaction.id", navegamos el data dict
+        value = data
+        for part in prop.split('.'):
+            if isinstance(value, dict):
+                value = value.get(part)
+            else:
+                value = None
+                break
+        concat += str(value if value is not None else '')
+    concat += str(timestamp) + settings.WOMPI_EVENTS_SECRET
+    expected = hashlib.sha256(concat.encode('utf-8')).hexdigest()
+    if expected != signature:
+        return JsonResponse({'ok': False, 'error': 'firma invalida'}, status=403)
 
     # Actualizar pedido segun el evento
     tx = (data.get('transaction') or {})
@@ -219,12 +339,25 @@ def wompi_webhook(request):
     if reference:
         pedido = Pedido.objects.filter(wompi_reference=reference).first()
         if pedido:
-            pedido.wompi_transaction_id = tx_id
             if status == 'APPROVED':
+                # El monto aprobado debe ser exactamente el del pedido: un APPROVED
+                # con otro monto (reference reutilizado, evento manipulado) no paga nada.
+                try:
+                    monto_evento = int(tx.get('amount_in_cents'))
+                except (TypeError, ValueError):
+                    monto_evento = None
+                if monto_evento != pedido.subtotal * 100:
+                    logger.warning(
+                        'Webhook de Wompi descartado: monto %s no coincide con el '
+                        'esperado %s (pedido #%s, tx %s)',
+                        monto_evento, pedido.subtotal * 100, pedido.pk, tx_id,
+                    )
+                    return JsonResponse({'ok': False, 'error': 'monto no coincide'}, status=400)
                 pedido.estado_pago = Pedido.ESTADO_PAGO_APROBADO
             elif status in ('DECLINED', 'VOIDED', 'ERROR'):
                 pedido.estado_pago = Pedido.ESTADO_PAGO_RECHAZADO
-            pedido.save(update_fields=['wompi_transaction_id', 'estado_pago'])
+            pedido.wompi_transaction_id = tx_id
+            pedido.save(update_fields=['wompi_transaction_id', 'estado_pago', 'actualizado'])
 
     return JsonResponse({'ok': True})
 
@@ -236,6 +369,17 @@ def pago_resultado(request):
     if tx_id:
         pedido = Pedido.objects.filter(wompi_transaction_id=tx_id).first()
     return TemplateResponse(request, 'orders/pago_resultado.html', {'pedido': pedido, 'tx_id': tx_id})
+
+
+def pago_estado(request):
+    """Estado del pago por id de transaccion. Lo consulta el polling de pago_resultado:
+    el redirect del navegador suele llegar antes que el webhook de Wompi, asi que la
+    pagina nace "en proceso" y esta vista permite enterarse cuando el webhook aterrice."""
+    tx_id = (request.GET.get('id') or '').strip()[:80]
+    pedido = Pedido.objects.filter(wompi_transaction_id=tx_id).first() if tx_id else None
+    if pedido is None:
+        return JsonResponse({'estado': 'desconocido'})
+    return JsonResponse({'estado': pedido.estado_pago})
 
 
 # ---------------- Panel de la mesera (protegido) ----------------

@@ -14,10 +14,13 @@ urlpatterns = [
     # Landing
     path('', order_views.home, name='home'),
     path('healthz', order_views.healthz, name='healthz'),
+    path('robots.txt', order_views.robots_txt, name='robots_txt'),
+    path('sitemap.xml', order_views.sitemap_xml, name='sitemap_xml'),
 
     # Assets de la landing (conservan las rutas relativas del index.html)
     path('styles.css', static_serve, {'document_root': BASE_DIR, 'path': 'styles.css'}),
     path('script.js', static_serve, {'document_root': BASE_DIR, 'path': 'script.js'}),
+    path('menu-data.js', static_serve, {'document_root': BASE_DIR, 'path': 'menu-data.js'}),
     path('statics/<path:path>', static_serve, {'document_root': BASE_DIR / 'statics'}),
 
     # API de pedidos (la usa el formulario de la web)
@@ -26,6 +29,7 @@ urlpatterns = [
     # Wompi (pasarela PSE)
     path('api/wompi/webhook/', order_views.wompi_webhook, name='wompi_webhook'),
     path('pago/resultado/', order_views.pago_resultado, name='pago_resultado'),
+    path('pago/estado/', order_views.pago_estado, name='pago_estado'),
 
     # Panel de la mesera (requiere login)
     path('panel/', order_views.dashboard, name='dashboard'),

@@ -34,6 +34,27 @@
             <div class="pago-icon pending"><i class="fa-solid fa-clock"></i></div>
             <h1>Pago en proceso</h1>
             <p>Estamos verificando tu pago. Esto puede tardar unos minutos. Apenas se confirme, te avisaremos por WhatsApp.</p>
+            {% if tx_id %}
+            <script>
+            // La confirmacion de Wompi llega por webhook, normalmente segundos despues
+            // del redirect. Consultamos el estado unos ~90 s y recargamos al confirmarse.
+            (function () {
+                var intentos = 0;
+                var timer = setInterval(function () {
+                    if (++intentos > 18) { clearInterval(timer); return; }
+                    fetch('/pago/estado/?id=' + encodeURIComponent('{{ tx_id|escapejs }}'))
+                        .then(function (r) { return r.json(); })
+                        .then(function (d) {
+                            if (d.estado === 'aprobado' || d.estado === 'rechazado') {
+                                clearInterval(timer);
+                                location.reload();
+                            }
+                        })
+                        .catch(function () {});
+                }, 5000);
+            })();
+            </script>
+            {% endif %}
         {% endif %}
 
         <div class="pago-buttons">
