@@ -538,7 +538,7 @@ body.loading { overflow: hidden; height: 100vh; height: 100dvh; }
     transition: transform 0.25s;
 }
 .menu-item:hover { transform: translateY(-2px); }
-.menu-item img {
+.menu-item img:not(.menu-item-thumb) {
     width: 90px;
     height: 90px;
     border-radius: var(--radius-sm);

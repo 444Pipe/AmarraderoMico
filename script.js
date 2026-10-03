@@ -208,6 +208,15 @@ const POPULAR = new Set([
     'sancocho-gallina', 'punta-anca', 'carne-cerdo', 'costilla-cerdo-tulio',
 ]);
 
+// Platos de la vitrina "Los más pedidos del Mico". TEMPORAL: mientras llegan las
+// fotos de todos los POPULAR, la vitrina muestra solo platos que ya tienen foto
+// (primero los POPULAR con foto). Ver VITRINA_MAS_PEDIDOS.md para restaurarla.
+const VITRINA = [
+    'picada-3', 'picada-4', 'plato-mamona', 'chicharrones', 'punta-anca',
+    'palo-costilla-mixto', 'hamburguesa-mamona', 'arroz-mico', 'sancocho-res',
+    'platano-queso', 'rellena', 'arepa-casa',
+];
+
 // Filtros rápidos por antojo. `match` recibe el dataset (data-*) del plato.
 const ANTOJOS = [
     { key: 'todos', label: 'Todos', icon: null, match: () => true },
@@ -465,17 +474,17 @@ function renderFullMenu() {
 }
 
 // HTML de la vitrina "Los más pedidos del Mico": tarjetas horizontales con los
-// platos estrella (POPULAR). Cada tarjeta tiene un hueco de foto: si el item trae
+// platos de VITRINA. Cada tarjeta tiene un hueco de foto: si el item trae
 // `img` se muestra la foto; si no, un marcador ("Foto") a la espera de las imágenes.
 // Al tocar una tarjeta se abre el domicilio (el enlace [data-open-delivery] global).
 function popularStripHTML() {
-    const items = [...POPULAR].map(id => MENU_INDEX.get(id)).filter(Boolean);
+    const items = VITRINA.map(id => MENU_INDEX.get(id)).filter(Boolean);
     const cards = items.map(it => `
         <button type="button" class="fmp-card" data-open-delivery aria-label="Pedir ${it.name}">
             <span class="fmp-photo">
                 <span class="fmp-flame"><i class="fa-solid fa-fire" aria-hidden="true"></i></span>
                 ${it.img
-                    ? `<img src="${it.img}" alt="${it.name}" loading="lazy">`
+                    ? `<img src="${it.img}" alt="${it.name} - El Amarradero del Mico" loading="lazy">`
                     : `<i class="fa-solid fa-image fmp-ph-ic" aria-hidden="true"></i><span class="fmp-ph-txt">Foto</span>`}
             </span>
             <span class="fmp-body">
@@ -519,7 +528,7 @@ function getItemById(id) {
 // de Font Awesome según el tipo de plato. Si en el futuro trae `img`, va la foto.
 function itemThumb(item, cls) {
     if (item.img) {
-        return `<img src="${item.img}" alt="${item.name}" class="${cls}" loading="lazy">`;
+        return `<img src="${item.img}" alt="${item.name} - El Amarradero del Mico" class="${cls}" loading="lazy">`;
     }
     return `<span class="${cls} thumb-icon" aria-hidden="true"><i class="fa-solid ${item.icon || 'fa-utensils'}"></i></span>`;
 }
