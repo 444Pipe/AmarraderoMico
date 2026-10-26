@@ -1,4 +1,4 @@
-// Carta oficial de El Amarradero del Mico (menú 2026, Sede Vanguardia).
+// Carta oficial de El Amarradero del Mico (carta Diciembre 2025, Sede Vanguardia).
 // FUENTE ÚNICA DE LA CARTA: la leen el frontend (script.js, que pinta la
 // sección "Menú" de la landing y el menú del domicilio) y el backend
 // (orders/catalogo.py, que resuelve los PRECIOS en el servidor: el precio
@@ -25,24 +25,25 @@ window.MENU_DATA = [
             {"id":"platano-queso","name":"Plátano con Queso y Bocadillo","price":12000,"img":"statics/platos/platano-queso.jpg"}
     ]},
     {"id":"lo-tipico","name":"Lo Típico","icon":"fa-fire", "items": [
-            {"id":"plato-mamona","name":"Plato de Mamona","price":38000,"img":"statics/platos/plato-mamona.jpg"},
-            {"id":"carne-cerdo","name":"Carne de Cerdo","price":38000},
-            {"id":"carne-mixta","name":"Carne Mixta","price":38000},
+            {"id":"plato-mamona","name":"Plato de Mamona","price":40000,"img":"statics/platos/plato-mamona.jpg"},
+            {"id":"carne-cerdo","name":"Carne de Cerdo","price":40000},
+            {"id":"carne-mixta","name":"Carne Mixta","price":40000},
             {"id":"chuleta-res","name":"Chuleta de Res","price":45000},
-            {"id":"costilla-cerdo-tulio","name":"Costilla de Cerdo — Tulio","price":55000},
-            {"id":"palo-costilla-mixto","name":"Palo de Costilla Mixto","price":50000,"img":"statics/platos/palo-costilla-mixto.jpg"},
+            {"id":"costilla-cerdo-tulio","name":"Costilla de Cerdo — Tulio","price":60000},
+            {"id":"palo-costilla-mixto","name":"Palo de Costilla Mixto","price":55000,"img":"statics/platos/palo-costilla-mixto.jpg"},
             {"id":"costilla-res","name":"Costilla de Res","price":65000}
     ]},
     {"id":"pa-compartir","name":"Pa' Compartir","icon":"fa-users", "items": [
-            {"id":"picada-3","name":"Picada del Mico (3 pax aprox)","price":90000,"img":"statics/platos/picada-3.jpg"},
-            {"id":"picada-4","name":"Picada del Mico (4 pax aprox)","price":110000,"img":"statics/platos/picada-4.jpg"}
+            {"id":"picada-3","name":"Picada del Mico (3 pax aprox)","price":100000,"img":"statics/platos/picada-3.jpg"},
+            {"id":"picada-4","name":"Picada del Mico (4 pax aprox)","price":120000,"img":"statics/platos/picada-4.jpg"}
     ]},
     {"id":"otras-opciones","name":"Otras Opciones","icon":"fa-utensils", "items": [
             {"id":"hamburguesa-mamona","name":"Hamburguesa de Mamona","price":32000,"img":"statics/platos/hamburguesa-mamona.jpg"},
             {"id":"arroz-vegetariano","name":"Arroz Vegetariano","price":32000},
             {"id":"sudado-cola","name":"Sudado de Cola","price":40000},
-            {"id":"arroz-mico","name":"Arroz del Mico","price":40000,"img":"statics/platos/arroz-mico.jpg"},
-            {"id":"lengua-salsa","name":"Lengua en Salsa","price":42000},
+            {"id":"arroz-mico","name":"Arroz del Mico","price":45000,"img":"statics/platos/arroz-mico.jpg"},
+            {"id":"lengua-salsa","name":"Lengua en Salsa","price":50000},
+            {"id":"sudado-pata","name":"Sudado de Pata","price":40000},
             {"id":"costillas-bbq","name":"Costillas BBQ","price":35000},
             {"id":"salchipapa","name":"Salchipapa","price":20000}
     ]},
@@ -53,23 +54,23 @@ window.MENU_DATA = [
             {"id":"pechuga-hawaiana","name":"Pechuga Hawaiana","price":48000},
             {"id":"lomo-cerdo","name":"Lomo de Cerdo a la Parrilla","price":40000},
             {"id":"punta-anca","name":"Punta de Anca","price":55000,"img":"statics/platos/punta-anca.jpg"},
-            {"id":"churrasco","name":"Churrasco","price":48000},
+            {"id":"churrasco","name":"Churrasco","price":50000},
             {"id":"baby-beef","name":"Baby Beef","price":52000}
     ]},
     {"id":"pescados","name":"Pescados","icon":"fa-fish", "items": [
             {"id":"mojarra","name":"Mojarra Frita o en Salsa","price":50000},
             {"id":"trucha-ajillo","name":"Trucha al Ajillo","price":50000},
             {"id":"bagre","name":"Bagre Frito o en Salsa","price":50000},
-            {"id":"amarillo-monsenor","name":"Amarillo a la Monseñor","price":60000},
+            {"id":"amarillo-monsenor","name":"Amarillo a la Monseñor","price":65000},
             {"id":"cachama","name":"Cachama de Río","price":55000},
             {"id":"salmon-parrilla","name":"Salmón a la Parrilla","price":55000},
             {"id":"salmon-camaron","name":"Salmón con Camarón","price":65000},
-            {"id":"cazuela-mariscos","name":"Cazuela de Mariscos","price":60000}
+            {"id":"cazuela-mariscos","name":"Cazuela de Mariscos","price":65000}
     ]},
     {"id":"sopitas","name":"Sopitas","icon":"fa-bowl-food", "items": [
             {"id":"sancocho-res","name":"Sancocho de Res Especial","price":20000,"img":"statics/platos/sancocho-res.jpg"},
             {"id":"mondongo","name":"Mondongo","price":25000},
-            {"id":"sancocho-gallina","name":"Sancocho de Gallina","price":40000}
+            {"id":"sancocho-gallina","name":"Sancocho de Gallina","price":45000}
     ]},
     {"id":"desayunos","name":"Desayunos","icon":"fa-egg", "items": [
             {"id":"caldo-hueso","name":"Caldo de Hueso","price":15000},
@@ -80,11 +81,11 @@ window.MENU_DATA = [
             {"id":"huevos-rancheros","name":"Huevos Rancheros","price":15000},
             {"id":"hayaca","name":"Hayaca","price":19000},
             {"id":"omelette","name":"Omelette","price":16000},
-            {"id":"calentao-paisa","name":"Calentao Paisa","price":26000},
-            {"id":"higado-plancha","name":"Hígado a la Plancha","price":23000},
+            {"id":"calentao-paisa","name":"Calentao Paisa","price":30000},
+            {"id":"higado-plancha","name":"Hígado a la Plancha","price":25000},
             {"id":"carne-bisteck","name":"Carne en Bisteck","price":25000},
             {"id":"bisteck-caballo","name":"Bisteck a Caballo","price":28000},
-            {"id":"carne-plancha-des","name":"Carne a la Plancha","price":23000}
+            {"id":"carne-plancha-des","name":"Carne a la Plancha","price":25000}
     ]},
     {"id":"porciones","name":"Porciones","icon":"fa-plate-wheat", "items": [
             {"id":"papa-criolla","name":"Papa Criolla","price":10000},
@@ -114,7 +115,8 @@ window.MENU_DATA = [
             {"id":"gaseosa","name":"Gaseosa","price":5000},
             {"id":"gaseosa-15","name":"Gaseosa (1.5 Lt)","price":10000},
             {"id":"jugos-hit","name":"Jugos Hit","price":5000},
-            {"id":"agua-h2o","name":"Agua H2O","price":5000}
+            {"id":"agua-h2o","name":"Agua H2O","price":5000},
+            {"id":"cola-pola","name":"Cola & Pola","price":6000}
     ]},
     {"id":"bebidas-calientes","name":"Bebidas Calientes","icon":"fa-mug-hot", "items": [
             {"id":"tinto","name":"Tinto","price":4000},
@@ -128,7 +130,7 @@ window.MENU_DATA = [
             {"id":"cerveza-llanera","name":"Cerveza Llanera","price":11000},
             {"id":"cerveza-aguila","name":"Cerveza Águila / Poker / Light","price":6000},
             {"id":"club-colombia","name":"Club Colombia","price":9000},
-            {"id":"cerveza-stella","name":"Cerveza Stella Artois","price":6000},
+            {"id":"cerveza-stella","name":"Cerveza Stella Artois","price":10000},
             {"id":"aguardiente-botella","name":"Aguardiente (Botella)","price":120000},
             {"id":"aguardiente-media","name":"Aguardiente (Media)","price":70000}
     ]}
